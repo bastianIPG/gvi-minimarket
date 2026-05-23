@@ -81,10 +81,10 @@
             70% { transform: scale(1.22) rotate(var(--dot-rotate, 0deg)); }
             100% { transform: translateY(-2px) scale(1.12) rotate(var(--dot-rotate, 0deg)); }
         }
-        .pin-dot.filled:nth-child(1) { --dot-color: #0a84ff; --dot-shadow: rgba(10, 132, 255, 0.48); --dot-halo: rgba(10, 132, 255, 0.18); --dot-radius: 50%; }
-        .pin-dot.filled:nth-child(2) { --dot-color: #30d158; --dot-shadow: rgba(48, 209, 88, 0.46); --dot-halo: rgba(48, 209, 88, 0.18); --dot-radius: 9px; --dot-rotate: 45deg; }
-        .pin-dot.filled:nth-child(3) { --dot-color: #ff9f0a; --dot-shadow: rgba(255, 159, 10, 0.48); --dot-halo: rgba(255, 159, 10, 0.18); --dot-radius: 7px; }
-        .pin-dot.filled:nth-child(4) { --dot-color: #bf5af2; --dot-shadow: rgba(191, 90, 242, 0.5); --dot-halo: rgba(191, 90, 242, 0.2); --dot-radius: 50% 50% 8px 50%; --dot-rotate: -45deg; }
+        .pin-dot.filled:nth-child(1) { --dot-color: #1e90ff; --dot-shadow: rgba(30, 144, 255, 0.6); --dot-halo: rgba(30, 144, 255, 0.28); --dot-radius: 50%; }
+        .pin-dot.filled:nth-child(2) { --dot-color: #32d74b; --dot-shadow: rgba(50, 215, 75, 0.58); --dot-halo: rgba(50, 215, 75, 0.28); --dot-radius: 9px; --dot-rotate: 45deg; }
+        .pin-dot.filled:nth-child(3) { --dot-color: #ffb340; --dot-shadow: rgba(255, 179, 64, 0.6); --dot-halo: rgba(255, 179, 64, 0.28); --dot-radius: 7px; }
+        .pin-dot.filled:nth-child(4) { --dot-color: #d56bff; --dot-shadow: rgba(213, 107, 255, 0.62); --dot-halo: rgba(213, 107, 255, 0.3); --dot-radius: 50% 50% 8px 50%; --dot-rotate: -45deg; }
 
         .numpad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 2svh, 16px) clamp(10px, 3vw, 18px); }
         
@@ -101,12 +101,6 @@
             touch-action: manipulation;
         }
         body.dark-mode .num-btn { background: rgba(255,255,255,0.05); color: white; }
-        .num-btn.input-feedback {
-            background: var(--feedback-color, #0a84ff) !important;
-            color: white !important;
-            transform: scale(1.08);
-            box-shadow: 0 0 0 5px var(--feedback-halo, rgba(10, 132, 255, 0.18)), 0 12px 24px var(--feedback-shadow, rgba(10, 132, 255, 0.28));
-        }
         
         /* Hover y Active (Feedback táctil visual) */
         @media (hover: hover) {
@@ -210,12 +204,6 @@
         const errorMsg = document.getElementById('errorMsg');
         const loginBox = document.getElementById('loginBox');
         let isProcessing = false;
-        const feedbackColors = [
-            { color: '#0a84ff', halo: 'rgba(10, 132, 255, 0.18)', shadow: 'rgba(10, 132, 255, 0.36)' },
-            { color: '#30d158', halo: 'rgba(48, 209, 88, 0.18)', shadow: 'rgba(48, 209, 88, 0.34)' },
-            { color: '#ff9f0a', halo: 'rgba(255, 159, 10, 0.18)', shadow: 'rgba(255, 159, 10, 0.34)' },
-            { color: '#bf5af2', halo: 'rgba(191, 90, 242, 0.2)', shadow: 'rgba(191, 90, 242, 0.36)' }
-        ];
 
         function updateDots() {
             dots.forEach((dot, index) => {
@@ -233,25 +221,11 @@
             dot.classList.add('pop');
         }
 
-        function animatePressedNumber(num) {
-            const btn = document.querySelector(`[data-num="${num}"]`);
-            if (!btn) return;
-            const color = feedbackColors[(currentPin.length - 1) % feedbackColors.length];
-            btn.style.setProperty('--feedback-color', color.color);
-            btn.style.setProperty('--feedback-halo', color.halo);
-            btn.style.setProperty('--feedback-shadow', color.shadow);
-            btn.classList.remove('input-feedback');
-            void btn.offsetWidth;
-            btn.classList.add('input-feedback');
-            setTimeout(() => btn.classList.remove('input-feedback'), 520);
-        }
-
         async function addNumber(num) {
             if (currentPin.length < 4 && !isProcessing) {
                 currentPin += num;
                 updateDots();
                 animateLatestDot();
-                animatePressedNumber(num);
                 errorMsg.classList.remove('visible');
                 
                 if (currentPin.length === 4) {
