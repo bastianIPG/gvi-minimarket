@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('partials/head') %>
+    <title>GVI - Centro de Auditoría</title>
+    <style>
+        .auditoria-header { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 30px; }
+        .panel-filtros { background: var(--panel-claro); padding: 20px; border-radius: 15px; display: flex; gap: 15px; margin-bottom: 25px; align-items: flex-end; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        body.dark-mode .panel-filtros { background: var(--panel-oscuro); }
+        
+        .campo-filtro { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+        .campo-filtro label { font-size: 12px; font-weight: 700; opacity: 0.6; text-transform: uppercase; }
+        .input-auditoria { padding: 10px; border-radius: 8px; border: 1px solid #ddd; background: transparent; color: inherit; outline: none; }
+        body.dark-mode .input-auditoria { border-color: #444; }
+
+        .tabla-auditoria { background: var(--panel-claro); border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        body.dark-mode .tabla-auditoria { background: var(--panel-oscuro); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 15px 20px; border-bottom: 1px solid #eee; }
+        body.dark-mode th, body.dark-mode td { border-bottom-color: #333; }
+        
+        .log-NUEVO { color: #34c759; font-weight: bold; background: rgba(52, 199, 89, 0.1); padding: 4px 8px; border-radius: 6px; font-size: 11px; }
+        .log-EDITAR { color: #007aff; font-weight: bold; background: rgba(0, 122, 255, 0.1); padding: 4px 8px; border-radius: 6px; font-size: 11px; }
+        .log-ELIMINAR { color: #ff3b30; font-weight: bold; background: rgba(255, 59, 48, 0.1); padding: 4px 8px; border-radius: 6px; font-size: 11px; }
+        
+        .btn-volver { background: #eee; color: #333; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; }
+        body.dark-mode .btn-volver { background: #333; color: white; }
+    </style>
+</head>
+<body>
+    <%- include('partials/nav') %>
+    <div class="switch-tema-wrapper">
+        <label class="switch-tema">
+            <input type="checkbox" id="checkTema" onclick="toggleTema()">
+            <span class="slider"><span class="icono-sol">☀️</span><span class="icono-luna">🌙</span></span>
+        </label>
+    </div>
+
+    <div class="contenedor">
+        <div class="auditoria-header">
+            <h1><span>📋</span> Centro de Auditoría</h1>
+            <button class="btn-volver" onclick="window.location.href='/bodega'">⬅ Volver a Bodega</button>
+        </div>
+
+        <div class="panel-filtros">
+            <div class="campo-filtro">
+                <label>Filtrar por Fecha</label>
+                <input type="date" id="filtroFecha" class="input-auditoria" onchange="renderizarHistorial()">
+            </div>
+            <div class="campo-filtro">
+                <label>Tipo de Acción</label>
+                <select id="filtroAccion" class="input-auditoria" onchange="renderizarHistorial()">
+                    <option value="TODOS">Todos los movimientos</option>
+                    <option value="NUEVO">Ingresos (NUEVO)</option>
+                    <option value="EDITAR">Cambios (EDITAR)</option>
+                    <option value="ELIMINAR">Bajas (ELIMINAR)</option>
+                </select>
+            </div>
+            <div class="campo-filtro" style="flex: 2;">
+                <label>Búsqueda Rápida</label>
+                <input type="text" id="filtroTexto" class="input-auditoria" placeholder="Buscar por producto o detalle..." oninput="renderizarHistorial()">
+            </div>
+            <button class="btn-volver" style="height: 40px;" onclick="limpiarFiltros()">Limpiar</button>
+        </div>
+
+        <div class="tabla-auditoria">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 150px;">Fecha y Hora</th>
+                        <th style="width: 120px;">Acción</th>
+                        <th>Detalle del Movimiento</th>
+                    </tr>
+                </thead>
+                <tbody id="listaHistorial"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <%- include('partials/scripts') %>
+    <script>
+        let historialCompleto = [];
+
+        async function cargarDatos() {
+            const res = await fetch('/api/historial');
+            historialCompleto = await res.json();
+            renderizarHistorial();
+        }
+
+        function renderizarHistorial() {
+            const fFecha = document.getElementById('filtroFecha').value;
+            const fAccion = document.getElementById('filtroAccion').value;
+            const fTexto = document.getElementById('filtroTexto').value.toLowerCase();
+            const tbody = document.getElementById('listaHistorial');
+            
+            tbody.innerHTML = '';
+
+            const filtrados = historialCompleto.filter(log => {
+                const [d, m, y] = log.fecha.split('-');
+                const fechaISO = `${y}-${m}-${d}`;
+                
+                const coincideFecha = !fFecha || fechaISO === fFecha;
+                const coincideAccion = fAccion === "TODOS" || log.accion === fAccion;
+                const coincideTexto = log.detalle.toLowerCase().includes(fTexto);
+                
+                return coincideFecha && coincideAccion && coincideTexto;
+            });
+
+            if (filtrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:40px; opacity:0.5;">No se encontraron registros con esos filtros.</td></tr>';
+                return;
+            }
+
+            filtrados.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-size: 13px;">
+                        <div style="font-weight: bold;">${log.fecha}</div>
+                        <div style="opacity: 0.6;">${log.hora}</div>
+                    </td>
+                    <td><span class="log-${log.accion}">${log.accion}</span></td>
+                    <td style="font-size: 14px;">${log.detalle}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function limpiarFiltros() {
+            document.getElementById('filtroFecha').value = '';
+            document.getElementById('filtroAccion').value = 'TODOS';
+            document.getElementById('filtroTexto').value = '';
+            renderizarHistorial();
+        }
+
+        document.addEventListener('DOMContentLoaded', cargarDatos);
+    </script>
+</body>
+</html>

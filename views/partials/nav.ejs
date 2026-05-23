@@ -1,0 +1,192 @@
+<!-- BOTÓN VOLVER ATRÁS (Solo visible fuera del inicio) -->
+<script>
+    // Detectamos si estamos en el inicio para no mostrar el botón de volver
+    const esInicio = window.location.pathname === '/';
+    if (!esInicio) {
+        document.write(`
+            <button class="btn-volver-atras" onclick="window.history.back()">
+                <i data-lucide="arrow-left"></i>
+            </button>
+        `);
+    }
+</script>
+
+<!-- BOTÓN MENÚ BURBUJA (Solo visible fuera del inicio) -->
+<script>
+    if (!esInicio) {
+        document.write(`
+            <button class="btn-menu-global" onclick="toggleMenuGlobal()" id="mainFab">
+                <i data-lucide="menu" id="iconMenu"></i>
+            </button>
+        `);
+    }
+</script>
+
+<div id="overlayGlobal" class="bubble-overlay" onclick="toggleMenuGlobal()">
+    <div class="bubble-container">
+        <a href="/" class="bubble-item" style="--delay: 0.1s">
+            <div class="bubble-icon icon-home"><i data-lucide="home"></i></div>
+            <span>Inicio</span>
+        </a>
+        <a href="/caja" class="bubble-item" style="--delay: 0.2s">
+            <div class="bubble-icon icon-caja"><i data-lucide="shopping-cart"></i></div>
+            <span>Venta</span>
+        </a>
+        <a href="/bodega" class="bubble-item" style="--delay: 0.3s">
+            <div class="bubble-icon icon-bodega"><i data-lucide="package"></i></div>
+            <span>Bodega</span>
+        </a>
+        <a href="/fiados" class="bubble-item" style="--delay: 0.4s">
+            <div class="bubble-icon icon-fiados"><i data-lucide="book-open"></i></div>
+            <span>Fiados</span>
+        </a>
+        <a href="/finanzas" class="bubble-item admin-only" style="--delay: 0.5s">
+            <div class="bubble-icon icon-finanzas"><i data-lucide="bar-chart-3"></i></div>
+            <span>Finanzas</span>
+        </a>
+        <a href="/configuracion" class="bubble-item admin-only" style="--delay: 0.6s">
+            <div class="bubble-icon icon-ajustes"><i data-lucide="settings"></i></div>
+            <span>Ajustes</span>
+        </a>
+        <a href="#" onclick="cerrarSesion(event)" class="bubble-item" style="--delay: 0.7s">
+            <div class="bubble-icon icon-logout"><i data-lucide="log-out"></i></div>
+            <span>Salir</span>
+        </a>
+    </div>
+</div>
+
+<script>
+    function cerrarSesion(e) {
+        if(e) e.preventDefault();
+        if(confirm("¿Seguro que deseas cerrar la sesión actual?")) {
+            localStorage.removeItem('gvi_user');
+            window.location.href = '/login';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            const usrInfo = JSON.parse(localStorage.getItem('gvi_user'));
+            if(usrInfo && usrInfo.rol !== 'ADMIN') {
+                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+            }
+        } catch (e) {}
+    });
+</script>
+
+<style>
+    /* BOTÓN VOLVER ATRÁS */
+    .btn-volver-atras {
+        position: fixed;
+        top: 25px;
+        left: 25px;
+        z-index: 2500;
+        background: var(--panel-claro, #fff);
+        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        color: var(--texto-claro, #333);
+        transition: 0.3s;
+    }
+    body.dark-mode .btn-volver-atras { background: var(--panel-oscuro, #1e1e1e); border-color: #333; color: white; }
+    .btn-volver-atras:hover { transform: scale(1.1); background: var(--azul-gvi); color: white; }
+    .btn-volver-atras i { width: 22px; height: 22px; stroke-width: 3px; }
+
+    /* EL BOTÓN FLOTANTE (FAB) MEJORADO */
+    .btn-menu-global {
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--azul-gvi, #007aff);
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(0,122,255,0.4);
+        cursor: pointer;
+        z-index: 3000;
+        transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .btn-menu-global:hover { transform: scale(1.1); box-shadow: 0 15px 30px rgba(0,122,255,0.5); }
+    .btn-menu-global.active { background: #ff3b30; transform: scale(0.9) rotate(90deg); box-shadow: 0 5px 15px rgba(255,59,48,0.4); }
+    .btn-menu-global i { width: 28px; height: 28px; stroke-width: 2.5px; }
+
+    /* OVERLAY Y BURBUJAS */
+    .bubble-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(15px);
+        z-index: 2999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: 0.4s;
+    }
+    body.dark-mode .bubble-overlay { background: rgba(0,0,0,0.8); }
+    .bubble-overlay.active { display: flex; opacity: 1; }
+
+    .bubble-container { display: grid; grid-template-columns: repeat(3, 120px); gap: 30px; justify-content: center; }
+
+    .bubble-item {
+        display: flex; flex-direction: column; align-items: center; gap: 12px;
+        text-decoration: none; color: inherit; opacity: 0; transform: scale(0.5) translateY(20px);
+        transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .bubble-overlay.active .bubble-item { opacity: 1; transform: scale(1) translateY(0); transition-delay: var(--delay); }
+
+    .bubble-icon {
+        width: 80px; height: 80px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); transition: 0.3s;
+    }
+    .bubble-icon i { width: 32px; height: 32px; }
+    .bubble-item:hover .bubble-icon { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+    .bubble-item span { font-weight: 800; font-size: 14px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+
+    .icon-home { background: #8e8e93; }
+    .icon-caja { background: #007aff; }
+    .icon-bodega { background: #34c759; }
+    .icon-fiados { background: #ff9500; }
+    .icon-finanzas { background: #af52de; }
+    .icon-ajustes { background: #5856d6; }
+    .icon-logout { background: #ff3b30; }
+</style>
+
+<script>
+    function toggleMenuGlobal() {
+        const fab = document.getElementById('mainFab');
+        const overlay = document.getElementById('overlayGlobal');
+        const icon = document.getElementById('iconMenu');
+        
+        fab.classList.toggle('active');
+        
+        if (fab.classList.contains('active')) {
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('active'), 10);
+            icon.setAttribute('data-lucide', 'x');
+        } else {
+            overlay.classList.remove('active');
+            setTimeout(() => overlay.style.display = 'none', 400);
+            icon.setAttribute('data-lucide', 'menu');
+        }
+        
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    // Asegurar iconos al cargar
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>

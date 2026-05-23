@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>GVI - Login</title>
+    <link rel="stylesheet" href="/css/global.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh;
+            background: var(--fondo-claro, #f0f2f5);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+        body.dark-mode { background: var(--fondo-oscuro, #121212); }
+
+        .login-container {
+            background: var(--panel-claro, #ffffff);
+            padding: 50px 40px;
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+            text-align: center;
+            width: 100%;
+            max-width: 380px;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            transition: 0.4s;
+        }
+        body.dark-mode .login-container { background: var(--panel-oscuro, #1e1e1e); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(60px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .login-header h1 { margin: 0; font-size: 32px; font-weight: 800; color: var(--texto-claro, #333); letter-spacing: -1px; }
+        body.dark-mode .login-header h1 { color: #fff; }
+        .login-header p { margin: 8px 0 40px; color: #8e8e93; font-weight: 600; font-size: 15px; }
+
+        .pin-display { display: flex; justify-content: center; gap: 20px; margin-bottom: 45px; }
+        .pin-dot {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.08);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        body.dark-mode .pin-dot { background: rgba(255,255,255,0.1); }
+        .pin-dot.filled { background: var(--azul-gvi, #007aff); transform: scale(1.3); }
+
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px 20px; }
+        
+        .num-btn {
+            background: rgba(0,0,0,0.03);
+            border: none; border-radius: 50%;
+            width: 75px; height: 75px;
+            font-size: 28px; font-weight: 600;
+            color: var(--texto-claro, #333);
+            cursor: pointer;
+            margin: 0 auto;
+            transition: 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        body.dark-mode .num-btn { background: rgba(255,255,255,0.05); color: white; }
+        
+        /* Hover y Active (Feedback táctil visual) */
+        @media (hover: hover) {
+            .num-btn:hover { background: rgba(0,122,255,0.1); color: var(--azul-gvi); transform: scale(1.05); }
+            body.dark-mode .num-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+        }
+        .num-btn:active { transform: scale(0.9); background: var(--azul-gvi) !important; color: white !important; }
+        
+        .num-btn.delete { color: #ff3b30; background: transparent; }
+        .num-btn.delete:active { background: rgba(255,59,48,0.2) !important; color: #ff3b30 !important; }
+
+        .shake { animation: shakeError 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shakeError {
+            10%, 90% { transform: translate3d(-4px, 0, 0); }
+            20%, 80% { transform: translate3d(8px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-12px, 0, 0); }
+            40%, 60% { transform: translate3d(12px, 0, 0); }
+        }
+
+        .error-msg { 
+            color: #ff3b30; font-size: 15px; font-weight: 600; 
+            margin-top: 30px; height: 20px; opacity: 0; 
+            transition: 0.3s; transform: translateY(-10px);
+        }
+        .error-msg.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="dark-mode">
+    <script>
+        if (localStorage.getItem('gvi_theme') === 'light') document.body.classList.remove('dark-mode');
+        // Si ya está logueado, redirigir directo
+        if (localStorage.getItem('gvi_user')) window.location.href = '/';
+    </script>
+
+    <div class="login-container" id="loginBox">
+        <div class="login-header">
+            <h1>GVI POS</h1>
+            <p>Ingresa tu PIN de acceso</p>
+        </div>
+
+        <div class="pin-display" id="pinDisplay">
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+        </div>
+
+        <div class="numpad">
+            <button class="num-btn" onclick="addNumber(1)">1</button>
+            <button class="num-btn" onclick="addNumber(2)">2</button>
+            <button class="num-btn" onclick="addNumber(3)">3</button>
+            <button class="num-btn" onclick="addNumber(4)">4</button>
+            <button class="num-btn" onclick="addNumber(5)">5</button>
+            <button class="num-btn" onclick="addNumber(6)">6</button>
+            <button class="num-btn" onclick="addNumber(7)">7</button>
+            <button class="num-btn" onclick="addNumber(8)">8</button>
+            <button class="num-btn" onclick="addNumber(9)">9</button>
+            <div></div>
+            <button class="num-btn" onclick="addNumber(0)">0</button>
+            <button class="num-btn delete" onclick="deleteNumber()"><i data-lucide="delete"></i></button>
+        </div>
+        
+        <div class="error-msg" id="errorMsg">PIN Incorrecto</div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let currentPin = '';
+        const dots = document.querySelectorAll('.pin-dot');
+        const errorMsg = document.getElementById('errorMsg');
+        const loginBox = document.getElementById('loginBox');
+        let isProcessing = false;
+
+        function updateDots() {
+            dots.forEach((dot, index) => {
+                if (index < currentPin.length) dot.classList.add('filled');
+                else dot.classList.remove('filled');
+            });
+        }
+
+        async function addNumber(num) {
+            if (currentPin.length < 4 && !isProcessing) {
+                currentPin += num;
+                updateDots();
+                errorMsg.classList.remove('visible');
+                
+                if (currentPin.length === 4) {
+                    await attemptLogin();
+                }
+            }
+        }
+
+        function deleteNumber() {
+            if (currentPin.length > 0 && !isProcessing) {
+                currentPin = currentPin.slice(0, -1);
+                updateDots();
+                errorMsg.classList.remove('visible');
+            }
+        }
+
+        // Permitir usar el teclado físico (Numpad)
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') addNumber(e.key);
+            if (e.key === 'Backspace') deleteNumber();
+        });
+
+        async function attemptLogin() {
+            isProcessing = true;
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ pin: currentPin })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    localStorage.setItem('gvi_user', JSON.stringify(data.user));
+                    
+                    // Animación de éxito
+                    dots.forEach(d => d.style.background = '#34c759'); // Verde
+                    loginBox.style.transform = 'scale(0.95)';
+                    loginBox.style.opacity = '0';
+                    
+                    setTimeout(() => window.location.href = '/', 400);
+                } else {
+                    // Animación de error
+                    currentPin = '';
+                    updateDots();
+                    loginBox.classList.add('shake');
+                    errorMsg.innerText = "PIN Incorrecto";
+                    errorMsg.classList.add('visible');
+                    
+                    setTimeout(() => {
+                        loginBox.classList.remove('shake');
+                        isProcessing = false;
+                    }, 500);
+                }
+            } catch (e) {
+                errorMsg.innerText = "Error de conexión";
+                errorMsg.classList.add('visible');
+                currentPin = ''; updateDots();
+                isProcessing = false;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('partials/head') %>
+    <title>GVI - Panel de Control</title>
+    <style>
+        /* --- LAYOUT PRINCIPAL --- */
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 90vh;
+            padding: 40px 20px;
+        }
+
+        /* Ocultar menú nav en el inicio */
+        .btn-menu-global { display: none !important; }
+
+        .dashboard-hero {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        /* --- RELOJ Y CLIMA --- */
+        .reloj-gigante {
+            font-size: 100px;
+            font-weight: 900;
+            margin: 0;
+            letter-spacing: -5px;
+            color: var(--texto-claro);
+            line-height: 1;
+        }
+        body.dark-mode .reloj-gigante { color: #fff; }
+
+        .reloj-periodo { font-size: 30px; opacity: 0.3; margin-left: 10px; letter-spacing: 0; }
+        .fecha-completa { font-size: 18px; opacity: 0.5; font-weight: 600; margin-top: 5px; text-transform: capitalize; }
+
+        .fecha-completa { font-size: 18px; opacity: 0.5; font-weight: 600; margin-top: 5px; text-transform: capitalize; }
+
+        /* --- GRID BALANCEADO --- */
+        .grid-modulos-pro {
+            display: grid;
+            grid-template-columns: repeat(3, 280px);
+            gap: 22px;
+        }
+        @media (max-width: 1000px) {
+            .grid-modulos-pro { grid-template-columns: repeat(2, 280px); }
+        }
+        @media (max-width: 700px) {
+            .grid-modulos-pro { grid-template-columns: 1fr; }
+        }
+
+        .card-menu-pro {
+            background: var(--panel-claro);
+            padding: 35px 25px;
+            border-radius: 28px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            position: relative;
+        }
+        body.dark-mode .card-menu-pro { background: var(--panel-oscuro); border-color: #333; }
+
+        .card-menu-pro:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            border-color: var(--azul-gvi);
+        }
+
+        .card-icono-pro { 
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--azul-gvi);
+            margin-bottom: 10px;
+        }
+        .card-icono-pro svg { width: 42px; height: 42px; stroke-width: 1.5px; }
+        body.dark-mode .card-icono-pro { color: #5ea9ff; }
+        .card-menu-pro h3 { margin: 10px 0 5px; font-size: 20px; font-weight: 700; }
+        .card-menu-pro p { margin: 0; font-size: 14px; opacity: 0.5; font-weight: 500; }
+
+        /* --- INDICADORES EN TIEMPO REAL (Live Badges) --- */
+        .badge-stats {
+            margin-top: 15px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            background: rgba(0, 122, 255, 0.08);
+            color: var(--azul-gvi);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-alerta { background: rgba(255, 59, 48, 0.1); color: #ff3b30; }
+        .badge-exito { background: rgba(52, 199, 89, 0.1); color: #34c759; }
+
+
+
+        /* Ocultar en escritorio (PC) */
+        @media (min-width: 769px) {
+            .solo-movil { display: none !important; }
+        }
+        /* --- ANIMACIONES DE ENTRADA (MOTION) --- */
+        @keyframes slideInUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes pulseAmbient {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(0.98); }
+        }
+
+        .dashboard-hero {
+            animation: slideInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .card-menu-pro {
+            animation: slideInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        /* Retraso escalonado para las tarjetas */
+        .card-menu-pro:nth-child(1) { animation-delay: 0.1s; }
+        .card-menu-pro:nth-child(2) { animation-delay: 0.2s; }
+        .card-menu-pro:nth-child(3) { animation-delay: 0.3s; }
+        .card-menu-pro:nth-child(4) { animation-delay: 0.4s; }
+        .card-menu-pro:nth-child(5) { animation-delay: 0.5s; }
+
+        .card-icono-pro {
+            display: inline-block;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card-menu-pro:hover .card-icono-pro {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .reloj-gigante {
+            animation: pulseAmbient 4s infinite ease-in-out;
+        }
+
+        /* --- HERRAMIENTAS SUPERIORES (Logout, Usuario, Tema) --- */
+        .header-tools {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 2000;
+        }
+
+        .user-info-pill {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--panel-claro);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--texto-claro);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        body.dark-mode .user-info-pill { background: var(--panel-oscuro); color: white; }
+        .user-info-pill i { width: 16px; height: 16px; opacity: 0.7; }
+
+        .btn-logout {
+            display: flex; align-items: center; gap: 6px;
+            background: #ff3b30; color: white;
+            border: none; padding: 8px 16px;
+            border-radius: 20px; font-size: 14px; font-weight: 700;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(255,59,48,0.3);
+            transition: 0.2s;
+        }
+        .btn-logout:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(255,59,48,0.4); }
+        .btn-logout i { width: 16px; height: 16px; }
+
+    </style>
+</head>
+<body>
+    <%- include('partials/nav') %>
+
+
+
+    <div class="header-tools">
+        <div class="user-info-pill">
+            <i data-lucide="user"></i> <span id="nombreUsuarioBadge">Usuario</span>
+        </div>
+        <button class="btn-logout" onclick="cerrarSesionIndex()">
+            <i data-lucide="log-out"></i> Salir
+        </button>
+        <label class="switch-tema">
+            <input type="checkbox" id="checkTema" onclick="toggleTema()">
+            <span class="slider"><span class="icono-sol">☀️</span><span class="icono-luna">🌙</span></span>
+        </label>
+    </div>
+
+    <div class="dashboard-container">
+        
+        <header class="dashboard-hero">
+            <h1 class="reloj-gigante">
+                <span id="relojHome">00:00</span><span id="relojPeriodo" class="reloj-periodo">--</span>
+            </h1>
+            <div class="fecha-completa" id="fechaHome">...</div>
+        </header>
+
+        <div class="grid-modulos-pro">
+            <a href="/caja" class="card-menu-pro">
+                <div class="card-icono-pro"><i data-lucide="shopping-cart"></i></div>
+                <h3>Punto de Venta</h3>
+                <p>Registrar ventas</p>
+                <div class="badge-stats" id="statsVentas">Hoy: $0</div>
+            </a>
+
+            <a href="/cobrar" class="card-menu-pro">
+                <div class="card-icono-pro"><i data-lucide="credit-card"></i></div>
+                <h3>Cobrar</h3>
+                <p>Pedidos en cola</p>
+                <div class="badge-stats" id="statsPedidos">0 en cola</div>
+            </a>
+
+            <a href="/bodega" class="card-menu-pro">
+                <div class="card-icono-pro"><i data-lucide="package"></i></div>
+                <h3>Bodega</h3>
+                <p>Inventario total</p>
+                <div class="badge-stats" id="statsStock">Cargando...</div>
+            </a>
+
+            <a href="/finanzas" class="card-menu-pro admin-only">
+                <div class="card-icono-pro"><i data-lucide="bar-chart-3"></i></div>
+                <h3>Finanzas</h3>
+                <p>Reportes y caja</p>
+                <div class="badge-stats badge-exito">Cierre listo</div>
+            </a>
+
+            <a href="/fiados" class="card-menu-pro">
+                <div class="card-icono-pro"><i data-lucide="book-open"></i></div>
+                <h3>Fiados</h3>
+                <p>Cuentas de clientes</p>
+                <div class="badge-stats">0 pendientes</div>
+            </a>
+
+            <a href="/configuracion" class="card-menu-pro admin-only">
+                <div class="card-icono-pro"><i data-lucide="settings"></i></div>
+                <h3>Ajustes</h3>
+                <p>Sistema y Red</p>
+                <div class="badge-stats">Configuración</div>
+            </a>
+        </div>
+    </div>
+
+    <%- include('partials/scripts') %>
+    
+    <script>
+        // --- FUNCIÓN PARA CARGAR ESTADÍSTICAS REALES ---
+        async function cargarStatsDashboard() {
+            try {
+                // 1. Obtener productos para contar stock bajo
+                const resProd = await fetch('/api/productos');
+                const productos = await resProd.json();
+                const stockBajo = productos.filter(p => p.stock <= 5).length;
+                
+                const elStock = document.getElementById('statsStock');
+                if(stockBajo > 0) {
+                    elStock.innerText = `${stockBajo} Stock Bajo`;
+                    elStock.classList.add('badge-alerta');
+                } else {
+                    elStock.innerText = `Stock al día`;
+                }
+
+                // 2. Obtener ventas y actualizar lista reciente
+                const resVentas = await fetch('/api/ventas');
+                const ventas = await resVentas.json();
+                const hoy = new Date().toLocaleDateString('es-CL');
+                const totalHoy = ventas
+                    .filter(v => v.fecha === hoy)
+                    .reduce((sum, v) => sum + v.total, 0);
+
+                document.getElementById('statsVentas').innerText = `Hoy: $${totalHoy.toLocaleString('es-CL')}`;
+
+            } catch (e) { console.error("Error cargando stats", e); }
+        }
+
+        function actualizarDashboard() {
+            const ahora = new Date();
+            let horas = ahora.getHours();
+            const minutos = String(ahora.getMinutes()).padStart(2, '0');
+            const periodo = horas >= 12 ? 'PM' : 'AM';
+            horas = horas % 12 || 12;
+            document.getElementById('relojHome').innerText = `${String(horas).padStart(2, '0')}:${minutos}`;
+            document.getElementById('relojPeriodo').innerText = periodo;
+            const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
+            document.getElementById('fechaHome').innerText = ahora.toLocaleDateString('es-CL', opciones);
+        }
+
+        // LÓGICA DE USUARIO Y CIERRE DE SESIÓN
+        function cargarDatosUsuario() {
+            try {
+                const usrInfo = JSON.parse(localStorage.getItem('gvi_user'));
+                if(usrInfo) {
+                    document.getElementById('nombreUsuarioBadge').innerText = usrInfo.nombre;
+                    if(usrInfo.rol !== 'ADMIN') {
+                        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function cerrarSesionIndex() {
+            if(confirm("¿Seguro que deseas cerrar la sesión actual?")) {
+                localStorage.removeItem('gvi_user');
+                window.location.href = '/login';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            actualizarDashboard();
+            setInterval(actualizarDashboard, 1000);
+            cargarStatsDashboard();
+            setInterval(cargarStatsDashboard, 5000);
+            cargarDatosUsuario();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

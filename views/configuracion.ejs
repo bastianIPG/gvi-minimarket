@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('partials/head') %>
+    <title>GVI - Configuración</title>
+    <style>
+        .config-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .config-section {
+            margin-bottom: 35px;
+        }
+
+        .config-section h2 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            margin-bottom: 12px;
+            margin-left: 15px;
+        }
+
+        .config-list {
+            background: var(--panel-claro);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        body.dark-mode .config-list { background: var(--panel-oscuro); border-color: #333; }
+
+        .config-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 25px;
+            gap: 20px;
+            text-decoration: none;
+            color: inherit;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        body.dark-mode .config-item { border-bottom-color: #333; }
+        .config-item:last-child { border-bottom: none; }
+        .config-item:hover { background: rgba(0,122,255,0.05); }
+
+        .config-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .icon-blue { background: #007aff; }
+        .icon-green { background: #34c759; }
+        .icon-orange { background: #ff9500; }
+        .icon-purple { background: #5856d6; }
+        .icon-gray { background: #8e8e93; }
+
+        .config-info { flex: 1; }
+        .config-info b { display: block; font-size: 16px; margin-bottom: 2px; }
+        .config-info p { margin: 0; font-size: 13px; opacity: 0.5; }
+
+        .config-action { font-size: 14px; font-weight: 800; color: var(--azul-gvi); }
+        .ip-badge { background: rgba(0,122,255,0.1); padding: 5px 12px; border-radius: 8px; font-family: monospace; font-size: 15px; }
+    </style>
+</head>
+<body>
+    <%- include('partials/nav') %>
+
+    <div class="config-container">
+        <header style="margin-bottom: 40px;">
+            <h1 style="font-size: 32px; margin: 0;">⚙️ Configuración</h1>
+            <p style="opacity: 0.5;">Ajustes del sistema y herramientas de mantenimiento.</p>
+        </header>
+
+        <!-- SECCIÓN RED -->
+        <div class="config-section">
+            <h2>Conectividad</h2>
+            <div class="config-list">
+                <div class="config-item">
+                    <div class="config-icon icon-blue"><i data-lucide="monitor"></i></div>
+                    <div class="config-info">
+                        <b>Servidor Local (PC 1)</b>
+                        <p>Dirección para conectar otros dispositivos en la red.</p>
+                    </div>
+                    <div class="ip-badge" id="lblIpRed">...</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-icon icon-purple"><i data-lucide="wifi"></i></div>
+                    <div class="config-info">
+                        <b>Estado de Red</b>
+                        <p>Asegúrate de estar en la misma red Wi-Fi.</p>
+                    </div>
+                    <div style="color: #34c759; font-size: 12px; font-weight: 800;">ACTIVO</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DATOS -->
+        <div class="config-section">
+            <h2>Seguridad y Datos</h2>
+            <div class="config-list">
+                <a href="/api/backup" class="config-item">
+                    <div class="config-icon icon-green"><i data-lucide="download"></i></div>
+                    <div class="config-info">
+                        <b>Copia de Seguridad</b>
+                        <p>Descargar todo el inventario y ventas (.zip)</p>
+                    </div>
+                    <div class="config-action">DESCARGAR</div>
+                </a>
+                <div class="config-item">
+                    <div class="config-icon icon-orange"><i data-lucide="database"></i></div>
+                    <div class="config-info">
+                        <b>Base de Datos</b>
+                        <p>Almacenamiento local basado en JSON.</p>
+                    </div>
+                    <div style="opacity: 0.4;">Estable</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN SISTEMA -->
+        <div class="config-section">
+            <h2>Información</h2>
+            <div class="config-list">
+                <div class="config-item">
+                    <div class="config-icon icon-gray"><i data-lucide="info"></i></div>
+                    <div class="config-info">
+                        <b>Versión del Software</b>
+                        <p>GVI Minimarket Pro</p>
+                    </div>
+                    <div style="opacity: 0.5;">v2.5.0</div>
+                </div>
+                <div class="config-item" onclick="window.location.reload()">
+                    <div class="config-icon icon-gray" style="background: #444;"><i data-lucide="refresh-cw"></i></div>
+                    <div class="config-info">
+                        <b>Reiniciar Aplicación</b>
+                        <p>Refrescar todos los servicios locales.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function cargarInfoRed() {
+            try {
+                const res = await fetch('/api/info-red');
+                const data = await res.json();
+                document.getElementById('lblIpRed').innerText = `http://${data.ip}:3000`;
+            } catch (e) {
+                document.getElementById('lblIpRed').innerText = "Error";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarInfoRed();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

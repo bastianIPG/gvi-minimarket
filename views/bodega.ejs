@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('partials/head') %>
+    <title>GVI - Gestión de Bodega</title>
+    <style>
+        /* --- ESTADÍSTICAS SUPERIORES --- */
+        .stats-bodega {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: var(--panel-claro);
+            padding: 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        body.dark-mode .stat-card { background: var(--panel-oscuro); border-color: #333; }
+        .stat-icon { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+        .stat-info span { display: block; font-size: 12px; opacity: 0.6; font-weight: 700; text-transform: uppercase; }
+        .stat-info b { font-size: 20px; font-weight: 900; }
+
+        /* --- CONTROLES Y BUSQUEDA --- */
+        .controles-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+            background: var(--panel-claro);
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
+        body.dark-mode .controles-top { background: var(--panel-oscuro); border: 1px solid #333; }
+
+        .busqueda-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        .busqueda-wrapper i, .busqueda-wrapper svg {
+            position: absolute;
+            left: 18px;
+            opacity: 0.5;
+            pointer-events: none;
+            width: 18px;
+            height: 18px;
+        }
+        .input-busqueda {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(0,0,0,0.02);
+            color: inherit;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+        body.dark-mode .input-busqueda { background: rgba(255,255,255,0.03); border-color: #444; }
+        .input-busqueda:focus { border-color: var(--azul-gvi); background: transparent; }
+
+        /* --- TABLA PREMIUM --- */
+        .tabla-contenedor {
+            background: var(--panel-claro);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        body.dark-mode .tabla-contenedor { background: var(--panel-oscuro); border-color: #333; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { 
+            padding: 18px 20px; 
+            text-align: left; 
+            background: rgba(0,0,0,0.02); 
+            font-size: 12px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            opacity: 0.6; 
+        }
+        body.dark-mode th { background: rgba(255,255,255,0.02); }
+        td { padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.03); }
+        body.dark-mode td { border-bottom-color: rgba(255,255,255,0.03); }
+        
+        tr:hover { background: rgba(0,122,255,0.02); }
+
+        .badge-stock {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stock-crítico { background: rgba(255, 59, 48, 0.1); color: #ff3b30; }
+        .stock-bajo { background: rgba(255, 149, 0, 0.1); color: #ff9500; }
+        .stock-normal { background: rgba(52, 199, 89, 0.1); color: #34c759; }
+
+        /* --- BOTONES RÁPIDOS --- */
+        .btn-quick {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        body.dark-mode .btn-quick { background: rgba(255,255,255,0.08); color: white; }
+        .btn-quick:hover { background: var(--azul-gvi); color: white; }
+        .btn-quick:active { transform: scale(0.9); }
+
+        .acciones-gap { display: flex; gap: 8px; align-items: center; }
+
+        .btn-add { background: var(--azul-gvi); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,122,255,0.3); }
+
+        .filtro-btn { 
+            padding: 8px 20px; border-radius: 50px; border: none; 
+            background: rgba(0,0,0,0.05); cursor: pointer; font-weight: 800; 
+            font-size: 13px; color: inherit; transition: 0.3s;
+        }
+        body.dark-mode .filtro-btn { background: rgba(255,255,255,0.08); }
+        .filtro-btn:hover { background: rgba(0,122,255,0.1); color: var(--azul-gvi); }
+        .filtro-btn.activo { background: var(--azul-gvi); color: white; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
+
+        /* Estilo circular para acciones de tabla */
+        .btn-tabla-accion {
+            width: 36px; height: 36px; border-radius: 50%; border: none;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.04); cursor: pointer; transition: 0.2s;
+            color: inherit;
+        }
+        body.dark-mode .btn-tabla-accion { background: rgba(255,255,255,0.08); }
+        .btn-tabla-accion:hover { background: var(--azul-gvi); color: white; transform: scale(1.1); }
+        .btn-tabla-accion.btn-borrar:hover { background: #ff3b30; }
+
+        /* MODAL */
+        .modal-fondo { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); backdrop-filter:blur(10px); z-index:4000; align-items:center; justify-content:center; }
+        .panel-modal { 
+            background: var(--panel-claro); 
+            width: 480px; 
+            padding: 40px; 
+            border-radius: 32px; 
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2); 
+            animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        body.dark-mode .panel-modal { background: var(--panel-oscuro); border: 1px solid #333; }
+
+        .form-group { margin-bottom: 20px; position: relative; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 13px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .input-with-icon { position: relative; display: flex; align-items: center; }
+        .input-with-icon i, .input-with-icon svg { position: absolute; left: 15px; opacity: 0.4; width: 18px; height: 18px; }
+        
+        .form-input { 
+            width: 100%; 
+            padding: 14px 15px 14px 45px; 
+            border-radius: 14px; 
+            border: 1px solid rgba(0,0,0,0.1); 
+            background: rgba(0,0,0,0.02); 
+            font-size: 15px; 
+            outline: none; 
+            transition: 0.3s;
+            color: inherit;
+        }
+        body.dark-mode .form-input { background: rgba(255,255,255,0.05); border-color: #444; }
+        .form-input:focus { border-color: var(--azul-gvi); background: transparent; box-shadow: 0 0 0 4px rgba(0,122,255,0.1); }
+
+        .toggle-peso {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: rgba(0,122,255,0.05);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .toggle-peso:hover { background: rgba(0,122,255,0.1); }
+    </style>
+</head>
+<body>
+    <%- include('partials/nav') %>
+
+    <div class="contenedor">
+        <!-- ESTADÍSTICAS -->
+        <div class="stats-bodega">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #007aff;"><i data-lucide="layers"></i></div>
+                <div class="stat-info">
+                    <span>Total Productos</span>
+                    <b id="statTotalItems">0</b>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #ff3b30;"><i data-lucide="alert-triangle"></i></div>
+                <div class="stat-info">
+                    <span>Stock Crítico</span>
+                    <b id="statStockBajo">0</b>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #34c759;"><i data-lucide="dollar-sign"></i></div>
+                <div class="stat-info">
+                    <span>Valor Bodega</span>
+                    <b id="statValorTotal">$0</b>
+                </div>
+            </div>
+        </div>
+
+        <div class="controles-top">
+            <div class="busqueda-wrapper">
+                <i data-lucide="search"></i>
+                <input type="text" class="input-busqueda" placeholder="Buscar producto por nombre o código..." id="buscarProducto">
+            </div>
+            <button class="btn-add" onclick="abrirModalNuevo()">
+                <i data-lucide="plus"></i> Nuevo Producto
+            </button>
+        </div>
+
+        <div class="filtros-bodega" style="margin-bottom: 25px; display: flex; gap: 12px; justify-content: flex-start;">
+            <button class="filtro-btn activo" data-filtro="todos" onclick="aplicarFiltro('todos')">Todos</button>
+            <button class="filtro-btn" data-filtro="peso" onclick="aplicarFiltro('peso')">⚖️ Por Peso</button>
+            <button class="filtro-btn" data-filtro="unidad" onclick="aplicarFiltro('unidad')">📦 Por Unidad</button>
+        </div>
+
+        <div class="tabla-contenedor">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Código</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones Rápidas</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody id="listaProductos"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL FORMULARIO -->
+    <div id="modalFormulario" class="modal-fondo">
+        <div class="panel-modal">
+            <h2 id="modalTitulo" style="margin:0 0 30px; font-size: 24px;">Nuevo Producto</h2>
+            <form id="formProducto">
+                <input type="hidden" id="codigoAnterior">
+                
+                <div class="form-group">
+                    <label class="form-label">Nombre del Producto</label>
+                    <div class="input-with-icon">
+                        <i data-lucide="tag"></i>
+                        <input type="text" id="prodNombre" class="form-input" required placeholder="Ej: Coca Cola 2.5L">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="toggle-peso">
+                        <span style="font-weight: 700; font-size: 14px;">⚖️ Venta por Kilo (Peso)</span>
+                        <input type="checkbox" id="prodPorPeso" onchange="toggleModoPeso()" style="width:20px; height:20px; cursor:pointer;">
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div style="flex: 1;">
+                        <label id="labelPrecio" class="form-label">Precio ($)</label>
+                        <div class="input-with-icon">
+                            <i data-lucide="dollar-sign"></i>
+                            <input type="text" id="prodPrecio" class="form-input" required oninput="formatearMoneda(this)">
+                        </div>
+                    </div>
+                    <div style="flex: 1;">
+                        <label id="labelStock" class="form-label">Stock Inicial</label>
+                        <div class="input-with-icon">
+                            <i data-lucide="box"></i>
+                            <input type="number" id="prodStock" class="form-input" required step="0.001">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 35px;">
+                    <label class="form-label">Código de Barras / SKU</label>
+                    <div class="input-with-icon">
+                        <i data-lucide="barcode"></i>
+                        <input type="text" id="prodCodigo" class="form-input" placeholder="Escanear o dejar vacío para autogenerar">
+                        <button type="button" onclick="generarCodigoAleatorio()" 
+                                style="position: absolute; right: 8px; background: var(--azul-gvi); color: white; border: none; padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer;">
+                            AUTO
+                        </button>
+                    </div>
+                    <small style="font-size: 11px; opacity: 0.5; margin-top: 5px; display: block;">Si el producto no tiene código, el sistema le asignará uno interno.</small>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button type="button" class="btn-cancelar" style="flex:1; border-radius:14px; padding: 14px;" onclick="cerrarModalFormulario()">Cerrar</button>
+                    <button type="submit" class="btn-add" style="flex:1.8; justify-content:center; border-radius:14px; padding: 14px;">
+                        <i data-lucide="check"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL AUTORIZACIÓN ADMIN -->
+    <div id="modalAdminAuth" class="modal-overlay">
+        <div class="modal-box" style="text-align: center; max-width: 320px;">
+            <div style="color: #ff3b30; margin-bottom: 15px;"><i data-lucide="lock" style="width:40px;height:40px;"></i></div>
+            <h2 style="margin-bottom: 10px;">Autorización Requerida</h2>
+            <p style="font-size: 14px; opacity: 0.7; margin-bottom: 20px;">Esta acción requiere privilegios de Administrador. Ingresa el PIN maestro.</p>
+            <input type="password" id="inputPinAdmin" class="form-input" style="text-align: center; letter-spacing: 10px; font-size: 28px; padding: 15px;" maxlength="4" placeholder="••••">
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button class="btn-cancelar" onclick="cerrarAdminAuth()" style="flex:1;">Cancelar</button>
+                <button class="btn-add" onclick="verificarAdminAuth()" style="flex:1;">Verificar</button>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/scripts') %>
+    <script>
+        let productosGlobales = [];
+        let filtroActual = 'todos';
+        let accionPendienteAdmin = null;
+
+        function requerirAdmin(callback) {
+            const usr = JSON.parse(localStorage.getItem('gvi_user'));
+            if (usr && usr.rol === 'ADMIN') {
+                callback(); 
+            } else {
+                accionPendienteAdmin = callback;
+                document.getElementById('inputPinAdmin').value = '';
+                document.getElementById('modalAdminAuth').style.display = 'flex';
+                document.getElementById('inputPinAdmin').focus();
+            }
+        }
+
+        function cerrarAdminAuth() {
+            document.getElementById('modalAdminAuth').style.display = 'none';
+            accionPendienteAdmin = null;
+        }
+
+        async function verificarAdminAuth() {
+            const pin = document.getElementById('inputPinAdmin').value;
+            try {
+                const res = await fetch('/api/verify-admin', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ pin })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    cerrarAdminAuth();
+                    if (accionPendienteAdmin) accionPendienteAdmin();
+                } else {
+                    alert('PIN de Administrador incorrecto');
+                    document.getElementById('inputPinAdmin').value = '';
+                    document.getElementById('inputPinAdmin').focus();
+                }
+            } catch (e) { alert('Error de red'); }
+        }
+
+        async function cargarBodega() {
+            try {
+                const res = await fetch('/api/productos');
+                productosGlobales = await res.json();
+                renderizarStats();
+                refrescarTabla();
+                lucide.createIcons();
+            } catch (e) { console.error(e); }
+        }
+
+        function renderizarStats() {
+            const total = productosGlobales.length;
+            const bajo = productosGlobales.filter(p => p.stock <= 5).length;
+            const valor = productosGlobales.reduce((sum, p) => sum + (p.precio * p.stock), 0);
+
+            document.getElementById('statTotalItems').innerText = total;
+            document.getElementById('statStockBajo').innerText = bajo;
+            document.getElementById('statValorTotal').innerText = `$${valor.toLocaleString('es-CL')}`;
+        }
+
+        function refrescarTabla() {
+            const busqueda = document.getElementById('buscarProducto').value.toLowerCase();
+            const filtrados = productosGlobales.filter(p => {
+                if (filtroActual === 'peso' && !p.vendidoPorPeso) return false;
+                if (filtroActual === 'unidad' && p.vendidoPorPeso) return false;
+                return p.nombre.toLowerCase().includes(busqueda) || p.codigo.toLowerCase().includes(busqueda);
+            });
+
+            const tbody = document.getElementById('listaProductos');
+            tbody.innerHTML = filtrados.map(p => {
+                const esPeso = p.vendidoPorPeso;
+                const estado = p.stock <= 2 ? 'crítico' : (p.stock <= 5 ? 'bajo' : 'normal');
+                const stockTexto = esPeso ? `${p.stock} kg` : `${p.stock} un.`;
+                
+                return `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 800; font-size: 15px;">${p.nombre}</div>
+                            <div style="font-size: 10px; opacity: 0.5; font-weight: 800;">${esPeso ? 'BALANZA' : 'UNIDAD'}</div>
+                        </td>
+                        <td style="font-family: monospace; font-size: 13px; opacity: 0.6;">${p.codigo}</td>
+                        <td style="font-weight: 800;">$${Number(p.precio).toLocaleString('es-CL')}${esPeso ? '/kg' : ''}</td>
+                        <td>
+                            <span class="badge-stock stock-${estado}">${stockTexto}</span>
+                        </td>
+                        <td>
+                            <div class="acciones-gap">
+                                <button class="btn-quick" onclick="cambiarStock('${p.codigo}', -1)"><i data-lucide="minus"></i></button>
+                                <button class="btn-quick" onclick="cambiarStock('${p.codigo}', 1)"><i data-lucide="plus"></i></button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="acciones-gap">
+                                <button class="btn-tabla-accion" onclick="abrirModalEditar('${p.codigo}')">
+                                    <i data-lucide="edit-3"></i>
+                                </button>
+                                <button class="btn-tabla-accion btn-borrar" onclick="eliminarProducto('${p.codigo}', '${p.nombre}')">
+                                    <i data-lucide="trash-2"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        async function cambiarStock(codigo, delta) {
+            requerirAdmin(async () => {
+                const prod = productosGlobales.find(p => p.codigo === codigo);
+                if (!prod) return;
+                const nuevoStock = Math.max(0, prod.stock + delta);
+                
+                try {
+                    const res = await fetch(`/api/productos/${codigo}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...prod, stock: nuevoStock })
+                    });
+                    if (res.ok) cargarBodega();
+                } catch (e) { console.error(e); }
+            });
+        }
+
+        function aplicarFiltro(tipo) {
+            filtroActual = tipo;
+            document.querySelectorAll('.filtro-btn').forEach(b => b.classList.toggle('activo', b.dataset.filtro === tipo));
+            refrescarTabla();
+        }
+
+        function toggleModoPeso() {
+            const esPeso = document.getElementById('prodPorPeso').checked;
+            document.getElementById('labelPrecio').innerText = esPeso ? 'Precio por Kilo ($/kg)' : 'Precio Venta ($)';
+            document.getElementById('labelStock').innerText = esPeso ? 'Stock Inicial (kg)' : 'Stock Inicial (un.)';
+        }
+
+        // --- FUNCIONES MODAL (Adaptadas) ---
+        function abrirModalNuevo() {
+            requerirAdmin(() => {
+                document.getElementById('modalFormulario').style.display = 'flex';
+                document.getElementById('modalTitulo').innerText = "📦 Nuevo Producto";
+                document.getElementById('formProducto').reset();
+                document.getElementById('codigoAnterior').value = "";
+                toggleModoPeso();
+            });
+        }
+
+        function abrirModalEditar(codigo) {
+            requerirAdmin(() => {
+                const p = productosGlobales.find(prod => prod.codigo === codigo);
+                if (!p) return;
+                document.getElementById('modalFormulario').style.display = 'flex';
+                document.getElementById('modalTitulo').innerText = "✏️ Editar Producto";
+                document.getElementById('codigoAnterior').value = p.codigo;
+                document.getElementById('prodNombre').value = p.nombre;
+                document.getElementById('prodPrecio').value = p.precio.toLocaleString('es-CL');
+                document.getElementById('prodStock').value = p.stock;
+                document.getElementById('prodPorPeso').checked = p.vendidoPorPeso;
+                document.getElementById('prodCodigo').value = p.codigo;
+                toggleModoPeso();
+            });
+        }
+
+        function cerrarModalFormulario() { document.getElementById('modalFormulario').style.display = 'none'; }
+
+        function formatearMoneda(input) {
+            let valor = input.value.replace(/\D/g, "");
+            input.value = valor === "" ? "" : Number(valor).toLocaleString('es-CL');
+        }
+
+        function generarCodigoAleatorio() {
+            const numero = Math.floor(1000 + Math.random() * 9000);
+            const prefix = "INT-";
+            document.getElementById('prodCodigo').value = prefix + numero;
+        }
+
+        document.getElementById('formProducto').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const codAntiguo = document.getElementById('codigoAnterior').value;
+            let codigoFinal = document.getElementById('prodCodigo').value.trim();
+            
+            // Si no hay código, generamos uno interno basado en el tiempo para que sea único
+            if (!codigoFinal) {
+                codigoFinal = "INT-" + Date.now().toString().slice(-6);
+            }
+
+            const datos = {
+                codigo: codigoFinal,
+                nombre: document.getElementById('prodNombre').value,
+                precio: Number(document.getElementById('prodPrecio').value.replace(/\./g, "")),
+                stock: Number(document.getElementById('prodStock').value),
+                vendidoPorPeso: document.getElementById('prodPorPeso').checked
+            };
+            const url = codAntiguo === "" ? '/api/productos' : `/api/productos/${codAntiguo}`;
+            const method = codAntiguo === "" ? 'POST' : 'PUT';
+            
+            const res = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            if (res.ok) { cerrarModalFormulario(); cargarBodega(); }
+        });
+
+        async function eliminarProducto(codigo, nombre) {
+            requerirAdmin(async () => {
+                if(!confirm(`¿Eliminar ${nombre}?`)) return;
+                await fetch(`/api/productos/${codigo}`, { method: 'DELETE' });
+                cargarBodega();
+            });
+        }
+
+        document.getElementById('buscarProducto').addEventListener('input', refrescarTabla);
+        document.addEventListener('DOMContentLoaded', cargarBodega);
+    </script>
+</body>
+</html>

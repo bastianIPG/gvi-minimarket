@@ -1,0 +1,232 @@
+:root {
+    --bg-claro: #f4f5f7;
+    --bg-oscuro: #121212;
+    --panel-claro: #ffffff;
+    --panel-oscuro: #1e1e1e;
+    --texto-claro: #1c1e21;
+    --texto-oscuro: #e4e6eb;
+    --azul-gvi: #007bff;
+    --verde-gvi: #2ecc71;
+}
+
+body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-claro); color: var(--texto-claro); transition: all 0.3s; }
+body.dark-mode { background-color: var(--bg-oscuro); color: var(--texto-oscuro); }
+
+/* Contenedores Genéricos */
+.contenedor { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+.panel { background: var(--panel-claro); border-radius: 16px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e4e6eb; }
+body.dark-mode .panel { background: var(--panel-oscuro); border-color: #333; box-shadow: none; }
+
+/* Navegación Modular */
+.nav-principal { background: var(--panel-claro); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e4e6eb; position: sticky; top: 0; z-index: 100; }
+body.dark-mode .nav-principal { background: var(--panel-oscuro); border-bottom-color: #333; }
+
+.nav-links a { text-decoration: none; color: var(--azul-gvi); font-weight: bold; margin-right: 20px; font-size: 14px; }
+.reloj-nav { font-family: monospace; font-weight: bold; font-size: 16px; }
+
+/* Modales */
+.modal-fondo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 9999; }
+
+/* ============================================
+   BOTONES UNIFICADOS (toda la app)
+   ============================================ */
+.btn-accion,
+.btn-cancelar,
+.btn-success,
+.btn-danger {
+    padding: 13px 22px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 15px;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    line-height: 1.2;
+    letter-spacing: 0.2px;
+}
+
+.btn-accion:hover,
+.btn-cancelar:hover,
+.btn-success:hover,
+.btn-danger:hover { transform: translateY(-2px); }
+
+.btn-accion:active,
+.btn-cancelar:active,
+.btn-success:active,
+.btn-danger:active { transform: translateY(0); }
+
+.btn-accion:disabled,
+.btn-success:disabled {
+    background: #ccc !important;
+    color: #888 !important;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Acción primaria — azul GVI */
+.btn-accion {
+    background: var(--azul-gvi);
+    color: white;
+    box-shadow: 0 2px 6px rgba(0, 122, 255, 0.25);
+}
+.btn-accion:hover { box-shadow: 0 6px 16px rgba(0, 122, 255, 0.35); }
+
+/* Cancelar / secundario */
+.btn-cancelar {
+    background: #eef0f3;
+    color: #333;
+}
+.btn-cancelar:hover { background: #e2e5ea; }
+body.dark-mode .btn-cancelar { background: #2c2c2c; color: var(--texto-oscuro); }
+body.dark-mode .btn-cancelar:hover { background: #3a3a3a; }
+
+/* Confirmar / verde */
+.btn-success {
+    background: #34c759;
+    color: white;
+    box-shadow: 0 2px 6px rgba(52, 199, 89, 0.25);
+}
+.btn-success:hover { background: #2eb84e; box-shadow: 0 6px 16px rgba(52, 199, 89, 0.35); }
+
+/* Peligro / rojo */
+.btn-danger {
+    background: #ff3b30;
+    color: white;
+    box-shadow: 0 2px 6px rgba(255, 59, 48, 0.25);
+}
+.btn-danger:hover { background: #e53029; box-shadow: 0 6px 16px rgba(255, 59, 48, 0.35); }
+
+/* Modificadores */
+.btn-volver { background: #eef0f3 !important; color: #333 !important; box-shadow: none !important; }
+body.dark-mode .btn-volver { background: #2c2c2c !important; color: var(--texto-oscuro) !important; }
+.btn-volver:hover { background: #e2e5ea !important; }
+body.dark-mode .btn-volver:hover { background: #3a3a3a !important; }
+
+.btn-historial { background: #ff9500 !important; color: white !important; box-shadow: 0 2px 6px rgba(255, 149, 0, 0.25) !important; }
+.btn-historial:hover { background: #ed8a00 !important; box-shadow: 0 6px 16px rgba(255, 149, 0, 0.35) !important; }
+
+/* --- ESTILOS ESPECÍFICOS PARA EL DASHBOARD --- */
+
+.grid-modulos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+/* La tarjeta que envuelve cada módulo */
+.card-menu {
+    background: var(--panel-claro);
+    padding: 40px 30px;
+    border-radius: 24px;
+    text-align: center;
+    text-decoration: none; /* Elimina el subrayado azul */
+    color: var(--texto-claro);
+    border: 1px solid #e4e6eb;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+body.dark-mode .card-menu {
+    background: var(--panel-oscuro);
+    border-color: #333;
+    color: var(--texto-oscuro);
+}
+
+.card-menu:hover {
+    transform: translateY(-8px);
+    border-color: var(--azul-gvi);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* El círculo con el emoji */
+.card-icono {
+    font-size: 40px;
+    background: #f8f9fa;
+    width: 85px;
+    height: 85px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    transition: background 0.3s;
+}
+
+body.dark-mode .card-icono {
+    background: #2b2b2b;
+}
+
+.card-menu h3 {
+    margin: 0 0 8px 0;
+    font-size: 22px;
+}
+
+.card-menu p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.6;
+}
+
+/* --- SWITCH DE TEMA ANIMADO --- */
+.switch-tema-wrapper {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 1000;
+}
+
+.switch-tema {
+    position: relative;
+    display: inline-block;
+    width: 64px;
+    height: 34px;
+}
+
+.switch-tema input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #e4e6eb;
+    transition: .4s;
+    border-radius: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Colores y Movimiento */
+input:checked + .slider { background-color: #2b2b2b; }
+input:checked + .slider:before { transform: translateX(30px); }
+
+/* Iconos dentro del switch */
+.icono-sol, .icono-luna { font-size: 14px; user-select: none; }
+body.dark-mode .slider { border: 1px solid #444; }

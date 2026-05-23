@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('partials/head') %>
+    <title>GVI - Cobrar Pedidos</title>
+    <style>
+        .header-cobrar { display:flex; justify-content:space-between; align-items:center; margin: 40px 0 20px; }
+        .header-cobrar h1 { margin:0; font-size: 30px; display: flex; align-items: center; gap: 10px; }
+        .header-cobrar .badge-live {
+            background: rgba(52,199,89,0.12); color: #2eb84e;
+            padding: 6px 14px; border-radius: 50px; font-weight: 800; font-size: 12px;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .live-dot { width: 8px; height: 8px; background: #2eb84e; border-radius: 50%; animation: pulse 1.4s infinite; }
+        @keyframes pulse { 0%,100%{ opacity:1; transform:scale(1);} 50%{ opacity:0.4; transform:scale(1.3);} }
+
+        .grid-cobrar { display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px; align-items: start; }
+
+        .panel-cola { background: var(--panel-claro); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); padding: 18px; }
+        body.dark-mode .panel-cola { background: var(--panel-oscuro); }
+        .panel-cola h3 { margin: 0 0 14px; font-size: 16px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+
+        .pedido-card {
+            background: var(--bg-claro); border-radius: 12px; padding: 16px;
+            margin-bottom: 10px; cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.15s; position: relative;
+        }
+        body.dark-mode .pedido-card { background: #2a2a2a; }
+        .pedido-card:hover { transform: translateX(3px); border-color: rgba(0,122,255,0.3); }
+        .pedido-card.activo { border-color: var(--azul-gvi); background: rgba(0,122,255,0.08); }
+        .pedido-card .etiqueta { font-size: 17px; font-weight: 900; margin-bottom: 4px; }
+        .pedido-card .meta { display: flex; justify-content: space-between; font-size: 13px; opacity: 0.7; }
+        .pedido-card .total { color: var(--azul-gvi); font-weight: 800; font-size: 16px; }
+        .pedido-card .hora-tag { font-size: 11px; opacity: 0.5; position: absolute; top: 10px; right: 14px; }
+        .pedido-nuevo { animation: fadeInNuevo 0.4s ease; }
+        @keyframes fadeInNuevo { from { background: rgba(52,199,89,0.3); transform: translateX(-10px); } }
+
+        .panel-detalle { background: var(--panel-claro); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); padding: 25px; min-height: 70vh; position: sticky; top: 20px; }
+        body.dark-mode .panel-detalle { background: var(--panel-oscuro); }
+
+        .vacio-state { text-align: center; padding: 80px 20px; opacity: 0.4; }
+        .vacio-state .icono { font-size: 70px; margin-bottom: 15px; }
+
+        .det-cabecera { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid #eee; }
+        body.dark-mode .det-cabecera { border-bottom-color: #333; }
+        .det-cabecera h2 { margin: 0; font-size: 26px; }
+        .det-cabecera small { display: block; opacity: 0.5; font-weight: 600; margin-top: 3px; }
+
+        .det-items { max-height: 38vh; overflow-y: auto; margin-bottom: 18px; }
+        .det-item-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        body.dark-mode .det-item-row { border-bottom-color: #2a2a2a; }
+        .det-item-row .nombre { flex: 1; font-weight: 700; }
+        .det-item-row .nombre small { display: block; opacity: 0.5; font-weight: 500; font-size: 11px; }
+        .qty-mini { display: flex; align-items: center; gap: 4px; }
+        .qty-mini button { width: 26px; height: 26px; border: none; border-radius: 6px; background: #eef0f3; cursor: pointer; font-weight: 800; }
+        body.dark-mode .qty-mini button { background: #333; color: white; }
+        .det-item-row .sub { min-width: 75px; text-align: right; font-weight: 800; }
+
+        .det-total {
+            display: flex; justify-content: space-between; align-items: baseline;
+            padding: 18px 0; border-top: 2px solid var(--azul-gvi); margin-top: 8px;
+        }
+        .det-total b { font-size: 36px; color: var(--azul-gvi); font-weight: 900; }
+
+        .metodos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .btn-met {
+            padding: 16px; border: 2px solid #eee; border-radius: 12px;
+            background: transparent; cursor: pointer; font-weight: 800; font-size: 15px;
+            color: inherit; transition: 0.2s; font-family: inherit;
+        }
+        body.dark-mode .btn-met { border-color: #333; }
+        .btn-met.activo { border-color: var(--azul-gvi); background: rgba(0,122,255,0.1); color: var(--azul-gvi); }
+
+        .seccion-pago input { width: 100%; padding: 13px; font-size: 20px; text-align: center; font-weight: 800; border-radius: 10px; border: 1.5px solid #ddd; outline: none; box-sizing: border-box; background: transparent; color: inherit; font-family: inherit; }
+        .vuelto-text { text-align: center; font-size: 18px; font-weight: 800; color: #34c759; margin-top: 10px; }
+
+        .acciones-det { display: flex; gap: 10px; margin-top: 18px; }
+
+        @media print {
+            body * { display: none !important; }
+            #areaImpresion, #areaImpresion * { display: block !important; }
+            #areaImpresion { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/nav') %>
+    <div class="switch-tema-wrapper">
+        <label class="switch-tema">
+            <input type="checkbox" id="checkTema" onclick="toggleTema()">
+            <span class="slider"><span class="icono-sol">☀️</span><span class="icono-luna">🌙</span></span>
+        </label>
+    </div>
+
+    <div class="contenedor">
+        <div class="header-cobrar">
+            <h1>💳 Cobrar Pedidos</h1>
+            <div style="display:flex; align-items:center; gap: 12px;">
+                <span class="badge-live"><span class="live-dot"></span> En vivo</span>
+                <button class="btn-cancelar btn-volver" onclick="window.location.href='/'">⬅ Volver</button>
+            </div>
+        </div>
+
+        <div class="grid-cobrar">
+            <div class="panel-cola">
+                <h3>Cola de Pedidos · <span id="numCola">0</span></h3>
+                <div id="listaPedidos">
+                    <div class="vacio-state" style="padding: 40px 10px;">
+                        <div class="icono">📭</div>
+                        <p>Sin pedidos por ahora</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-detalle" id="panelDetalle">
+                <div class="vacio-state">
+                    <div class="icono">👈</div>
+                    <h3 style="margin: 0 0 6px;">Selecciona un pedido</h3>
+                    <p style="margin: 0; font-size: 14px;">Los pedidos aparecen automáticamente al recibirlos del recolector.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="areaImpresion" style="display: none;"></div>
+
+    <%- include('partials/scripts') %>
+    <script>
+        let pedidos = [];
+        let pedidoSel = null;
+        let metodoPago = 'Efectivo';
+        let pagoCon = 0;
+        let pedidosVistos = new Set();
+
+        async function cargarPedidos() {
+            try {
+                const res = await fetch('/api/pedidos');
+                const nuevos = await res.json();
+
+                const idsViejos = pedidos.map(p => p.id);
+                const idsNuevos = nuevos.map(p => p.id);
+                const aparecieron = nuevos.filter(p => !pedidosVistos.has(p.id) && pedidosVistos.size > 0);
+
+                pedidos = nuevos;
+                pedidos.forEach(p => pedidosVistos.add(p.id));
+
+                renderCola(aparecieron.map(p => p.id));
+                document.getElementById('numCola').innerText = pedidos.length;
+
+                if (aparecieron.length > 0) sonidoCampana();
+
+                if (pedidoSel && !pedidos.find(p => p.id === pedidoSel.id)) {
+                    pedidoSel = null;
+                    renderDetalle();
+                } else if (pedidoSel) {
+                    pedidoSel = pedidos.find(p => p.id === pedidoSel.id) || pedidoSel;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function renderCola(idsNuevos = []) {
+            const cont = document.getElementById('listaPedidos');
+            if (pedidos.length === 0) {
+                cont.innerHTML = '<div class="vacio-state" style="padding: 40px 10px;"><div class="icono">📭</div><p>Sin pedidos por ahora</p></div>';
+                return;
+            }
+            cont.innerHTML = pedidos.map(p => {
+                const numUnidades = p.items.length;
+                const isActivo = pedidoSel && pedidoSel.id === p.id;
+                const isNuevo = idsNuevos.includes(p.id);
+                return `<div class="pedido-card ${isActivo?'activo':''} ${isNuevo?'pedido-nuevo':''}" onclick="seleccionarPedido(${p.id})">
+                    <span class="hora-tag">🕒 ${p.hora.split(':').slice(0,2).join(':')}</span>
+                    <div class="etiqueta">👤 ${p.etiqueta}</div>
+                    <div class="meta">
+                        <span>${numUnidades} ${numUnidades===1?'producto':'productos'}</span>
+                        <span class="total">$${p.total.toLocaleString('es-CL')}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function seleccionarPedido(id) {
+            pedidoSel = pedidos.find(p => p.id === id);
+            metodoPago = 'Efectivo';
+            pagoCon = 0;
+            renderCola();
+            renderDetalle();
+        }
+
+        function renderDetalle() {
+            const panel = document.getElementById('panelDetalle');
+            if (!pedidoSel) {
+                panel.innerHTML = `<div class="vacio-state">
+                    <div class="icono">👈</div>
+                    <h3 style="margin: 0 0 6px;">Selecciona un pedido</h3>
+                    <p style="margin: 0; font-size: 14px;">Los pedidos aparecen automáticamente al recibirlos del recolector.</p>
+                </div>`;
+                return;
+            }
+
+            const totalCalc = pedidoSel.items.reduce((s,i) => s + i.precio * i.cantidad, 0);
+            pedidoSel.total = totalCalc;
+
+            const itemsHTML = pedidoSel.items.map((it, idx) => {
+                const sub = it.precio * it.cantidad;
+                const ctrl = it.vendidoPorPeso
+                    ? `<span style="font-weight:800; padding: 0 8px;">⚖️ ${it.pesoGramos}g</span>`
+                    : `<div class="qty-mini">
+                          <button onclick="ajustarItem(${idx},-1)">−</button>
+                          <b style="min-width:22px; text-align:center;">${it.cantidad}</b>
+                          <button onclick="ajustarItem(${idx},1)">+</button>
+                       </div>`;
+                return `<div class="det-item-row">
+                    <div class="nombre">${it.nombre}<small>$${it.precio.toLocaleString('es-CL')}${it.vendidoPorPeso?'/kg':''}</small></div>
+                    ${ctrl}
+                    <span class="sub">$${sub.toLocaleString('es-CL')}</span>
+                    <button onclick="quitarItem(${idx})" style="border:none; background:transparent; cursor:pointer; font-size: 16px;">❌</button>
+                </div>`;
+            }).join('');
+
+            const vueltoCalc = Math.max(0, pagoCon - totalCalc);
+            const seccionEf = `<div class="seccion-pago" id="secEfectivo">
+                <input type="text" id="inputPago" inputmode="numeric" placeholder="¿Cuánto entrega?" oninput="actualizarPago(this)">
+                <div class="vuelto-text">Vuelto: $<span id="vuelto">${vueltoCalc.toLocaleString('es-CL')}</span></div>
+            </div>`;
+
+            panel.innerHTML = `
+                <div class="det-cabecera">
+                    <div>
+                        <h2>👤 ${pedidoSel.etiqueta}</h2>
+                        <small>Recibido a las ${pedidoSel.hora}</small>
+                    </div>
+                    <button onclick="cancelarPedido()" class="btn-danger" title="Cancelar pedido" style="padding: 9px 14px; font-size: 13px;">🗑️ Cancelar</button>
+                </div>
+                <div class="det-items">${itemsHTML}</div>
+                <div class="det-total">
+                    <span style="font-weight: 700; opacity: 0.6; text-transform: uppercase; font-size: 12px;">Total</span>
+                    <b>$${totalCalc.toLocaleString('es-CL')}</b>
+                </div>
+                <div class="metodos">
+                    <button class="btn-met ${metodoPago==='Efectivo'?'activo':''}" onclick="setMetodo('Efectivo')">💵 EFECTIVO</button>
+                    <button class="btn-met ${metodoPago==='Tarjeta'?'activo':''}" onclick="setMetodo('Tarjeta')">💳 TARJETA</button>
+                </div>
+                ${metodoPago === 'Efectivo' ? seccionEf : ''}
+                <div class="acciones-det">
+                    <button class="btn-cancelar" style="flex: 1;" onclick="cobrar(false)">Solo Cobrar</button>
+                    <button class="btn-success" style="flex: 1.7;" onclick="cobrar(true)">✅ Cobrar e Imprimir</button>
+                </div>
+            `;
+        }
+
+        function setMetodo(m) {
+            metodoPago = m;
+            pagoCon = m === 'Tarjeta' ? pedidoSel.total : 0;
+            renderDetalle();
+        }
+
+        function actualizarPago(input) {
+            const valor = input.value.replace(/\D/g, "");
+            input.value = valor === "" ? "" : "$" + Number(valor).toLocaleString('es-CL');
+            pagoCon = Number(valor);
+            const vuelto = Math.max(0, pagoCon - pedidoSel.total);
+            const v = document.getElementById('vuelto');
+            if (v) v.innerText = vuelto.toLocaleString('es-CL');
+        }
+
+        async function ajustarItem(idx, delta) {
+            const it = pedidoSel.items[idx];
+            if (it.vendidoPorPeso) return;
+            const nuevo = it.cantidad + delta;
+            if (nuevo <= 0) pedidoSel.items.splice(idx, 1);
+            else it.cantidad = nuevo;
+            await guardarCambios();
+            renderDetalle();
+        }
+
+        async function quitarItem(idx) {
+            pedidoSel.items.splice(idx, 1);
+            if (pedidoSel.items.length === 0) {
+                if (confirm('Sin items quedará el pedido vacío. ¿Cancelar pedido?')) {
+                    await cancelarPedido();
+                    return;
+                } else {
+                    cargarPedidos();
+                    return;
+                }
+            }
+            await guardarCambios();
+            renderDetalle();
+        }
+
+        async function guardarCambios() {
+            const total = pedidoSel.items.reduce((s,i) => s + i.precio * i.cantidad, 0);
+            pedidoSel.total = total;
+            await fetch(`/api/pedidos/${pedidoSel.id}`, {
+                method: 'PUT',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ items: pedidoSel.items, total })
+            });
+        }
+
+        async function cancelarPedido() {
+            if (!confirm(`¿Cancelar el pedido de ${pedidoSel.etiqueta}?`)) return;
+            await fetch(`/api/pedidos/${pedidoSel.id}`, { method: 'DELETE' });
+            pedidoSel = null;
+            renderDetalle();
+            cargarPedidos();
+        }
+
+        async function cobrar(imprimir) {
+            if (!pedidoSel) return;
+            if (metodoPago === 'Efectivo' && pagoCon < pedidoSel.total) {
+                return alert('⚠️ El pago en efectivo es insuficiente.');
+            }
+            const datos = {
+                metodoPago,
+                pagoCon: metodoPago === 'Efectivo' ? pagoCon : pedidoSel.total,
+                vuelto: metodoPago === 'Efectivo' ? pagoCon - pedidoSel.total : 0
+            };
+            try {
+                const res = await fetch(`/api/pedidos/${pedidoSel.id}/cobrar`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(datos)
+                });
+                const r = await res.json();
+                if (r.success) {
+                    if (imprimir) imprimirTicket(r.ventaId, pedidoSel, datos);
+                    pedidoSel = null;
+                    renderDetalle();
+                    cargarPedidos();
+                } else {
+                    alert('❌ Error al cobrar');
+                }
+            } catch (e) { alert('Error de red'); }
+        }
+
+        function imprimirTicket(id, pedido, datos) {
+            const fecha = new Date().toLocaleString('es-CL');
+            document.getElementById('areaImpresion').innerHTML = `
+                <div style="text-align:center; font-family:monospace;">
+                    <h3>GVI MINIMARKET</h3>
+                    <p>Ticket #${id}<br>${fecha}<br>${pedido.etiqueta}</p><hr>
+                    <table style="width:100%; font-size:12px;">
+                        ${pedido.items.map(i => {
+                            const desc = i.vendidoPorPeso ? `${i.pesoGramos}g ${i.nombre.substring(0,15)}` : `${i.cantidad}x ${i.nombre.substring(0,18)}`;
+                            return `<tr><td>${desc}</td><td style="text-align:right;">$${(i.precio*i.cantidad).toLocaleString('es-CL')}</td></tr>`;
+                        }).join('')}
+                    </table><hr>
+                    <p style="text-align:right;"><b>TOTAL: $${pedido.total.toLocaleString('es-CL')}</b></p>
+                    <p style="text-align:right;">Pago: ${datos.metodoPago}</p>
+                    ${datos.metodoPago==='Efectivo' ? `<p style="text-align:right;">Vuelto: $${datos.vuelto.toLocaleString('es-CL')}</p>` : ''}
+                    <p>¡Gracias por su compra!</p>
+                </div>`;
+            window.print();
+        }
+
+        function sonidoCampana() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.connect(g); g.connect(ctx.destination);
+                o.type = 'sine'; o.frequency.value = 880;
+                g.gain.setValueAtTime(0.0001, ctx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.02);
+                g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
+                o.start(); o.stop(ctx.currentTime + 0.4);
+            } catch(_) {}
+        }
+
+        cargarPedidos();
+        setInterval(cargarPedidos, 2500);
+    </script>
+</body>
+</html>
