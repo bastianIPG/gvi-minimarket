@@ -597,7 +597,10 @@ server.listen(PORT, '0.0.0.0', () => {
 // --- CONFIGURACIÓN ELECTRON ---
 function createWindow() {
     const win = new BrowserWindow({
-        width: 1280, height: 800,
+        width: 1180,
+        height: 720,
+        minWidth: 960,
+        minHeight: 640,
         title: "GVI - Gestor de Ventas Intuitivo",
         webPreferences: { 
             nodeIntegration: false,    // SEGURIDAD: Previene ejecución de código OS desde la vista
