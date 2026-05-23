@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GVI - Login</title>
     <link rel="stylesheet" href="/css/global.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -10,59 +11,89 @@
         body {
             margin: 0; padding: 0;
             display: flex; justify-content: center; align-items: center;
-            height: 100vh;
-            background: var(--fondo-claro, #f0f2f5);
+            min-height: 100vh;
+            min-height: 100svh;
+            background:
+                radial-gradient(circle at top left, rgba(0, 122, 255, 0.14), transparent 34%),
+                linear-gradient(135deg, #eef3f8 0%, #f7f9fb 52%, #eef2f6 100%);
             font-family: 'Inter', sans-serif;
-            overflow: hidden;
+            overflow: auto;
             transition: background 0.3s;
+            box-sizing: border-box;
+            padding: clamp(16px, 4vw, 36px);
         }
-        body.dark-mode { background: var(--fondo-oscuro, #121212); }
+        *, *::before, *::after { box-sizing: inherit; }
+        body.dark-mode {
+            background:
+                radial-gradient(circle at top left, rgba(0, 122, 255, 0.18), transparent 34%),
+                linear-gradient(135deg, #0f1115 0%, #151922 54%, #101114 100%);
+        }
 
         .login-container {
             background: var(--panel-claro, #ffffff);
-            padding: 50px 40px;
-            border-radius: 32px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+            padding: clamp(28px, 4vw, 44px) clamp(22px, 4vw, 38px);
+            border-radius: 24px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            box-shadow: 0 24px 70px rgba(20, 30, 45, 0.12);
             text-align: center;
-            width: 100%;
-            max-width: 380px;
+            width: min(100%, 420px);
+            max-width: 100%;
             animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             transition: 0.4s;
         }
-        body.dark-mode .login-container { background: var(--panel-oscuro, #1e1e1e); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        body.dark-mode .login-container { background: rgba(30, 30, 30, 0.96); border-color: rgba(255,255,255,0.08); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
 
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(60px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .login-header h1 { margin: 0; font-size: 32px; font-weight: 800; color: var(--texto-claro, #333); letter-spacing: -1px; }
+        .login-header h1 { margin: 0; font-size: clamp(28px, 6vw, 36px); font-weight: 800; color: var(--texto-claro, #333); letter-spacing: 0; }
         body.dark-mode .login-header h1 { color: #fff; }
-        .login-header p { margin: 8px 0 40px; color: #8e8e93; font-weight: 600; font-size: 15px; }
+        .login-header p { margin: 8px 0 clamp(28px, 6vw, 40px); color: #8e8e93; font-weight: 600; font-size: 15px; }
 
-        .pin-display { display: flex; justify-content: center; gap: 20px; margin-bottom: 45px; }
+        .pin-display { display: flex; justify-content: center; gap: clamp(12px, 4vw, 20px); margin-bottom: clamp(30px, 7vw, 44px); }
         .pin-dot {
-            width: 22px; height: 22px;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.08);
+            width: clamp(20px, 6vw, 28px); height: clamp(20px, 6vw, 28px);
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.08);
+            border: 2px solid rgba(15, 23, 42, 0.08);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6);
             transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        body.dark-mode .pin-dot { background: rgba(255,255,255,0.1); }
-        .pin-dot.filled { background: var(--azul-gvi, #007aff); transform: scale(1.3); }
+        body.dark-mode .pin-dot { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); box-shadow: none; }
+        .pin-dot.filled {
+            background: var(--dot-color, var(--azul-gvi, #007aff));
+            border-color: transparent;
+            border-radius: var(--dot-radius, 50%);
+            transform: translateY(-2px) scale(1.12) rotate(var(--dot-rotate, 0deg));
+            box-shadow: 0 10px 22px var(--dot-shadow, rgba(0, 122, 255, 0.28));
+        }
+        .pin-dot.pop { animation: pinPop 0.26s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes pinPop {
+            0% { transform: scale(0.72); }
+            70% { transform: scale(1.22) rotate(var(--dot-rotate, 0deg)); }
+            100% { transform: translateY(-2px) scale(1.12) rotate(var(--dot-rotate, 0deg)); }
+        }
+        .pin-dot.filled:nth-child(1) { --dot-color: #007aff; --dot-shadow: rgba(0, 122, 255, 0.28); --dot-radius: 50%; }
+        .pin-dot.filled:nth-child(2) { --dot-color: #34c759; --dot-shadow: rgba(52, 199, 89, 0.28); --dot-radius: 9px; --dot-rotate: 45deg; }
+        .pin-dot.filled:nth-child(3) { --dot-color: #ff9500; --dot-shadow: rgba(255, 149, 0, 0.28); --dot-radius: 7px; }
+        .pin-dot.filled:nth-child(4) { --dot-color: #af52de; --dot-shadow: rgba(175, 82, 222, 0.28); --dot-radius: 50% 50% 8px 50%; --dot-rotate: -45deg; }
 
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px 20px; }
+        .numpad { display: grid; grid-template-columns: repeat(3, minmax(64px, 1fr)); gap: clamp(14px, 3vw, 22px); }
         
         .num-btn {
             background: rgba(0,0,0,0.03);
             border: none; border-radius: 50%;
-            width: 75px; height: 75px;
-            font-size: 28px; font-weight: 600;
+            width: min(100%, clamp(62px, 17vw, 78px)); height: clamp(62px, 17vw, 78px);
+            font-size: clamp(23px, 6vw, 29px); font-weight: 700;
             color: var(--texto-claro, #333);
             cursor: pointer;
             margin: 0 auto;
-            transition: 0.2s;
+            transition: transform 0.2s, background 0.2s, color 0.2s, box-shadow 0.2s;
             display: flex; align-items: center; justify-content: center;
+            touch-action: manipulation;
         }
         body.dark-mode .num-btn { background: rgba(255,255,255,0.05); color: white; }
         
@@ -90,6 +121,20 @@
             transition: 0.3s; transform: translateY(-10px);
         }
         .error-msg.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-height: 620px) {
+            .login-container { padding-top: 22px; padding-bottom: 22px; }
+            .login-header p { margin-bottom: 22px; }
+            .pin-display { margin-bottom: 24px; }
+            .numpad { gap: 12px; }
+            .error-msg { margin-top: 18px; }
+        }
+
+        @media (max-width: 420px) {
+            body { padding: 12px; }
+            .login-container { padding-left: 18px; padding-right: 18px; }
+            .numpad { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 12px; }
+        }
     </style>
 </head>
 <body class="dark-mode">
@@ -140,15 +185,25 @@
 
         function updateDots() {
             dots.forEach((dot, index) => {
-                if (index < currentPin.length) dot.classList.add('filled');
-                else dot.classList.remove('filled');
+                const shouldFill = index < currentPin.length;
+                dot.classList.toggle('filled', shouldFill);
+                if (!shouldFill) dot.classList.remove('pop');
             });
+        }
+
+        function animateLatestDot() {
+            const dot = dots[currentPin.length - 1];
+            if (!dot) return;
+            dot.classList.remove('pop');
+            void dot.offsetWidth;
+            dot.classList.add('pop');
         }
 
         async function addNumber(num) {
             if (currentPin.length < 4 && !isProcessing) {
                 currentPin += num;
                 updateDots();
+                animateLatestDot();
                 errorMsg.classList.remove('visible');
                 
                 if (currentPin.length === 4) {

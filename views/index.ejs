@@ -10,8 +10,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 90vh;
-            padding: 40px 20px;
+            min-height: 100svh;
+            padding: clamp(84px, 10vh, 120px) clamp(16px, 4vw, 32px) clamp(28px, 5vh, 48px);
         }
 
         /* Ocultar menú nav en el inicio */
@@ -19,21 +19,21 @@
 
         .dashboard-hero {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: clamp(28px, 6vh, 50px);
         }
 
         /* --- RELOJ Y CLIMA --- */
         .reloj-gigante {
-            font-size: 100px;
+            font-size: clamp(48px, 12vw, 100px);
             font-weight: 900;
             margin: 0;
-            letter-spacing: -5px;
+            letter-spacing: 0;
             color: var(--texto-claro);
             line-height: 1;
         }
         body.dark-mode .reloj-gigante { color: #fff; }
 
-        .reloj-periodo { font-size: 30px; opacity: 0.3; margin-left: 10px; letter-spacing: 0; }
+        .reloj-periodo { font-size: clamp(18px, 4vw, 30px); opacity: 0.3; margin-left: 10px; letter-spacing: 0; }
         .fecha-completa { font-size: 18px; opacity: 0.5; font-weight: 600; margin-top: 5px; text-transform: capitalize; }
 
         .fecha-completa { font-size: 18px; opacity: 0.5; font-weight: 600; margin-top: 5px; text-transform: capitalize; }
@@ -41,8 +41,10 @@
         /* --- GRID BALANCEADO --- */
         .grid-modulos-pro {
             display: grid;
-            grid-template-columns: repeat(3, 280px);
-            gap: 22px;
+            grid-template-columns: repeat(3, minmax(220px, 280px));
+            gap: clamp(16px, 2.4vw, 22px);
+            width: min(100%, 884px);
+            justify-content: center;
         }
         @media (max-width: 1000px) {
             .grid-modulos-pro { grid-template-columns: repeat(2, 280px); }
@@ -53,8 +55,8 @@
 
         .card-menu-pro {
             background: var(--panel-claro);
-            padding: 35px 25px;
-            border-radius: 28px;
+            padding: clamp(24px, 3.2vw, 35px) clamp(18px, 3vw, 25px);
+            border-radius: 20px;
             text-decoration: none;
             color: inherit;
             display: flex;
@@ -154,13 +156,16 @@
 
         /* --- HERRAMIENTAS SUPERIORES (Logout, Usuario, Tema) --- */
         .header-tools {
-            position: absolute;
-            top: 25px;
-            right: 25px;
+            position: fixed;
+            top: clamp(12px, 3vw, 25px);
+            right: clamp(12px, 3vw, 25px);
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             z-index: 2000;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            max-width: calc(100% - 24px);
         }
 
         .user-info-pill {
@@ -186,6 +191,18 @@
         }
         .btn-logout:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(255,59,48,0.4); }
         .btn-logout i { width: 16px; height: 16px; }
+
+        @media (max-width: 700px) {
+            .dashboard-container { justify-content: flex-start; }
+            .header-tools {
+                left: 12px;
+                right: 12px;
+                justify-content: center;
+            }
+            .user-info-pill,
+            .btn-logout { padding: 8px 12px; }
+            .grid-modulos-pro { width: 100%; }
+        }
 
     </style>
 </head>

@@ -611,8 +611,10 @@ function createWindow() {
     win.loadURL(`http://localhost:${PORT}`);
 }
 
-app.whenReady().then(createWindow);
+if (app && app.whenReady) {
+    app.whenReady().then(createWindow);
 
-app.on('window-all-closed', () => {
-    process.exit(0); 
-});
+    app.on('window-all-closed', () => {
+        process.exit(0); 
+    });
+}
