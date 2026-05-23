@@ -11,7 +11,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100svh;
-            padding: clamp(84px, 10vh, 120px) clamp(16px, 4vw, 32px) clamp(28px, 5vh, 48px);
+            padding: clamp(62px, 8vh, 86px) clamp(14px, 3vw, 28px) clamp(18px, 3vh, 28px);
         }
 
         /* Ocultar menú nav en el inicio */
@@ -19,12 +19,12 @@
 
         .dashboard-hero {
             text-align: center;
-            margin-bottom: clamp(28px, 6vh, 50px);
+            margin-bottom: clamp(18px, 3.5vh, 30px);
         }
 
         /* --- RELOJ Y CLIMA --- */
         .reloj-gigante {
-            font-size: clamp(48px, 12vw, 100px);
+            font-size: clamp(44px, 9vw, 82px);
             font-weight: 900;
             margin: 0;
             letter-spacing: 0;
@@ -33,17 +33,15 @@
         }
         body.dark-mode .reloj-gigante { color: #fff; }
 
-        .reloj-periodo { font-size: clamp(18px, 4vw, 30px); opacity: 0.3; margin-left: 10px; letter-spacing: 0; }
-        .fecha-completa { font-size: 18px; opacity: 0.5; font-weight: 600; margin-top: 5px; text-transform: capitalize; }
-
-        .fecha-completa { font-size: 18px; opacity: 0.5; font-weight: 600; margin-top: 5px; text-transform: capitalize; }
+        .reloj-periodo { font-size: clamp(16px, 3vw, 24px); opacity: 0.3; margin-left: 8px; letter-spacing: 0; }
+        .fecha-completa { font-size: clamp(14px, 2vw, 17px); opacity: 0.5; font-weight: 600; margin-top: 3px; text-transform: capitalize; }
 
         /* --- GRID BALANCEADO --- */
         .grid-modulos-pro {
             display: grid;
-            grid-template-columns: repeat(3, minmax(220px, 280px));
-            gap: clamp(16px, 2.4vw, 22px);
-            width: min(100%, 884px);
+            grid-template-columns: repeat(3, minmax(210px, 260px));
+            gap: clamp(12px, 1.8vw, 18px);
+            width: min(100%, 816px);
             justify-content: center;
         }
         @media (max-width: 1000px) {
@@ -55,8 +53,8 @@
 
         .card-menu-pro {
             background: var(--panel-claro);
-            padding: clamp(24px, 3.2vw, 35px) clamp(18px, 3vw, 25px);
-            border-radius: 20px;
+            padding: clamp(20px, 2.6vh, 28px) clamp(16px, 2.5vw, 22px);
+            border-radius: 18px;
             text-decoration: none;
             color: inherit;
             display: flex;
@@ -77,24 +75,24 @@
         }
 
         .card-icono-pro { 
-            height: 60px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--azul-gvi);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
-        .card-icono-pro svg { width: 42px; height: 42px; stroke-width: 1.5px; }
+        .card-icono-pro svg { width: 34px; height: 34px; stroke-width: 1.7px; }
         body.dark-mode .card-icono-pro { color: #5ea9ff; }
-        .card-menu-pro h3 { margin: 10px 0 5px; font-size: 20px; font-weight: 700; }
-        .card-menu-pro p { margin: 0; font-size: 14px; opacity: 0.5; font-weight: 500; }
+        .card-menu-pro h3 { margin: 8px 0 4px; font-size: clamp(17px, 2vw, 19px); font-weight: 700; }
+        .card-menu-pro p { margin: 0; font-size: 13px; opacity: 0.5; font-weight: 500; }
 
         /* --- INDICADORES EN TIEMPO REAL (Live Badges) --- */
         .badge-stats {
-            margin-top: 15px;
-            padding: 6px 14px;
+            margin-top: 12px;
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
             background: rgba(0, 122, 255, 0.08);
             color: var(--azul-gvi);
@@ -157,8 +155,8 @@
         /* --- HERRAMIENTAS SUPERIORES (Logout, Usuario, Tema) --- */
         .header-tools {
             position: fixed;
-            top: clamp(12px, 3vw, 25px);
-            right: clamp(12px, 3vw, 25px);
+            top: clamp(10px, 2vw, 18px);
+            right: clamp(10px, 2vw, 18px);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -202,6 +200,16 @@
             .user-info-pill,
             .btn-logout { padding: 8px 12px; }
             .grid-modulos-pro { width: 100%; }
+        }
+
+        @media (max-height: 760px) and (min-width: 900px) {
+            .dashboard-container { justify-content: flex-start; padding-top: 58px; }
+            .dashboard-hero { margin-bottom: 16px; }
+            .reloj-gigante { font-size: 68px; }
+            .card-menu-pro { padding-top: 18px; padding-bottom: 18px; }
+            .card-icono-pro { height: 38px; margin-bottom: 4px; }
+            .card-icono-pro svg { width: 30px; height: 30px; }
+            .badge-stats { margin-top: 8px; }
         }
 
     </style>
