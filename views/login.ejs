@@ -68,10 +68,12 @@
         body.dark-mode .pin-dot { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); box-shadow: none; }
         .pin-dot.filled {
             background: var(--dot-color, var(--azul-gvi, #007aff));
-            border-color: transparent;
+            border-color: rgba(255,255,255,0.9);
             border-radius: var(--dot-radius, 50%);
-            transform: translateY(-2px) scale(1.12) rotate(var(--dot-rotate, 0deg));
-            box-shadow: 0 10px 22px var(--dot-shadow, rgba(0, 122, 255, 0.28));
+            transform: translateY(-3px) scale(1.22) rotate(var(--dot-rotate, 0deg));
+            box-shadow:
+                0 0 0 4px var(--dot-halo, rgba(0, 122, 255, 0.16)),
+                0 12px 26px var(--dot-shadow, rgba(0, 122, 255, 0.38));
         }
         .pin-dot.pop { animation: pinPop 0.26s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes pinPop {
@@ -79,10 +81,10 @@
             70% { transform: scale(1.22) rotate(var(--dot-rotate, 0deg)); }
             100% { transform: translateY(-2px) scale(1.12) rotate(var(--dot-rotate, 0deg)); }
         }
-        .pin-dot.filled:nth-child(1) { --dot-color: #007aff; --dot-shadow: rgba(0, 122, 255, 0.28); --dot-radius: 50%; }
-        .pin-dot.filled:nth-child(2) { --dot-color: #34c759; --dot-shadow: rgba(52, 199, 89, 0.28); --dot-radius: 9px; --dot-rotate: 45deg; }
-        .pin-dot.filled:nth-child(3) { --dot-color: #ff9500; --dot-shadow: rgba(255, 149, 0, 0.28); --dot-radius: 7px; }
-        .pin-dot.filled:nth-child(4) { --dot-color: #af52de; --dot-shadow: rgba(175, 82, 222, 0.28); --dot-radius: 50% 50% 8px 50%; --dot-rotate: -45deg; }
+        .pin-dot.filled:nth-child(1) { --dot-color: #0a84ff; --dot-shadow: rgba(10, 132, 255, 0.48); --dot-halo: rgba(10, 132, 255, 0.18); --dot-radius: 50%; }
+        .pin-dot.filled:nth-child(2) { --dot-color: #30d158; --dot-shadow: rgba(48, 209, 88, 0.46); --dot-halo: rgba(48, 209, 88, 0.18); --dot-radius: 9px; --dot-rotate: 45deg; }
+        .pin-dot.filled:nth-child(3) { --dot-color: #ff9f0a; --dot-shadow: rgba(255, 159, 10, 0.48); --dot-halo: rgba(255, 159, 10, 0.18); --dot-radius: 7px; }
+        .pin-dot.filled:nth-child(4) { --dot-color: #bf5af2; --dot-shadow: rgba(191, 90, 242, 0.5); --dot-halo: rgba(191, 90, 242, 0.2); --dot-radius: 50% 50% 8px 50%; --dot-rotate: -45deg; }
 
         .numpad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 2svh, 16px) clamp(10px, 3vw, 18px); }
         
@@ -99,6 +101,12 @@
             touch-action: manipulation;
         }
         body.dark-mode .num-btn { background: rgba(255,255,255,0.05); color: white; }
+        .num-btn.input-feedback {
+            background: var(--feedback-color, #0a84ff) !important;
+            color: white !important;
+            transform: scale(1.08);
+            box-shadow: 0 0 0 5px var(--feedback-halo, rgba(10, 132, 255, 0.18)), 0 12px 24px var(--feedback-shadow, rgba(10, 132, 255, 0.28));
+        }
         
         /* Hover y Active (Feedback táctil visual) */
         @media (hover: hover) {
@@ -178,17 +186,17 @@
         </div>
 
         <div class="numpad">
-            <button class="num-btn" onclick="addNumber(1)">1</button>
-            <button class="num-btn" onclick="addNumber(2)">2</button>
-            <button class="num-btn" onclick="addNumber(3)">3</button>
-            <button class="num-btn" onclick="addNumber(4)">4</button>
-            <button class="num-btn" onclick="addNumber(5)">5</button>
-            <button class="num-btn" onclick="addNumber(6)">6</button>
-            <button class="num-btn" onclick="addNumber(7)">7</button>
-            <button class="num-btn" onclick="addNumber(8)">8</button>
-            <button class="num-btn" onclick="addNumber(9)">9</button>
+            <button class="num-btn" data-num="1" onclick="addNumber(1)">1</button>
+            <button class="num-btn" data-num="2" onclick="addNumber(2)">2</button>
+            <button class="num-btn" data-num="3" onclick="addNumber(3)">3</button>
+            <button class="num-btn" data-num="4" onclick="addNumber(4)">4</button>
+            <button class="num-btn" data-num="5" onclick="addNumber(5)">5</button>
+            <button class="num-btn" data-num="6" onclick="addNumber(6)">6</button>
+            <button class="num-btn" data-num="7" onclick="addNumber(7)">7</button>
+            <button class="num-btn" data-num="8" onclick="addNumber(8)">8</button>
+            <button class="num-btn" data-num="9" onclick="addNumber(9)">9</button>
             <div></div>
-            <button class="num-btn" onclick="addNumber(0)">0</button>
+            <button class="num-btn" data-num="0" onclick="addNumber(0)">0</button>
             <button class="num-btn delete" onclick="deleteNumber()"><i data-lucide="delete"></i></button>
         </div>
         
@@ -202,6 +210,12 @@
         const errorMsg = document.getElementById('errorMsg');
         const loginBox = document.getElementById('loginBox');
         let isProcessing = false;
+        const feedbackColors = [
+            { color: '#0a84ff', halo: 'rgba(10, 132, 255, 0.18)', shadow: 'rgba(10, 132, 255, 0.36)' },
+            { color: '#30d158', halo: 'rgba(48, 209, 88, 0.18)', shadow: 'rgba(48, 209, 88, 0.34)' },
+            { color: '#ff9f0a', halo: 'rgba(255, 159, 10, 0.18)', shadow: 'rgba(255, 159, 10, 0.34)' },
+            { color: '#bf5af2', halo: 'rgba(191, 90, 242, 0.2)', shadow: 'rgba(191, 90, 242, 0.36)' }
+        ];
 
         function updateDots() {
             dots.forEach((dot, index) => {
@@ -219,11 +233,25 @@
             dot.classList.add('pop');
         }
 
+        function animatePressedNumber(num) {
+            const btn = document.querySelector(`[data-num="${num}"]`);
+            if (!btn) return;
+            const color = feedbackColors[(currentPin.length - 1) % feedbackColors.length];
+            btn.style.setProperty('--feedback-color', color.color);
+            btn.style.setProperty('--feedback-halo', color.halo);
+            btn.style.setProperty('--feedback-shadow', color.shadow);
+            btn.classList.remove('input-feedback');
+            void btn.offsetWidth;
+            btn.classList.add('input-feedback');
+            setTimeout(() => btn.classList.remove('input-feedback'), 520);
+        }
+
         async function addNumber(num) {
             if (currentPin.length < 4 && !isProcessing) {
                 currentPin += num;
                 updateDots();
                 animateLatestDot();
+                animatePressedNumber(num);
                 errorMsg.classList.remove('visible');
                 
                 if (currentPin.length === 4) {
