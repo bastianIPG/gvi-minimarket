@@ -81,10 +81,10 @@
             70% { transform: scale(1.22) rotate(var(--dot-rotate, 0deg)); }
             100% { transform: translateY(-2px) scale(1.12) rotate(var(--dot-rotate, 0deg)); }
         }
-        .pin-dot.filled:nth-child(1) { --dot-color: #1e90ff; --dot-shadow: rgba(30, 144, 255, 0.6); --dot-halo: rgba(30, 144, 255, 0.28); --dot-radius: 50%; }
-        .pin-dot.filled:nth-child(2) { --dot-color: #32d74b; --dot-shadow: rgba(50, 215, 75, 0.58); --dot-halo: rgba(50, 215, 75, 0.28); --dot-radius: 9px; --dot-rotate: 45deg; }
-        .pin-dot.filled:nth-child(3) { --dot-color: #ffb340; --dot-shadow: rgba(255, 179, 64, 0.6); --dot-halo: rgba(255, 179, 64, 0.28); --dot-radius: 7px; }
-        .pin-dot.filled:nth-child(4) { --dot-color: #d56bff; --dot-shadow: rgba(213, 107, 255, 0.62); --dot-halo: rgba(213, 107, 255, 0.3); --dot-radius: 50% 50% 8px 50%; --dot-rotate: -45deg; }
+        .pin-dot.filled.pin-color-1 { --dot-shadow: rgba(30, 144, 255, 0.6); --dot-halo: rgba(30, 144, 255, 0.28); --dot-radius: 50%; background-color: #1e90ff !important; }
+        .pin-dot.filled.pin-color-2 { --dot-shadow: rgba(50, 215, 75, 0.58); --dot-halo: rgba(50, 215, 75, 0.28); --dot-radius: 9px; --dot-rotate: 45deg; background-color: #32d74b !important; }
+        .pin-dot.filled.pin-color-3 { --dot-shadow: rgba(255, 179, 64, 0.6); --dot-halo: rgba(255, 179, 64, 0.28); --dot-radius: 7px; background-color: #ffb340 !important; }
+        .pin-dot.filled.pin-color-4 { --dot-shadow: rgba(213, 107, 255, 0.62); --dot-halo: rgba(213, 107, 255, 0.3); --dot-radius: 50% 50% 8px 50%; --dot-rotate: -45deg; background-color: #d56bff !important; }
 
         .numpad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 2svh, 16px) clamp(10px, 3vw, 18px); }
         
@@ -208,8 +208,10 @@
         function updateDots() {
             dots.forEach((dot, index) => {
                 const shouldFill = index < currentPin.length;
+                dot.classList.remove('pin-color-1', 'pin-color-2', 'pin-color-3', 'pin-color-4');
                 dot.classList.toggle('filled', shouldFill);
-                if (!shouldFill) dot.classList.remove('pop');
+                if (shouldFill) dot.classList.add(`pin-color-${index + 1}`);
+                else dot.classList.remove('pop');
             });
         }
 
