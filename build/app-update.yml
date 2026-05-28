@@ -1,0 +1,4 @@
+provider: github
+owner: bastianIPG
+repo: gvi-minimarket
+updaterCacheDirName: gvi-updater

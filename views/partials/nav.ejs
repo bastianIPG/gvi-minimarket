@@ -1,192 +1,740 @@
-<!-- BOTÓN VOLVER ATRÁS (Solo visible fuera del inicio) -->
 <script>
-    // Detectamos si estamos en el inicio para no mostrar el botón de volver
     const esInicio = window.location.pathname === '/';
-    if (!esInicio) {
-        document.write(`
-            <button class="btn-volver-atras" onclick="window.history.back()">
-                <i data-lucide="arrow-left"></i>
-            </button>
-        `);
-    }
 </script>
 
-<!-- BOTÓN MENÚ BURBUJA (Solo visible fuera del inicio) -->
-<script>
-    if (!esInicio) {
-        document.write(`
-            <button class="btn-menu-global" onclick="toggleMenuGlobal()" id="mainFab">
-                <i data-lucide="menu" id="iconMenu"></i>
-            </button>
-        `);
-    }
-</script>
-
-<div id="overlayGlobal" class="bubble-overlay" onclick="toggleMenuGlobal()">
-    <div class="bubble-container">
-        <a href="/" class="bubble-item" style="--delay: 0.1s">
-            <div class="bubble-icon icon-home"><i data-lucide="home"></i></div>
-            <span>Inicio</span>
-        </a>
-        <a href="/caja" class="bubble-item" style="--delay: 0.2s">
-            <div class="bubble-icon icon-caja"><i data-lucide="shopping-cart"></i></div>
-            <span>Venta</span>
-        </a>
-        <a href="/bodega" class="bubble-item" style="--delay: 0.3s">
-            <div class="bubble-icon icon-bodega"><i data-lucide="package"></i></div>
-            <span>Bodega</span>
-        </a>
-        <a href="/fiados" class="bubble-item" style="--delay: 0.4s">
-            <div class="bubble-icon icon-fiados"><i data-lucide="book-open"></i></div>
-            <span>Fiados</span>
-        </a>
-        <a href="/finanzas" class="bubble-item admin-only" style="--delay: 0.5s">
-            <div class="bubble-icon icon-finanzas"><i data-lucide="bar-chart-3"></i></div>
-            <span>Finanzas</span>
-        </a>
-        <a href="/configuracion" class="bubble-item admin-only" style="--delay: 0.6s">
-            <div class="bubble-icon icon-ajustes"><i data-lucide="settings"></i></div>
-            <span>Ajustes</span>
-        </a>
-        <a href="#" onclick="cerrarSesion(event)" class="bubble-item" style="--delay: 0.7s">
-            <div class="bubble-icon icon-logout"><i data-lucide="log-out"></i></div>
-            <span>Salir</span>
-        </a>
+<nav class="app-topbar" id="appTopbar">
+    <div class="app-topbar-left">
+        <button class="topbar-icon-btn" onclick="window.history.back()" title="Volver">
+            <i data-lucide="arrow-left"></i>
+        </button>
+        <div class="topbar-brand" title="GVI">
+            <span class="brand-mark">GVI</span>
+        </div>
     </div>
+
+    <div class="topbar-links">
+        <span class="topbar-active-indicator" id="topbarActiveIndicator"></span>
+        <a href="/" class="topbar-link" data-label="Inicio"><i data-lucide="home"></i><span>Inicio</span></a>
+        <a href="/caja" class="topbar-link" data-label="Venta"><i data-lucide="shopping-cart"></i><span>Venta</span></a>
+        <a href="/cobrar" class="topbar-link" data-label="Cobrar"><i data-lucide="credit-card"></i><span>Cobrar</span></a>
+        <a href="/bodega" class="topbar-link" data-label="Bodega"><i data-lucide="package"></i><span>Bodega</span></a>
+        <a href="/productos" class="topbar-link" data-label="Productos"><i data-lucide="scan-barcode"></i><span>Productos</span></a>
+        <a href="/finanzas" class="topbar-link admin-only" data-label="Finanzas"><i data-lucide="bar-chart-3"></i><span>Finanzas</span></a>
+        <a href="/configuracion" class="topbar-link admin-only" data-label="Ajustes"><i data-lucide="settings"></i><span>Ajustes</span></a>
+        <div class="topbar-clock-chip" id="topbarClockChip">
+            <strong id="topbarClock">00:00</strong>
+            <span id="topbarDate">--</span>
+        </div>
+        <a href="#" onclick="togglePerfil(event)" class="topbar-link user-switch" data-label="Perfil"><i data-lucide="user"></i><span id="topbarUserName">Usuario</span></a>
+        <button class="topbar-window-btn theme-toggle" onclick="toggleTemaNav()" title="Cambiar tema" data-label="Tema"><i data-lucide="moon" id="themeToggleIcon"></i></button>
+        <button class="topbar-window-btn" onclick="minimizarAppNav()" title="Minimizar GVI" data-label="Minimizar"><i data-lucide="minus"></i></button>
+        <button class="topbar-window-btn danger" onclick="cerrarProgramaNav()" title="Cerrar programa" data-label="Cerrar"><i data-lucide="power"></i></button>
+    </div>
+</nav>
+
+<div class="profile-popover" id="profilePopover">
+    <div class="profile-avatar" id="profileAvatar">U</div>
+    <div class="profile-meta">
+        <strong id="profileName">Usuario</strong>
+        <span id="profileRole">Perfil activo</span>
+    </div>
+    <button type="button" class="profile-switch-btn" onclick="cambiarUsuario(event)">
+        <i data-lucide="repeat-2"></i>
+        Cambiar usuario
+    </button>
+    <button type="button" class="profile-logout-btn" onclick="cerrarSesion(event)">
+        <i data-lucide="log-out"></i>
+        Cerrar sesion
+    </button>
 </div>
 
 <script>
+    if (esInicio) document.getElementById('appTopbar')?.classList.add('compact');
+
     function cerrarSesion(e) {
-        if(e) e.preventDefault();
-        if(confirm("¿Seguro que deseas cerrar la sesión actual?")) {
+        if (e) e.preventDefault();
+        if (confirm('Cerrar sesion actual?')) {
             localStorage.removeItem('gvi_user');
             window.location.href = '/login';
         }
     }
 
+    function prepararCambioRuta(destino) {
+        const topbar = document.getElementById('appTopbar');
+        const vaInicio = destino === '/';
+        const origen = esInicio ? 'compact' : 'full';
+        const destinoTipo = vaInicio ? 'compact' : 'full';
+        sessionStorage.setItem('gvi_bar_motion', `${origen}-to-${destinoTipo}`);
+        if (topbar) topbar.classList.add('route-shift');
+        document.body.classList.add('content-leaving');
+    }
+
+    function navegarConMovimiento(destino) {
+        prepararCambioRuta(destino);
+        setTimeout(() => { window.location.href = destino; }, 190);
+    }
+
+    function togglePerfil(e) {
+        if (e) e.preventDefault();
+        const popover = document.getElementById('profilePopover');
+        popover?.classList.toggle('open');
+    }
+
+    function actualizarTemaNav() {
+        const icon = document.getElementById('themeToggleIcon');
+        const esOscuro = document.body.classList.contains('dark-mode');
+        if (icon) icon.setAttribute('data-lucide', esOscuro ? 'sun' : 'moon');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function toggleTemaNav() {
+        if (typeof toggleTema === 'function') {
+            toggleTema();
+        } else {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('temaGVI', document.body.classList.contains('dark-mode') ? 'oscuro' : 'claro');
+        }
+        actualizarTemaNav();
+    }
+
+    function cambiarUsuario(e) {
+        if (e) e.preventDefault();
+        document.getElementById('profilePopover')?.classList.remove('open');
+        localStorage.removeItem('gvi_user');
+        window.location.href = '/login';
+    }
+
+    async function minimizarAppNav() {
+        await fetch('/api/app/minimize', { method: 'POST' });
+    }
+
+    async function cerrarProgramaNav() {
+        if (!confirm('Cerrar GVI por completo?')) return;
+        localStorage.removeItem('gvi_user');
+        await fetch('/api/app/quit', { method: 'POST' });
+    }
+
+    function actualizarRelojTopbar() {
+        const ahora = new Date();
+        const clock = document.getElementById('topbarClock');
+        const date = document.getElementById('topbarDate');
+        if (clock) {
+            let horas = ahora.getHours();
+            const minutos = String(ahora.getMinutes()).padStart(2, '0');
+            const periodo = horas >= 12 ? 'PM' : 'AM';
+            horas = horas % 12 || 12;
+            clock.innerText = `${String(horas).padStart(2, '0')}:${minutos} ${periodo}`;
+        }
+        if (date) {
+            date.innerText = ahora.toLocaleDateString('es-CL', {
+                weekday: 'short',
+                day: '2-digit',
+                month: 'short'
+            });
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         try {
+            if (localStorage.getItem('temaGVI') === 'oscuro') {
+                document.body.classList.add('dark-mode');
+            }
+            actualizarTemaNav();
+
             const usrInfo = JSON.parse(localStorage.getItem('gvi_user'));
-            if(usrInfo && usrInfo.rol !== 'ADMIN') {
+            if (usrInfo?.nombre) {
+                const userName = document.getElementById('topbarUserName');
+                if (userName) userName.innerText = usrInfo.nombre;
+                const profileName = document.getElementById('profileName');
+                const profileRole = document.getElementById('profileRole');
+                const profileAvatar = document.getElementById('profileAvatar');
+                if (profileName) profileName.innerText = usrInfo.nombre;
+                if (profileRole) profileRole.innerText = usrInfo.rol || 'Perfil activo';
+                if (profileAvatar) profileAvatar.innerText = usrInfo.nombre.trim().charAt(0).toUpperCase();
+            }
+            if (usrInfo && usrInfo.rol !== 'ADMIN') {
                 document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
             }
         } catch (e) {}
+
+        const path = window.location.pathname;
+        const indicator = document.getElementById('topbarActiveIndicator');
+
+        function moverIndicador(link, instant = false) {
+            if (!indicator || !link) return;
+            const parentRect = link.parentElement.getBoundingClientRect();
+            const rect = link.getBoundingClientRect();
+            if (instant) indicator.style.transition = 'none';
+            indicator.style.width = `${rect.width}px`;
+            indicator.style.height = `${rect.height}px`;
+            indicator.style.transform = `translateX(${rect.left - parentRect.left + link.parentElement.scrollLeft}px)`;
+            if (instant) {
+                indicator.offsetHeight;
+                indicator.style.transition = '';
+            }
+        }
+
+        const activeLink = Array.from(document.querySelectorAll('.topbar-link')).find(link => link.getAttribute('href') === path);
+        if (activeLink) {
+            activeLink.classList.add('active');
+            requestAnimationFrame(() => moverIndicador(activeLink, true));
+        }
+
+        document.querySelectorAll('.topbar-link').forEach(link => {
+            const href = link.getAttribute('href');
+            if (!href || href === '#' || href === path) return;
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                document.querySelectorAll('.topbar-link').forEach(item => item.classList.remove('active'));
+                link.classList.add('active');
+                moverIndicador(link);
+                navegarConMovimiento(href);
+            });
+        });
+
+        document.querySelectorAll('a[href^="/"]').forEach(link => {
+            if (link.classList.contains('topbar-link')) return;
+            link.addEventListener('click', (event) => {
+                const href = link.getAttribute('href');
+                if (!href || href === path) return;
+                event.preventDefault();
+                navegarConMovimiento(href);
+            });
+        });
+
+        const motion = sessionStorage.getItem('gvi_bar_motion');
+        sessionStorage.removeItem('gvi_bar_motion');
+        const topbar = document.getElementById('appTopbar');
+        if (topbar && motion === 'compact-to-full' && !esInicio) {
+            topbar.classList.add('from-compact');
+        }
+        if (topbar && motion === 'full-to-compact' && esInicio) {
+            topbar.classList.add('from-full');
+        }
+
+        document.addEventListener('click', (event) => {
+            const popover = document.getElementById('profilePopover');
+            const userButton = document.querySelector('.topbar-link.user-switch');
+            if (!popover?.classList.contains('open')) return;
+            if (popover.contains(event.target) || userButton?.contains(event.target)) return;
+            popover.classList.remove('open');
+        });
+
+        window.addEventListener('resize', () => moverIndicador(document.querySelector('.topbar-link.active'), true));
+        document.querySelector('.topbar-links')?.addEventListener('scroll', () => moverIndicador(document.querySelector('.topbar-link.active'), true));
+        actualizarRelojTopbar();
+        setInterval(actualizarRelojTopbar, 1000);
+
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 </script>
 
 <style>
-    /* BOTÓN VOLVER ATRÁS */
-    .btn-volver-atras {
-        position: fixed;
-        top: 25px;
-        left: 25px;
-        z-index: 2500;
-        background: var(--panel-claro, #fff);
-        border: 1px solid rgba(0,0,0,0.05);
-        border-radius: 50%;
-        width: 45px;
-        height: 45px;
-        cursor: pointer;
+    .app-topbar {
+        width: min(100% - 32px, 1240px);
+        margin: 14px auto 0;
+        padding: 8px;
+        border-radius: 18px;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 14px rgba(20, 30, 45, 0.05);
         display: flex;
         align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        color: var(--texto-claro, #333);
-        transition: 0.3s;
+        gap: 10px;
+        position: sticky;
+        top: 10px;
+        z-index: 1800;
     }
-    body.dark-mode .btn-volver-atras { background: var(--panel-oscuro, #1e1e1e); border-color: #333; color: white; }
-    .btn-volver-atras:hover { transform: scale(1.1); background: var(--azul-gvi); color: white; }
-    .btn-volver-atras i { width: 22px; height: 22px; stroke-width: 3px; }
 
-    /* EL BOTÓN FLOTANTE (FAB) MEJORADO */
-    .btn-menu-global {
-        position: fixed;
-        bottom: 30px;
-        left: 30px;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: var(--azul-gvi, #007aff);
-        color: white;
+    body.dark-mode .app-topbar {
+        background: #1e1e1e;
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    .app-topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 0 0 auto;
+    }
+
+    .topbar-icon-btn,
+    .topbar-window-btn,
+    .topbar-link,
+    .topbar-brand {
+        min-height: 38px;
+        border-radius: 12px;
         border: none;
+        text-decoration: none;
+        color: inherit;
+        transition: background-color 0.24s ease, color 0.24s ease, box-shadow 0.24s ease, transform 0.24s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        font-weight: 800;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .topbar-icon-btn,
+    .topbar-window-btn {
+        width: 38px;
+        padding: 0;
+        background: rgba(0, 0, 0, 0.04);
+        cursor: pointer;
+        flex: 0 0 auto;
+    }
+
+    body.dark-mode .topbar-icon-btn,
+    body.dark-mode .topbar-window-btn {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .topbar-window-btn.theme-toggle {
+        color: var(--azul-gvi);
+    }
+
+    body.dark-mode .topbar-window-btn.theme-toggle {
+        color: #ffd166;
+    }
+
+    .topbar-icon-btn:hover,
+    .topbar-window-btn:hover,
+    .topbar-link:hover {
+        background: rgba(0, 122, 255, 0.1);
+        color: var(--azul-gvi);
+    }
+
+    .topbar-icon-btn i,
+    .topbar-icon-btn svg,
+    .topbar-window-btn i,
+    .topbar-window-btn svg,
+    .topbar-link i,
+    .topbar-link svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 2.5px;
+    }
+
+    .topbar-brand {
+        padding: 0 4px;
+        cursor: default;
+    }
+
+    .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--azul-gvi);
+        color: white;
+        font-size: 12px;
+        letter-spacing: 0;
+    }
+
+    .topbar-links {
         display: flex;
         align-items: center;
-        justify-content: center;
-        box-shadow: 0 10px 25px rgba(0,122,255,0.4);
-        cursor: pointer;
-        z-index: 3000;
-        transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        gap: 4px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        padding-bottom: 1px;
+        flex: 1 1 auto;
+        position: relative;
     }
-    .btn-menu-global:hover { transform: scale(1.1); box-shadow: 0 15px 30px rgba(0,122,255,0.5); }
-    .btn-menu-global.active { background: #ff3b30; transform: scale(0.9) rotate(90deg); box-shadow: 0 5px 15px rgba(255,59,48,0.4); }
-    .btn-menu-global i { width: 28px; height: 28px; stroke-width: 2.5px; }
 
-    /* OVERLAY Y BURBUJAS */
-    .bubble-overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(255,255,255,0.8);
-        backdrop-filter: blur(15px);
-        z-index: 2999;
+    .topbar-link {
+        padding: 0 11px;
+        font-size: 13px;
+        color: rgba(28, 30, 33, 0.78);
+        position: relative;
+        z-index: 1;
+    }
+
+    body.dark-mode .topbar-link { color: rgba(228, 230, 235, 0.78); }
+
+    .topbar-link.active {
+        color: white;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .topbar-active-indicator {
+        position: absolute;
+        left: 0;
+        top: 0;
+        border-radius: 12px;
+        background: var(--azul-gvi);
+        box-shadow: 0 3px 9px rgba(0, 122, 255, 0.18);
+        pointer-events: none;
+        transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1), width 0.42s cubic-bezier(0.16, 1, 0.3, 1), height 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 0;
+    }
+
+    .topbar-link.user-switch {
+        width: 38px;
+        padding: 0;
+        background: rgba(0, 0, 0, 0.04);
+        color: rgba(28, 30, 33, 0.78);
+    }
+
+    .topbar-link.user-switch span {
         display: none;
+    }
+
+    body.dark-mode .topbar-link.user-switch {
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(228, 230, 235, 0.78);
+    }
+
+    .topbar-link.user-switch:hover {
+        background: rgba(0, 122, 255, 0.1);
+        color: var(--azul-gvi);
+    }
+
+    .topbar-clock-chip {
+        margin-left: auto;
+        min-height: 38px;
+        padding: 0 13px;
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.04);
+        color: rgba(28, 30, 33, 0.74);
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+        line-height: 1.05;
+        white-space: nowrap;
+        flex: 0 0 auto;
+    }
+
+    body.dark-mode .topbar-clock-chip {
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(228, 230, 235, 0.78);
+    }
+
+    .topbar-clock-chip strong {
+        font-size: 14px;
+        font-weight: 900;
+        color: inherit;
+    }
+
+    .topbar-clock-chip span {
+        margin-top: 3px;
+        font-size: 10px;
+        font-weight: 800;
+        opacity: 0.58;
+        text-transform: capitalize;
+    }
+
+    .topbar-window-btn.danger {
+        background: #ff3b30;
+        color: white;
+    }
+
+    .topbar-window-btn.danger:hover {
+        background: #ff3b30;
+        color: white;
+        box-shadow: 0 4px 12px rgba(255, 59, 48, 0.2);
+    }
+
+    .app-topbar.compact {
+        width: fit-content;
+        max-width: calc(100% - 32px);
+        margin-left: auto;
+        margin-right: 24px;
+        border-radius: 999px;
+        transform-origin: right top;
+        animation: topbarCompactIn 0.34s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+    }
+
+    .app-topbar.compact .app-topbar-left {
+        display: none;
+    }
+
+    .app-topbar.compact .topbar-links {
+        flex: 0 1 auto;
+        overflow: visible;
+    }
+
+    .app-topbar.compact .topbar-active-indicator {
+        display: none;
+    }
+
+    .app-topbar.compact .topbar-clock-chip {
+        display: none;
+    }
+
+    .app-topbar.compact .topbar-link:not(.user-switch) {
+        display: none;
+    }
+
+    .app-topbar.compact .topbar-link.user-switch {
+        display: inline-flex;
+    }
+
+    .app-topbar.compact .topbar-link,
+    .app-topbar.compact .topbar-window-btn {
+        width: 42px;
+        min-width: 42px;
+        height: 42px;
+        min-height: 42px;
+        padding: 0;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.04);
+        color: rgba(28, 30, 33, 0.78);
+        position: relative;
+        overflow: visible;
+        transition: background-color 0.14s ease, color 0.14s ease, transform 0.14s ease;
+    }
+
+    body.dark-mode .app-topbar.compact .topbar-link,
+    body.dark-mode .app-topbar.compact .topbar-window-btn {
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(228, 230, 235, 0.78);
+    }
+
+    .app-topbar.compact .topbar-link span {
+        max-width: 0;
+        opacity: 0;
+        overflow: hidden;
+        display: none;
+    }
+
+    .app-topbar.compact .topbar-link.active {
+        background: rgba(0, 0, 0, 0.04);
+        color: rgba(28, 30, 33, 0.78);
+    }
+
+    body.dark-mode .app-topbar.compact .topbar-link.active {
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(228, 230, 235, 0.78);
+    }
+
+    .app-topbar.compact .topbar-link:hover {
+        background: var(--azul-gvi);
+        color: white;
+    }
+
+    .app-topbar.compact .topbar-window-btn::after {
+        content: attr(data-label);
+        position: absolute;
+        top: calc(100% + 9px);
+        left: 50%;
+        transform: translateX(-50%) translateY(-3px);
+        background: rgba(28, 30, 33, 0.94);
+        color: white;
+        padding: 7px 9px;
+        border-radius: 9px;
+        font-size: 11px;
+        font-weight: 800;
+        opacity: 0;
+        pointer-events: none;
+        white-space: nowrap;
+        transition: opacity 0.22s ease, transform 0.22s ease;
+        z-index: 20;
+    }
+
+    .app-topbar.compact .topbar-window-btn:hover::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .app-topbar.compact .topbar-link.user-switch:hover {
+        background: rgba(0, 122, 255, 0.1);
+        color: var(--azul-gvi);
+    }
+
+    .app-topbar.compact .topbar-window-btn.danger {
+        background: #ff3b30;
+        color: white;
+    }
+
+    .app-topbar.compact .topbar-window-btn.theme-toggle {
+        display: inline-flex;
+    }
+
+    .profile-popover {
+        position: fixed;
+        top: 82px;
+        right: 168px;
+        z-index: 1810;
+        width: 230px;
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(0, 0, 0, 0.07);
+        box-shadow: 0 18px 44px rgba(18, 24, 36, 0.16);
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        gap: 10px;
+        opacity: 0;
+        transform: translateY(-10px) scale(0.96);
+        pointer-events: none;
+        transition: opacity 0.34s ease, transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body.dark-mode .profile-popover {
+        background: rgba(30, 30, 30, 0.96);
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+    }
+
+    .profile-popover.open {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+    }
+
+    .profile-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #007aff, #26c281);
+        color: white;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        opacity: 0;
-        transition: 0.4s;
+        font-weight: 900;
+        font-size: 18px;
     }
-    body.dark-mode .bubble-overlay { background: rgba(0,0,0,0.8); }
-    .bubble-overlay.active { display: flex; opacity: 1; }
 
-    .bubble-container { display: grid; grid-template-columns: repeat(3, 120px); gap: 30px; justify-content: center; }
-
-    .bubble-item {
-        display: flex; flex-direction: column; align-items: center; gap: 12px;
-        text-decoration: none; color: inherit; opacity: 0; transform: scale(0.5) translateY(20px);
-        transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    .profile-meta {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
     }
-    .bubble-overlay.active .bubble-item { opacity: 1; transform: scale(1) translateY(0); transition-delay: var(--delay); }
 
-    .bubble-icon {
-        width: 80px; height: 80px; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        color: white; font-size: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); transition: 0.3s;
+    .profile-meta strong {
+        font-size: 15px;
+        color: var(--texto-claro);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    .bubble-icon i { width: 32px; height: 32px; }
-    .bubble-item:hover .bubble-icon { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
-    .bubble-item span { font-weight: 800; font-size: 14px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
 
-    .icon-home { background: #8e8e93; }
-    .icon-caja { background: #007aff; }
-    .icon-bodega { background: #34c759; }
-    .icon-fiados { background: #ff9500; }
-    .icon-finanzas { background: #af52de; }
-    .icon-ajustes { background: #5856d6; }
-    .icon-logout { background: #ff3b30; }
-</style>
+    body.dark-mode .profile-meta strong { color: var(--texto-oscuro); }
 
-<script>
-    function toggleMenuGlobal() {
-        const fab = document.getElementById('mainFab');
-        const overlay = document.getElementById('overlayGlobal');
-        const icon = document.getElementById('iconMenu');
-        
-        fab.classList.toggle('active');
-        
-        if (fab.classList.contains('active')) {
-            overlay.style.display = 'flex';
-            setTimeout(() => overlay.classList.add('active'), 10);
-            icon.setAttribute('data-lucide', 'x');
-        } else {
-            overlay.classList.remove('active');
-            setTimeout(() => overlay.style.display = 'none', 400);
-            icon.setAttribute('data-lucide', 'menu');
+    .profile-meta span {
+        font-size: 11px;
+        font-weight: 800;
+        color: rgba(28, 30, 33, 0.48);
+        text-transform: uppercase;
+    }
+
+    body.dark-mode .profile-meta span { color: rgba(228, 230, 235, 0.55); }
+
+    .profile-switch-btn,
+    .profile-logout-btn {
+        grid-column: 1 / -1;
+        height: 42px;
+        border: none;
+        border-radius: 12px;
+        font: inherit;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+    .profile-switch-btn {
+        background: rgba(0, 122, 255, 0.1);
+        color: var(--azul-gvi);
+    }
+
+    .profile-logout-btn {
+        background: rgba(255, 59, 48, 0.11);
+        color: #ff3b30;
+    }
+
+    .profile-switch-btn svg,
+    .profile-logout-btn svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    .app-topbar.route-shift {
+        animation: topbarRouteShift 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .app-topbar.from-compact {
+        transform-origin: right top;
+        animation: topbarFromCompact 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .app-topbar.compact.from-full {
+        transform-origin: right top;
+        animation: topbarFromFull 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes topbarCompactIn {
+        from {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.98);
         }
-        
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
     }
 
-    // Asegurar iconos al cargar
-    document.addEventListener('DOMContentLoaded', () => {
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    });
-</script>
+    @keyframes topbarRouteShift {
+        from { transform: translateY(0); opacity: 1; }
+        to { transform: translateY(-4px); opacity: 0.92; }
+    }
+
+    @keyframes topbarFromCompact {
+        from {
+            opacity: 0.9;
+            transform: translateY(-6px);
+            border-radius: 999px;
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+            border-radius: 18px;
+        }
+    }
+
+    @keyframes topbarFromFull {
+        from {
+            opacity: 0.9;
+            transform: translateY(-6px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 760px) {
+        .app-topbar {
+            width: min(100% - 20px, 1220px);
+            margin-top: 10px;
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .topbar-links {
+            width: 100%;
+        }
+
+        .topbar-link.user-switch {
+            margin-left: 0;
+        }
+
+        .profile-popover {
+            right: 16px;
+            top: 76px;
+            width: min(230px, calc(100% - 32px));
+        }
+    }
+</style>

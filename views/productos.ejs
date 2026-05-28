@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('partials/head') %>
+    <title>GVI - Productos</title>
+    <style>
+        body {
+            background:
+                radial-gradient(circle at 82% 16%, rgba(0, 122, 255, 0.08), transparent 30%),
+                linear-gradient(145deg, #f8fbff 0%, #f3f6fa 46%, #f6f7f9 100%);
+        }
+
+        body.dark-mode {
+            background:
+                radial-gradient(circle at 82% 16%, rgba(0, 122, 255, 0.13), transparent 30%),
+                linear-gradient(145deg, #10151d 0%, #14171d 46%, #111216 100%);
+        }
+
+        .productos-shell {
+            width: min(100% - 42px, 1180px);
+            margin: 30px auto 54px;
+            display: grid;
+            grid-template-columns: minmax(360px, 0.95fr) minmax(420px, 1.25fr);
+            gap: 18px;
+        }
+
+        .productos-hero,
+        .product-card,
+        .quick-panel {
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid rgba(20, 30, 45, 0.07);
+            box-shadow: 0 18px 48px rgba(20, 30, 45, 0.07);
+            backdrop-filter: blur(16px);
+            border-radius: 26px;
+        }
+
+        body.dark-mode .productos-hero,
+        body.dark-mode .product-card,
+        body.dark-mode .quick-panel {
+            background: rgba(30, 30, 30, 0.72);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+        }
+
+        .productos-hero {
+            grid-column: 1 / -1;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-end;
+        }
+
+        .productos-hero h1 {
+            margin: 0;
+            font-size: clamp(32px, 4vw, 52px);
+            line-height: 1;
+        }
+
+        .productos-hero p {
+            margin: 10px 0 0;
+            color: rgba(28, 30, 33, 0.58);
+            font-weight: 650;
+        }
+
+        body.dark-mode .productos-hero p { color: rgba(228, 230, 235, 0.6); }
+
+        .hero-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--azul-gvi);
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .quick-panel {
+            padding: 20px;
+        }
+
+        .panel-label {
+            margin: 0 0 12px;
+            color: var(--azul-gvi);
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .scan-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 12px;
+            border-radius: 18px;
+            background: rgba(0, 122, 255, 0.08);
+            border: 1px solid rgba(0, 122, 255, 0.16);
+        }
+
+        .scan-box svg {
+            width: 24px;
+            height: 24px;
+            color: var(--azul-gvi);
+            flex: 0 0 auto;
+        }
+
+        .scan-input,
+        .form-input,
+        .form-select {
+            width: 100%;
+            border: 1px solid rgba(20, 30, 45, 0.11);
+            border-radius: 15px;
+            padding: 13px 14px;
+            background: rgba(255, 255, 255, 0.9);
+            color: inherit;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 750;
+            outline: none;
+        }
+
+        body.dark-mode .scan-input,
+        body.dark-mode .form-input,
+        body.dark-mode .form-select {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .scan-input {
+            border: none;
+            background: transparent;
+            padding: 8px 2px;
+            font-size: 18px;
+        }
+
+        .scan-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn-main,
+        .btn-soft,
+        .btn-green,
+        .btn-danger-soft {
+            min-height: 44px;
+            border: none;
+            border-radius: 15px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-main { background: var(--azul-gvi); color: white; box-shadow: 0 12px 24px rgba(0, 122, 255, 0.18); }
+        .btn-green { background: #34c759; color: white; box-shadow: 0 12px 24px rgba(52, 199, 89, 0.18); }
+        .btn-soft { background: rgba(0, 0, 0, 0.06); color: inherit; }
+        .btn-danger-soft { background: rgba(255, 59, 48, 0.11); color: #ff3b30; }
+        body.dark-mode .btn-soft { background: rgba(255, 255, 255, 0.08); }
+
+        .suggestions {
+            display: grid;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .suggestion {
+            border: none;
+            border-radius: 16px;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.74);
+            color: inherit;
+            text-align: left;
+            font: inherit;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        body.dark-mode .suggestion { background: rgba(255, 255, 255, 0.06); }
+
+        .suggestion b { display: block; }
+        .suggestion span { display: block; margin-top: 3px; opacity: 0.56; font-size: 12px; font-weight: 750; }
+        .suggestion strong { color: var(--azul-gvi); white-space: nowrap; }
+
+        .product-card {
+            padding: 0;
+            overflow: hidden;
+            min-height: 540px;
+        }
+
+        .empty-state {
+            height: 100%;
+            min-height: 520px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 38px;
+            color: rgba(28, 30, 33, 0.55);
+            font-weight: 750;
+        }
+
+        body.dark-mode .empty-state { color: rgba(228, 230, 235, 0.58); }
+
+        .empty-state svg {
+            width: 56px;
+            height: 56px;
+            color: var(--azul-gvi);
+            margin-bottom: 12px;
+        }
+
+        .product-detail {
+            display: none;
+            padding: 22px;
+        }
+
+        .product-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(20, 30, 45, 0.08);
+        }
+
+        body.dark-mode .product-head { border-bottom-color: rgba(255, 255, 255, 0.08); }
+
+        .product-head h2 {
+            margin: 0;
+            font-size: clamp(24px, 3vw, 36px);
+            line-height: 1.05;
+        }
+
+        .sku-pill {
+            margin-top: 8px;
+            display: inline-flex;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.05);
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        body.dark-mode .sku-pill { background: rgba(255, 255, 255, 0.08); }
+
+        .type-pill {
+            padding: 9px 12px;
+            border-radius: 999px;
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--azul-gvi);
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 18px 0;
+        }
+
+        .metric {
+            padding: 14px;
+            border-radius: 18px;
+            background: rgba(20, 30, 45, 0.04);
+        }
+
+        body.dark-mode .metric { background: rgba(255, 255, 255, 0.06); }
+
+        .metric span {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 11px;
+            font-weight: 900;
+            opacity: 0.55;
+            text-transform: uppercase;
+        }
+
+        .metric b {
+            font-size: 19px;
+            font-weight: 900;
+        }
+
+        .stock-tools {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            padding: 14px;
+            border-radius: 20px;
+            background: rgba(52, 199, 89, 0.1);
+            margin-bottom: 18px;
+        }
+
+        .profit-tools {
+            padding: 14px;
+            border-radius: 20px;
+            background: rgba(0, 122, 255, 0.08);
+            border: 1px solid rgba(0, 122, 255, 0.12);
+            margin-bottom: 18px;
+        }
+
+        .profit-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .profit-head b {
+            display: block;
+            font-size: 15px;
+        }
+
+        .profit-head span {
+            display: block;
+            margin-top: 3px;
+            font-size: 12px;
+            font-weight: 750;
+            opacity: 0.58;
+        }
+
+        .profit-grid {
+            display: grid;
+            grid-template-columns: 1fr 110px auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .profit-result {
+            min-height: 44px;
+            padding: 9px 12px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.72);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        body.dark-mode .profit-result {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .profit-result span {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            opacity: 0.55;
+        }
+
+        .profit-result strong {
+            margin-top: 3px;
+            color: var(--azul-gvi);
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .edit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .field-full { grid-column: 1 / -1; }
+
+        .form-label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 11px;
+            font-weight: 900;
+            opacity: 0.56;
+            text-transform: uppercase;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 13px 14px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.04);
+            font-weight: 850;
+        }
+
+        body.dark-mode .toggle-row { background: rgba(255, 255, 255, 0.06); }
+
+        .product-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .new-mode-banner {
+            display: none;
+            margin: 14px 0 0;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: rgba(255, 149, 0, 0.12);
+            color: #c97700;
+            font-weight: 850;
+        }
+
+        @media (max-width: 980px) {
+            .productos-shell { grid-template-columns: 1fr; }
+            .product-card { min-height: 420px; }
+            .empty-state { min-height: 360px; }
+        }
+
+        @media (max-width: 640px) {
+            .productos-shell { width: min(100% - 26px, 620px); margin-top: 20px; }
+            .productos-hero { flex-direction: column; align-items: flex-start; }
+            .scan-actions,
+            .metric-grid,
+            .edit-grid,
+            .stock-tools,
+            .profit-grid,
+            .product-actions { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/nav') %>
+
+    <main class="productos-shell">
+        <header class="productos-hero">
+            <div>
+                <h1>Productos</h1>
+                <p>Escanea, busca, crea o actualiza stock sin entrar a toda la bodega.</p>
+            </div>
+            <div class="hero-chip"><i data-lucide="scan-barcode"></i> Ingreso rapido</div>
+        </header>
+
+        <section class="quick-panel">
+            <p class="panel-label">Buscar o escanear</p>
+            <div class="scan-box">
+                <i data-lucide="scan-line"></i>
+                <input id="buscarProductoRapido" class="scan-input" autocomplete="off" placeholder="Escanea SKU o escribe el nombre">
+            </div>
+            <div class="scan-actions">
+                <button class="btn-main" type="button" onclick="buscarExacto()"><i data-lucide="search"></i> Buscar</button>
+                <button class="btn-soft" type="button" onclick="prepararNuevo()"><i data-lucide="plus"></i> Nuevo</button>
+            </div>
+            <div class="new-mode-banner" id="newModeBanner"></div>
+            <div class="suggestions" id="sugerenciasProductos"></div>
+        </section>
+
+        <section class="product-card">
+            <div class="empty-state" id="estadoVacio">
+                <div>
+                    <i data-lucide="package-search"></i>
+                    <h2>Busca un producto</h2>
+                    <p>Usa el escaner o escribe nombre/SKU para ver la ficha y modificar stock, precio, oferta o mayorista.</p>
+                </div>
+            </div>
+
+            <div class="product-detail" id="detalleProducto">
+                <div class="product-head">
+                    <div>
+                        <h2 id="detalleNombre">Producto</h2>
+                        <div class="sku-pill" id="detalleSku">SKU</div>
+                    </div>
+                    <div class="type-pill" id="detalleTipo">Unidad</div>
+                </div>
+
+                <div class="metric-grid">
+                    <div class="metric"><span>Precio</span><b id="metricPrecio">$0</b></div>
+                    <div class="metric"><span>Stock</span><b id="metricStock">0</b></div>
+                    <div class="metric"><span>Valor</span><b id="metricValor">$0</b></div>
+                </div>
+
+                <div class="stock-tools">
+                    <input id="stockAgregar" class="form-input" type="number" min="0" step="0.001" placeholder="Cantidad a sumar">
+                    <button class="btn-green" type="button" onclick="sumarStock()"><i data-lucide="plus"></i> Sumar stock</button>
+                </div>
+
+                <div class="profit-tools">
+                    <div class="profit-head">
+                        <div>
+                            <b>Calcular ganancia</b>
+                            <span>Ingresa costo y margen real para recomendar precio final.</span>
+                        </div>
+                        <i data-lucide="percent"></i>
+                    </div>
+                    <div class="profit-grid">
+                        <div>
+                            <label class="form-label">Costo compra</label>
+                            <input id="calcCosto" class="form-input" inputmode="numeric" placeholder="Ej: 1.000" oninput="formatearMoneda(this); calcularPrecioSugerido();">
+                        </div>
+                        <div>
+                            <label class="form-label">% margen real</label>
+                            <input id="calcMargen" class="form-input" type="number" min="0" step="1" placeholder="30" oninput="calcularPrecioSugerido()">
+                        </div>
+                        <div class="profit-result">
+                            <span>Sugerido</span>
+                            <strong id="calcSugerido">$0</strong>
+                        </div>
+                    </div>
+                    <div class="scan-actions">
+                        <button class="btn-soft" type="button" onclick="limpiarCalculadora()">Limpiar calculo</button>
+                        <button class="btn-main" type="button" onclick="aplicarPrecioSugerido()"><i data-lucide="arrow-down-to-line"></i> Usar precio</button>
+                    </div>
+                </div>
+
+                <form id="formProductoRapido">
+                    <div class="edit-grid">
+                        <div class="field-full">
+                            <label class="form-label">Nombre</label>
+                            <input id="prodNombre" class="form-input" required>
+                        </div>
+                        <div>
+                            <label class="form-label">SKU / Codigo</label>
+                            <input id="prodCodigo" class="form-input" required>
+                        </div>
+                        <div>
+                            <label class="form-label">Stock total</label>
+                            <input id="prodStock" class="form-input" type="number" min="0" step="0.001" required>
+                        </div>
+                        <div>
+                            <label class="form-label">Precio venta</label>
+                            <input id="prodPrecio" class="form-input" inputmode="numeric" required oninput="formatearMoneda(this)">
+                        </div>
+                        <label class="toggle-row">
+                            Venta por peso
+                            <input id="prodPorPeso" type="checkbox" onchange="renderVistaActual()">
+                        </label>
+                        <label class="toggle-row">
+                            Oferta
+                            <input id="prodOfertaActiva" type="checkbox" onchange="toggleCamposComerciales()">
+                        </label>
+                        <div id="campoOferta">
+                            <label class="form-label">Precio oferta</label>
+                            <input id="prodPrecioOferta" class="form-input" inputmode="numeric" oninput="formatearMoneda(this)">
+                        </div>
+                        <label class="toggle-row">
+                            Mayorista
+                            <input id="prodMayorActivo" type="checkbox" onchange="toggleCamposComerciales()">
+                        </label>
+                        <div id="campoCantidadMayor">
+                            <label class="form-label">Desde cantidad/kg</label>
+                            <input id="prodCantidadMayor" class="form-input" type="number" min="0" step="0.001">
+                        </div>
+                        <div id="campoPrecioMayor">
+                            <label class="form-label">Precio mayorista</label>
+                            <input id="prodPrecioMayor" class="form-input" inputmode="numeric" oninput="formatearMoneda(this)">
+                        </div>
+                    </div>
+
+                    <div class="product-actions">
+                        <button class="btn-soft" type="button" onclick="limpiarSeleccion()">Limpiar</button>
+                        <button class="btn-main" type="submit"><i data-lucide="save"></i> Guardar producto</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <%- include('partials/scripts') %>
+    <script>
+        let productos = [];
+        let productoActual = null;
+        let modoNuevo = false;
+
+        const money = value => `$${Number(value || 0).toLocaleString('es-CL')}`;
+        const cleanMoney = value => Number(String(value || '').replace(/\D/g, '')) || 0;
+
+        async function cargarProductos() {
+            const res = await fetch('/api/productos');
+            productos = await res.json();
+            renderSugerencias();
+        }
+
+        function normalizar(texto) {
+            return String(texto || '').trim().toLowerCase();
+        }
+
+        function renderSugerencias() {
+            const q = normalizar(document.getElementById('buscarProductoRapido').value);
+            const cont = document.getElementById('sugerenciasProductos');
+            if (!q) {
+                cont.innerHTML = '';
+                return;
+            }
+
+            const exacto = productos.find(p => normalizar(p.codigo) === q);
+            if (exacto) {
+                seleccionarProducto(exacto.codigo);
+                cont.innerHTML = '';
+                return;
+            }
+
+            const encontrados = productos
+                .filter(p => normalizar(p.nombre).includes(q) || normalizar(p.codigo).includes(q))
+                .slice(0, 6);
+
+            cont.innerHTML = encontrados.map(p => `
+                <button type="button" class="suggestion" onclick="seleccionarProducto('${p.codigo.replace(/'/g, "\\'")}')">
+                    <span><b>${p.nombre}</b><span>${p.codigo} - Stock: ${p.stock}${p.vendidoPorPeso ? ' kg' : ' un.'}</span></span>
+                    <strong>${money(p.precio)}</strong>
+                </button>
+            `).join('');
+        }
+
+        function buscarExacto() {
+            const q = normalizar(document.getElementById('buscarProductoRapido').value);
+            if (!q) return;
+            const encontrado = productos.find(p => normalizar(p.codigo) === q)
+                || productos.find(p => normalizar(p.nombre) === q)
+                || productos.find(p => normalizar(p.nombre).startsWith(q));
+            if (encontrado) seleccionarProducto(encontrado.codigo);
+            else prepararNuevo(q);
+        }
+
+        function seleccionarProducto(codigo) {
+            const p = productos.find(item => item.codigo === codigo);
+            if (!p) return;
+            productoActual = p;
+            modoNuevo = false;
+            document.getElementById('newModeBanner').style.display = 'none';
+            cargarEnFormulario(p);
+            renderVistaActual();
+        }
+
+        function prepararNuevo(prefill = '') {
+            productoActual = {
+                codigo: prefill && !prefill.includes(' ') ? prefill : '',
+                nombre: prefill && prefill.includes(' ') ? prefill : '',
+                precio: 0,
+                stock: 0,
+                vendidoPorPeso: false,
+                ofertaActiva: false,
+                precioOferta: 0,
+                mayorActivo: false,
+                cantidadMayor: 0,
+                precioMayor: 0
+            };
+            modoNuevo = true;
+            document.getElementById('newModeBanner').style.display = 'block';
+            document.getElementById('newModeBanner').innerText = 'Producto no encontrado. Completa la ficha para crearlo.';
+            cargarEnFormulario(productoActual);
+            renderVistaActual();
+            document.getElementById('prodNombre').focus();
+        }
+
+        function cargarEnFormulario(p) {
+            document.getElementById('prodNombre').value = p.nombre || '';
+            document.getElementById('prodCodigo').value = p.codigo || '';
+            document.getElementById('prodStock').value = p.stock || 0;
+            document.getElementById('prodPrecio').value = p.precio ? Number(p.precio).toLocaleString('es-CL') : '';
+            document.getElementById('prodPorPeso').checked = !!p.vendidoPorPeso;
+            document.getElementById('prodOfertaActiva').checked = !!p.ofertaActiva;
+            document.getElementById('prodPrecioOferta').value = p.precioOferta ? Number(p.precioOferta).toLocaleString('es-CL') : '';
+            document.getElementById('prodMayorActivo').checked = !!p.mayorActivo;
+            document.getElementById('prodCantidadMayor').value = p.cantidadMayor || '';
+            document.getElementById('prodPrecioMayor').value = p.precioMayor ? Number(p.precioMayor).toLocaleString('es-CL') : '';
+            toggleCamposComerciales();
+        }
+
+        function leerFormulario() {
+            return {
+                codigo: document.getElementById('prodCodigo').value.trim(),
+                nombre: document.getElementById('prodNombre').value.trim(),
+                precio: cleanMoney(document.getElementById('prodPrecio').value),
+                stock: Number(document.getElementById('prodStock').value) || 0,
+                vendidoPorPeso: document.getElementById('prodPorPeso').checked,
+                ofertaActiva: document.getElementById('prodOfertaActiva').checked,
+                precioOferta: cleanMoney(document.getElementById('prodPrecioOferta').value),
+                mayorActivo: document.getElementById('prodMayorActivo').checked,
+                cantidadMayor: Number(document.getElementById('prodCantidadMayor').value) || 0,
+                precioMayor: cleanMoney(document.getElementById('prodPrecioMayor').value)
+            };
+        }
+
+        function renderVistaActual() {
+            const p = leerFormulario();
+            document.getElementById('estadoVacio').style.display = 'none';
+            document.getElementById('detalleProducto').style.display = 'block';
+            document.getElementById('detalleNombre').innerText = p.nombre || 'Nuevo producto';
+            document.getElementById('detalleSku').innerText = p.codigo || 'Sin SKU';
+            document.getElementById('detalleTipo').innerText = p.vendidoPorPeso ? 'Por peso' : 'Unidad';
+            document.getElementById('metricPrecio').innerText = `${money(p.precio)}${p.vendidoPorPeso ? '/kg' : ''}`;
+            document.getElementById('metricStock').innerText = `${p.stock}${p.vendidoPorPeso ? ' kg' : ' un.'}`;
+            document.getElementById('metricValor').innerText = money(p.precio * p.stock);
+        }
+
+        function toggleCamposComerciales() {
+            document.getElementById('campoOferta').style.display = document.getElementById('prodOfertaActiva').checked ? 'block' : 'none';
+            const mayor = document.getElementById('prodMayorActivo').checked;
+            document.getElementById('campoCantidadMayor').style.display = mayor ? 'block' : 'none';
+            document.getElementById('campoPrecioMayor').style.display = mayor ? 'block' : 'none';
+            renderVistaActual();
+        }
+
+        function calcularPrecioSugerido() {
+            const costo = cleanMoney(document.getElementById('calcCosto').value);
+            const margen = Number(document.getElementById('calcMargen').value) || 0;
+            const margenDecimal = Math.min(Math.max(margen, 0), 99.9) / 100;
+            const sugerido = costo > 0 ? Math.round(costo / (1 - margenDecimal)) : 0;
+            document.getElementById('calcSugerido').innerText = money(sugerido);
+            return sugerido;
+        }
+
+        function aplicarPrecioSugerido() {
+            const sugerido = calcularPrecioSugerido();
+            if (!sugerido) {
+                alert('Ingresa costo y porcentaje primero.');
+                return;
+            }
+            document.getElementById('prodPrecio').value = sugerido.toLocaleString('es-CL');
+            renderVistaActual();
+        }
+
+        function limpiarCalculadora() {
+            document.getElementById('calcCosto').value = '';
+            document.getElementById('calcMargen').value = '';
+            document.getElementById('calcSugerido').innerText = '$0';
+        }
+
+        async function sumarStock() {
+            if (!productoActual || modoNuevo) {
+                alert('Primero guarda el producto nuevo.');
+                return;
+            }
+            const cantidad = Number(document.getElementById('stockAgregar').value);
+            if (!cantidad || cantidad <= 0) {
+                alert('Ingresa una cantidad valida.');
+                return;
+            }
+            const datos = leerFormulario();
+            datos.stock = Number(datos.stock) + cantidad;
+            await guardarProducto(datos, false);
+            document.getElementById('stockAgregar').value = '';
+        }
+
+        async function guardarProducto(datos, mostrarMensaje = true) {
+            const codigoAnterior = modoNuevo ? '' : productoActual.codigo;
+            const url = modoNuevo ? '/api/productos' : `/api/productos/${encodeURIComponent(codigoAnterior)}`;
+            const method = modoNuevo ? 'POST' : 'PUT';
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({}));
+                alert(error.message || 'No se pudo guardar el producto.');
+                return;
+            }
+            await cargarProductos();
+            seleccionarProducto(datos.codigo);
+            if (mostrarMensaje) alert('Producto guardado.');
+        }
+
+        function limpiarSeleccion() {
+            productoActual = null;
+            modoNuevo = false;
+            document.getElementById('buscarProductoRapido').value = '';
+            document.getElementById('sugerenciasProductos').innerHTML = '';
+            document.getElementById('newModeBanner').style.display = 'none';
+            document.getElementById('detalleProducto').style.display = 'none';
+            document.getElementById('estadoVacio').style.display = 'grid';
+            document.getElementById('buscarProductoRapido').focus();
+        }
+
+        function formatearMoneda(input) {
+            const valor = String(input.value).replace(/\D/g, '');
+            input.value = valor ? Number(valor).toLocaleString('es-CL') : '';
+            renderVistaActual();
+        }
+
+        document.getElementById('buscarProductoRapido').addEventListener('input', renderSugerencias);
+        document.getElementById('buscarProductoRapido').addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                buscarExacto();
+            }
+        });
+        ['prodNombre', 'prodCodigo', 'prodStock', 'prodCantidadMayor'].forEach(id => {
+            document.getElementById(id).addEventListener('input', renderVistaActual);
+        });
+        document.getElementById('formProductoRapido').addEventListener('submit', async e => {
+            e.preventDefault();
+            const datos = leerFormulario();
+            if (!datos.codigo || !datos.nombre) {
+                alert('Nombre y SKU son obligatorios.');
+                return;
+            }
+            await guardarProducto(datos);
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await cargarProductos();
+            document.getElementById('buscarProductoRapido').focus();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

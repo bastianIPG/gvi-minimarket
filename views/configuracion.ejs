@@ -2,59 +2,112 @@
 <html lang="es">
 <head>
     <%- include('partials/head') %>
-    <title>GVI - Configuración</title>
+    <title>GVI - Ajustes</title>
     <style>
         .config-container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
+            width: min(100% - 36px, 980px);
+            margin: 30px auto 48px;
+        }
+
+        .config-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 26px;
+        }
+
+        .config-header h1 {
+            font-size: clamp(26px, 3vw, 38px);
+            margin: 0 0 6px;
+            letter-spacing: 0;
+        }
+
+        .config-header p {
+            margin: 0;
+            color: var(--texto-suave, rgba(28, 30, 33, 0.56));
+            font-weight: 600;
+        }
+
+        .version-pill {
+            min-width: 98px;
+            padding: 9px 14px;
+            border-radius: 999px;
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--azul-gvi);
+            text-align: center;
+            font-weight: 900;
         }
 
         .config-section {
-            margin-bottom: 35px;
+            margin-bottom: 24px;
         }
 
         .config-section h2 {
-            font-size: 13px;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.5;
-            margin-bottom: 12px;
-            margin-left: 15px;
+            letter-spacing: 0.08em;
+            color: var(--texto-suave, rgba(28, 30, 33, 0.56));
+            margin: 0 0 10px 12px;
+            font-weight: 900;
         }
 
         .config-list {
             background: var(--panel-claro);
+            border: 1px solid rgba(20, 30, 45, 0.07);
             border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 12px 30px rgba(20, 30, 45, 0.05);
         }
-        body.dark-mode .config-list { background: var(--panel-oscuro); border-color: #333; }
+
+        body.dark-mode .config-list {
+            background: var(--panel-oscuro);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+        }
 
         .config-item {
             display: flex;
             align-items: center;
-            padding: 18px 25px;
-            gap: 20px;
+            gap: 16px;
+            min-height: 72px;
+            padding: 16px 20px;
             text-decoration: none;
             color: inherit;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            transition: 0.2s;
+            border-bottom: 1px solid rgba(20, 30, 45, 0.06);
+            transition: background-color 0.14s ease;
+        }
+
+        body.dark-mode .config-item {
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .config-item:last-child {
+            border-bottom: none;
+        }
+
+        .config-item.clickable {
             cursor: pointer;
         }
-        body.dark-mode .config-item { border-bottom-color: #333; }
-        .config-item:last-child { border-bottom: none; }
-        .config-item:hover { background: rgba(0,122,255,0.05); }
+
+        .config-item.clickable:hover {
+            background: rgba(0, 122, 255, 0.055);
+        }
 
         .config-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            flex: 0 0 auto;
+        }
+
+        .config-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2.6px;
         }
 
         .icon-blue { background: #007aff; }
@@ -62,92 +115,512 @@
         .icon-orange { background: #ff9500; }
         .icon-purple { background: #5856d6; }
         .icon-gray { background: #8e8e93; }
+        .icon-dark { background: #1c1f26; }
 
-        .config-info { flex: 1; }
-        .config-info b { display: block; font-size: 16px; margin-bottom: 2px; }
-        .config-info p { margin: 0; font-size: 13px; opacity: 0.5; }
+        .config-info {
+            flex: 1;
+            min-width: 0;
+        }
 
-        .config-action { font-size: 14px; font-weight: 800; color: var(--azul-gvi); }
-        .ip-badge { background: rgba(0,122,255,0.1); padding: 5px 12px; border-radius: 8px; font-family: monospace; font-size: 15px; }
+        .config-info b {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .config-info p {
+            margin: 0;
+            color: var(--texto-suave, rgba(28, 30, 33, 0.56));
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .config-action,
+        .ip-badge,
+        .status-badge {
+            flex: 0 0 auto;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .config-action {
+            border: none;
+            padding: 11px 16px;
+            background: var(--azul-gvi);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(0, 122, 255, 0.16);
+        }
+
+        .config-action.secondary {
+            background: rgba(0, 0, 0, 0.06);
+            color: inherit;
+            box-shadow: none;
+        }
+
+        .config-action.success {
+            background: #34c759;
+            box-shadow: 0 8px 16px rgba(52, 199, 89, 0.18);
+        }
+
+        .config-action[disabled] {
+            cursor: not-allowed;
+            opacity: 0.55;
+            box-shadow: none;
+        }
+
+        body.dark-mode .config-action.secondary {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .ip-badge {
+            padding: 8px 12px;
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--azul-gvi);
+            font-family: Consolas, monospace;
+        }
+
+        .status-badge {
+            padding: 7px 11px;
+            background: rgba(52, 199, 89, 0.13);
+            color: #22a947;
+        }
+
+        .status-badge.pending {
+            background: rgba(255, 149, 0, 0.14);
+            color: #c97700;
+        }
+
+        .update-status {
+            margin-top: 12px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: rgba(0, 122, 255, 0.08);
+            color: var(--azul-gvi);
+            font-weight: 800;
+            display: none;
+        }
+
+        .update-status.visible {
+            display: block;
+        }
+
+        .update-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .user-form {
+            display: grid;
+            grid-template-columns: 1fr 150px 150px auto;
+            gap: 10px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .config-input {
+            width: 100%;
+            border: 1px solid rgba(20, 30, 45, 0.12);
+            background: rgba(255, 255, 255, 0.92);
+            color: inherit;
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            outline: none;
+        }
+
+        body.dark-mode .config-input {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .users-list {
+            display: grid;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(20, 30, 45, 0.04);
+            font-weight: 800;
+        }
+
+        body.dark-mode .user-row {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .user-row span {
+            color: var(--texto-suave, rgba(28, 30, 33, 0.56));
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 720px) {
+            .config-header,
+            .config-item {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .config-action,
+            .ip-badge,
+            .status-badge,
+            .version-pill {
+                width: fit-content;
+            }
+
+            .user-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Rediseño visual: panel de ajustes */
+        body {
+            background:
+                radial-gradient(circle at 86% 12%, rgba(0, 122, 255, 0.08), transparent 28%),
+                linear-gradient(145deg, #f8fbff 0%, #f3f6fa 46%, #f6f7f9 100%);
+        }
+
+        body.dark-mode {
+            background:
+                radial-gradient(circle at 86% 12%, rgba(0, 122, 255, 0.13), transparent 28%),
+                linear-gradient(145deg, #10151d 0%, #14171d 46%, #111216 100%);
+        }
+
+        .config-container {
+            width: min(100% - 48px, 1180px);
+            margin: 28px auto 56px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .config-header {
+            grid-column: 1 / -1;
+            margin: 0;
+            padding: 24px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(20, 30, 45, 0.07);
+            box-shadow: 0 18px 48px rgba(20, 30, 45, 0.07);
+            backdrop-filter: blur(16px);
+        }
+
+        body.dark-mode .config-header {
+            background: rgba(30, 30, 30, 0.72);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+        }
+
+        .config-header h1 {
+            font-size: clamp(32px, 4vw, 52px);
+            line-height: 1;
+        }
+
+        .version-pill {
+            min-width: 112px;
+            padding: 12px 16px;
+            background: var(--azul-gvi);
+            color: white;
+            box-shadow: 0 12px 24px rgba(0, 122, 255, 0.18);
+        }
+
+        .config-section {
+            margin: 0;
+            padding: 18px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.62);
+            border: 1px solid rgba(20, 30, 45, 0.06);
+            box-shadow: 0 14px 36px rgba(20, 30, 45, 0.055);
+        }
+
+        body.dark-mode .config-section {
+            background: rgba(30, 30, 30, 0.62);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.2);
+        }
+
+        .config-section:nth-of-type(3) {
+            grid-row: span 2;
+        }
+
+        .config-section h2 {
+            margin: 0 0 14px;
+            color: var(--azul-gvi);
+            font-size: 13px;
+        }
+
+        .config-list {
+            display: grid;
+            gap: 10px;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            overflow: visible;
+            box-shadow: none;
+        }
+
+        body.dark-mode .config-list {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .config-item {
+            min-height: 76px;
+            padding: 16px;
+            border: 1px solid rgba(20, 30, 45, 0.06);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.86);
+            box-shadow: 0 8px 22px rgba(20, 30, 45, 0.035);
+        }
+
+        body.dark-mode .config-item {
+            background: rgba(255, 255, 255, 0.045);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: none;
+        }
+
+        .config-item:last-child {
+            border-bottom: 1px solid rgba(20, 30, 45, 0.06);
+        }
+
+        body.dark-mode .config-item:last-child {
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .config-item.clickable:hover {
+            background: rgba(0, 122, 255, 0.075);
+            border-color: rgba(0, 122, 255, 0.18);
+        }
+
+        .config-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+        }
+
+        .config-info b {
+            font-size: 15px;
+            letter-spacing: 0;
+        }
+
+        .config-info p {
+            line-height: 1.35;
+        }
+
+        .config-action {
+            min-height: 40px;
+            border-radius: 13px;
+        }
+
+        .update-actions {
+            justify-content: flex-end;
+        }
+
+        .update-status {
+            grid-column: 1 / -1;
+            margin-top: 12px;
+            border: 1px solid rgba(0, 122, 255, 0.12);
+            background: rgba(0, 122, 255, 0.08);
+        }
+
+        .user-form {
+            grid-template-columns: minmax(160px, 1fr) 150px 120px auto;
+        }
+
+        .users-list {
+            margin-top: 10px;
+        }
+
+        .user-row {
+            padding: 12px 14px;
+            background: rgba(0, 122, 255, 0.06);
+        }
+
+        body.dark-mode .user-row {
+            background: rgba(94, 169, 255, 0.08);
+        }
+
+        @media (max-width: 980px) {
+            .config-container {
+                grid-template-columns: 1fr;
+                width: min(100% - 28px, 760px);
+            }
+
+            .config-section:nth-of-type(3) {
+                grid-row: auto;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .config-container {
+                margin-top: 18px;
+            }
+
+            .config-header,
+            .config-item {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .update-actions,
+            .user-form {
+                width: 100%;
+                grid-template-columns: 1fr;
+            }
+
+            .config-action,
+            .ip-badge,
+            .status-badge,
+            .version-pill {
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
     <%- include('partials/nav') %>
 
-    <div class="config-container">
-        <header style="margin-bottom: 40px;">
-            <h1 style="font-size: 32px; margin: 0;">⚙️ Configuración</h1>
-            <p style="opacity: 0.5;">Ajustes del sistema y herramientas de mantenimiento.</p>
+    <main class="config-container">
+        <header class="config-header">
+            <div>
+                <h1>Ajustes</h1>
+                <p>Sistema, datos, red y mantenimiento de GVI.</p>
+            </div>
+            <div class="version-pill" id="lblVersionTop">v...</div>
         </header>
 
-        <!-- SECCIÓN RED -->
-        <div class="config-section">
+        <section class="config-section">
+            <h2>Actualizacion</h2>
+            <div class="config-list">
+                <div class="config-item">
+                    <div class="config-icon icon-blue"><i data-lucide="download-cloud"></i></div>
+                    <div class="config-info">
+                        <b>Buscar actualizaciones</b>
+                        <p id="updateDescription">GVI puede prepararse para recibir nuevas versiones desde GitHub Releases.</p>
+                    </div>
+                    <div class="update-actions">
+                        <button class="config-action" id="btnCheckUpdate" type="button" onclick="buscarActualizacion()">Buscar</button>
+                        <button class="config-action secondary" id="btnDownloadUpdate" type="button" onclick="descargarActualizacion()" hidden>Descargar</button>
+                        <button class="config-action success" id="btnInstallUpdate" type="button" onclick="instalarActualizacion()" hidden>Instalar</button>
+                    </div>
+                </div>
+                <div class="config-item">
+                    <div class="config-icon icon-purple"><i data-lucide="git-branch"></i></div>
+                    <div class="config-info">
+                        <b>Canal estable</b>
+                        <p id="updateProvider">Proveedor pendiente.</p>
+                    </div>
+                    <span class="status-badge pending" id="updateMode">Preparado</span>
+                </div>
+            </div>
+            <div class="update-status" id="updateStatus"></div>
+        </section>
+
+        <section class="config-section">
             <h2>Conectividad</h2>
             <div class="config-list">
                 <div class="config-item">
                     <div class="config-icon icon-blue"><i data-lucide="monitor"></i></div>
                     <div class="config-info">
-                        <b>Servidor Local (PC 1)</b>
-                        <p>Dirección para conectar otros dispositivos en la red.</p>
+                        <b>Servidor local</b>
+                        <p>Direccion para conectar otros dispositivos en la misma red.</p>
                     </div>
                     <div class="ip-badge" id="lblIpRed">...</div>
                 </div>
                 <div class="config-item">
-                    <div class="config-icon icon-purple"><i data-lucide="wifi"></i></div>
+                    <div class="config-icon icon-green"><i data-lucide="wifi"></i></div>
                     <div class="config-info">
-                        <b>Estado de Red</b>
-                        <p>Asegúrate de estar en la misma red Wi-Fi.</p>
+                        <b>Estado de red</b>
+                        <p>Usa la misma red Wi-Fi para celulares o equipos secundarios.</p>
                     </div>
-                    <div style="color: #34c759; font-size: 12px; font-weight: 800;">ACTIVO</div>
+                    <span class="status-badge">Activo</span>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- SECCIÓN DATOS -->
-        <div class="config-section">
-            <h2>Seguridad y Datos</h2>
+        <section class="config-section">
+            <h2>Seguridad y datos</h2>
             <div class="config-list">
-                <a href="/api/backup" class="config-item">
-                    <div class="config-icon icon-green"><i data-lucide="download"></i></div>
+                <div class="config-item">
+                    <div class="config-icon icon-purple"><i data-lucide="users"></i></div>
                     <div class="config-info">
-                        <b>Copia de Seguridad</b>
-                        <p>Descargar todo el inventario y ventas (.zip)</p>
+                        <b>Crear usuario</b>
+                        <p>Agrega perfiles con rol y PIN para iniciar sesion.</p>
                     </div>
-                    <div class="config-action">DESCARGAR</div>
+                </div>
+                <div class="config-item">
+                    <div class="user-form">
+                        <input class="config-input" id="nuevoUsuarioNombre" placeholder="Nombre">
+                        <select class="config-input" id="nuevoUsuarioRol">
+                            <option value="CAJA">Caja</option>
+                            <option value="ADMIN">Administrador</option>
+                        </select>
+                        <input class="config-input" id="nuevoUsuarioPin" maxlength="6" inputmode="numeric" placeholder="PIN">
+                        <button class="config-action" type="button" onclick="crearUsuario()">Crear</button>
+                    </div>
+                </div>
+                <div class="config-item">
+                    <div class="config-info">
+                        <b>Usuarios creados</b>
+                        <div class="users-list" id="usuariosList"></div>
+                    </div>
+                </div>
+                <a href="/api/backup" class="config-item clickable">
+                    <div class="config-icon icon-green"><i data-lucide="archive"></i></div>
+                    <div class="config-info">
+                        <b>Copia de seguridad</b>
+                        <p>Descargar inventario, ventas y datos del negocio en un archivo ZIP.</p>
+                    </div>
+                    <span class="config-action">Descargar</span>
                 </a>
                 <div class="config-item">
                     <div class="config-icon icon-orange"><i data-lucide="database"></i></div>
                     <div class="config-info">
-                        <b>Base de Datos</b>
-                        <p>Almacenamiento local basado en JSON.</p>
+                        <b>Base de datos local</b>
+                        <p>Los datos se guardan en este equipo para uso como programa de escritorio.</p>
                     </div>
-                    <div style="opacity: 0.4;">Estable</div>
+                    <span class="status-badge">Estable</span>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- SECCIÓN SISTEMA -->
-        <div class="config-section">
-            <h2>Información</h2>
+        <section class="config-section">
+            <h2>Sistema</h2>
             <div class="config-list">
                 <div class="config-item">
                     <div class="config-icon icon-gray"><i data-lucide="info"></i></div>
                     <div class="config-info">
-                        <b>Versión del Software</b>
-                        <p>GVI Minimarket Pro</p>
+                        <b>Version del software</b>
+                        <p id="appFullName">GVI - Gestor de Ventas Intuitivo</p>
                     </div>
-                    <div style="opacity: 0.5;">v2.5.0</div>
+                    <span class="status-badge" id="lblVersion">v...</span>
                 </div>
-                <div class="config-item" onclick="window.location.reload()">
-                    <div class="config-icon icon-gray" style="background: #444;"><i data-lucide="refresh-cw"></i></div>
+                <div class="config-item clickable" onclick="window.location.reload()">
+                    <div class="config-icon icon-dark"><i data-lucide="refresh-cw"></i></div>
                     <div class="config-info">
-                        <b>Reiniciar Aplicación</b>
-                        <p>Refrescar todos los servicios locales.</p>
+                        <b>Reiniciar vista</b>
+                        <p>Refresca la pantalla actual sin cerrar el programa.</p>
                     </div>
+                    <button class="config-action secondary" type="button">Reiniciar</button>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script>
         async function cargarInfoRed() {
@@ -156,12 +629,139 @@
                 const data = await res.json();
                 document.getElementById('lblIpRed').innerText = `http://${data.ip}:3000`;
             } catch (e) {
-                document.getElementById('lblIpRed').innerText = "Error";
+                document.getElementById('lblIpRed').innerText = 'Sin red';
+            }
+        }
+
+        function aplicarEstadoActualizacion(data) {
+            const status = document.getElementById('updateStatus');
+            const mode = document.getElementById('updateMode');
+            const btnCheck = document.getElementById('btnCheckUpdate');
+            const btnDownload = document.getElementById('btnDownloadUpdate');
+            const btnInstall = document.getElementById('btnInstallUpdate');
+
+            mode.innerText = data.configured ? (data.ready ? 'Lista' : data.available ? 'Disponible' : 'Activo') : 'Pendiente';
+            mode.classList.toggle('pending', !data.configured || data.checking || data.downloading);
+
+            btnCheck.disabled = !!data.checking || !!data.downloading;
+            btnDownload.hidden = !data.available || data.ready;
+            btnDownload.disabled = !!data.downloading;
+            btnInstall.hidden = !data.ready;
+
+            if (data.message) {
+                status.classList.add('visible');
+                status.innerText = data.message;
+            }
+        }
+
+        async function cargarInfoApp() {
+            try {
+                const res = await fetch('/api/app/info');
+                const data = await res.json();
+                document.getElementById('lblVersionTop').innerText = `v${data.version}`;
+                document.getElementById('lblVersion').innerText = `v${data.version}`;
+                document.getElementById('appFullName').innerText = `${data.name} - ${data.fullName}`;
+                document.getElementById('updateProvider').innerText = `${data.updateProvider} - canal ${data.updateChannel}`;
+                aplicarEstadoActualizacion(data.updater || {});
+            } catch (e) {
+                document.getElementById('lblVersionTop').innerText = 'v?';
+                document.getElementById('lblVersion').innerText = 'v?';
+            }
+        }
+
+        async function cargarUsuarios() {
+            const list = document.getElementById('usuariosList');
+            try {
+                const res = await fetch('/api/usuarios');
+                const usuarios = await res.json();
+                list.innerHTML = usuarios.map(u => `
+                    <div class="user-row">
+                        <b>${u.nombre}</b>
+                        <span>${u.temporal ? 'Temporal - ' : ''}${u.rol}</span>
+                    </div>
+                `).join('') || '<div class="user-row"><b>Sin usuarios</b><span>Pendiente</span></div>';
+            } catch (_) {
+                list.innerHTML = '<div class="user-row"><b>Error al cargar</b><span>Usuarios</span></div>';
+            }
+        }
+
+        async function crearUsuario() {
+            const nombre = document.getElementById('nuevoUsuarioNombre').value.trim();
+            const rol = document.getElementById('nuevoUsuarioRol').value;
+            const pin = document.getElementById('nuevoUsuarioPin').value.trim();
+
+            try {
+                const res = await fetch('/api/usuarios', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, rol, pin })
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    alert(data.message || 'No se pudo crear el usuario.');
+                    return;
+                }
+                document.getElementById('nuevoUsuarioNombre').value = '';
+                document.getElementById('nuevoUsuarioPin').value = '';
+                cargarUsuarios();
+            } catch (_) {
+                alert('No se pudo crear el usuario.');
+            }
+        }
+
+        async function consultarEstadoActualizacion() {
+            try {
+                const res = await fetch('/api/app/update/status');
+                const data = await res.json();
+                aplicarEstadoActualizacion(data);
+            } catch (_) {}
+        }
+
+        async function buscarActualizacion() {
+            const status = document.getElementById('updateStatus');
+            status.classList.add('visible');
+            status.innerText = 'Buscando configuracion de actualizaciones...';
+
+            try {
+                const res = await fetch('/api/app/update/check', { method: 'POST' });
+                const data = await res.json();
+                aplicarEstadoActualizacion(data);
+            } catch (e) {
+                const mode = document.getElementById('updateMode');
+                mode.innerText = 'Error';
+                mode.classList.add('pending');
+                status.innerText = 'No se pudo consultar el estado de actualizacion.';
+            }
+        }
+
+        async function descargarActualizacion() {
+            const status = document.getElementById('updateStatus');
+            status.classList.add('visible');
+            status.innerText = 'Iniciando descarga...';
+
+            try {
+                const res = await fetch('/api/app/update/download', { method: 'POST' });
+                const data = await res.json();
+                aplicarEstadoActualizacion(data);
+            } catch (e) {
+                status.innerText = 'No se pudo iniciar la descarga.';
+            }
+        }
+
+        async function instalarActualizacion() {
+            if (!confirm('GVI se cerrara para instalar la actualizacion. Continuar?')) return;
+            try {
+                await fetch('/api/app/update/install', { method: 'POST' });
+            } catch (e) {
+                document.getElementById('updateStatus').innerText = 'No se pudo iniciar la instalacion.';
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             cargarInfoRed();
+            cargarInfoApp();
+            cargarUsuarios();
+            setInterval(consultarEstadoActualizacion, 2500);
             lucide.createIcons();
         });
     </script>

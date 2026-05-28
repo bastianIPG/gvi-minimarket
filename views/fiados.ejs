@@ -29,34 +29,49 @@
         
         .card-fiado { 
             background: var(--panel-claro); padding: 30px; border-radius: 25px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.05);
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative;
+            box-shadow: 0 5px 16px rgba(0,0,0,0.025); border: 1px solid rgba(0,0,0,0.05);
+            transition: border-color 0.16s ease, box-shadow 0.16s ease; position: relative;
         }
         body.dark-mode .card-fiado { background: var(--panel-oscuro); border-color: #333; }
-        .card-fiado:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .card-fiado:hover { border-color: rgba(0,122,255,0.2); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
         
         .deuda-monto { font-size: 38px; font-weight: 900; color: #ff3b30; margin: 10px 0; }
         
         .btn-detalle { 
             background: rgba(0,122,255,0.08); color: var(--azul-gvi); border: none; 
             padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; margin-bottom: 12px;
-            transition: 0.2s;
+            transition: background-color 0.14s ease;
         }
         .btn-detalle:hover { background: rgba(0,122,255,0.15); }
 
         .btn-pagar { 
             width: 100%; padding: 15px; border-radius: 12px; border: none; 
             background: #34c759; color: white; font-weight: 800; cursor: pointer; 
-            transition: 0.3s; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2);
+            transition: background-color 0.14s ease, box-shadow 0.14s ease; box-shadow: 0 3px 10px rgba(52, 199, 89, 0.18);
         }
-        .btn-pagar:hover { background: #2eb350; transform: scale(1.02); }
+        .btn-pagar:hover { background: #2eb350; box-shadow: 0 5px 14px rgba(52, 199, 89, 0.22); }
         
         .badge-p { background: #ff950015; color: #ff9500; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; }
 
         /* Estilos Impresión */
         @media print {
+            @page { margin: 0; size: 80mm auto; }
             body * { display: none !important; }
             #areaImpresion, #areaImpresion * { display: block !important; }
+            #areaImpresion {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 68mm;
+                padding: 3mm 4mm;
+                color: #000 !important;
+                background: #fff !important;
+                font-family: "Courier New", monospace !important;
+                font-weight: 800 !important;
+                box-sizing: border-box;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
     </style>
 </head>
@@ -273,30 +288,32 @@
             const fecha = new Date().toLocaleString();
             const area = document.getElementById('areaImpresion');
             area.innerHTML = `
-                <div style="text-align:center;">
-                    <h2 style="margin:0;">GVI MINIMARKET</h2>
-                    <p style="margin:5px 0;">COMPROBANTE DE PAGO DEUDA</p>
-                    <p style="font-size:12px;">Ticket #${vId} | ${fecha}</p>
-                    <hr>
-                    <p style="text-align:left;"><b>CLIENTE: ${cuenta.cliente}</b></p>
-                    <table style="width:100%; font-size:11px; text-align:left;">
+                <div style="text-align:center; font-family:'Courier New', monospace; width:100%; color:#000; font-weight:800; line-height:1.25;">
+                    <div style="font-size:18px; font-weight:900; letter-spacing:0;">GVI MINIMARKET</div>
+                    <div style="font-size:12px; font-weight:900; margin-top:4px;">PAGO DE DEUDA</div>
+                    <div style="font-size:12px; font-weight:900;">Ticket #${vId}</div>
+                    <div style="font-size:12px; font-weight:800;">${fecha}</div>
+                    <div style="border-top:2px solid #000; margin:8px 0;"></div>
+                    <div style="text-align:left; font-size:12px; font-weight:900;">CLIENTE: ${cuenta.cliente}</div>
+                    <table style="width:100%; font-size:12px; font-weight:900; text-align:left; border-collapse:collapse; table-layout:fixed; margin-top:6px;">
                         ${cuenta.items.map(i => `
                             <tr>
-                                <td>${i.fechaMov || cuenta.fechaInicio}</td>
-                                <td>${i.cantidad}x ${i.nombre.substring(0,15)}</td>
-                                <td style="text-align:right;">$${(i.precio*i.cantidad).toLocaleString('es-CL')}</td>
+                                <td style="width:30%; padding:3px 0; white-space:nowrap; overflow:hidden;">${i.fechaMov || cuenta.fechaInicio}</td>
+                                <td style="width:35%; padding:3px 0; white-space:nowrap; overflow:hidden;">${i.cantidad}x ${i.nombre.substring(0,15)}</td>
+                                <td style="width:35%; text-align:right; padding:3px 0; white-space:nowrap;">$${(i.precio*i.cantidad).toLocaleString('es-CL')}</td>
                             </tr>`).join('')}
                     </table>
-                    <hr>
-                    <div style="text-align:right; font-weight:bold; font-size:16px;">
+                    <div style="border-top:2px solid #000; margin:8px 0;"></div>
+                    <div style="text-align:right; font-weight:900; font-size:16px;">
                         TOTAL PAGADO: $${cuenta.total.toLocaleString('es-CL')}
                     </div>
-                    <div style="text-align:right; font-size:12px; margin-top:5px;">
+                    <div style="text-align:right; font-size:12px; font-weight:900; margin-top:5px;">
                         Metodo: ${pago.metodoPago}<br>
                         Entregó: $${pago.pagoCon.toLocaleString('es-CL')}<br>
                         Vuelto: $${pago.vuelto.toLocaleString('es-CL')}
                     </div>
-                    <p style="margin-top:20px; font-size:12px;">¡Deuda Saldada! Gracias por su preferencia.</p>
+                    <div style="border-top:1px solid #000; margin:8px 0 6px;"></div>
+                    <div style="font-size:13px; font-weight:900; margin-top:8px;">Deuda saldada. Gracias</div>
                 </div>`;
             window.print();
         }

@@ -6,12 +6,7 @@
     <!-- Incluimos Chart.js para los gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* --- ANIMACIONES --- */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .anim-fade { animation: fadeInUp 0.5s ease backwards; }
+        .anim-fade { opacity: 1; }
 
         /* --- DASHBOARD GRID --- */
         .finanzas-header { display: flex; justify-content: space-between; align-items: center; margin: 40px 0 30px; }
@@ -27,12 +22,12 @@
             background: var(--panel-claro);
             padding: 25px;
             border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            box-shadow: 0 5px 16px rgba(0,0,0,0.025);
             border: 1px solid rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
             gap: 20px;
-            transition: 0.3s;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease;
         }
         .btn-accion-fin { 
             padding: 10px 20px; 
@@ -42,13 +37,13 @@
             cursor: pointer; 
             font-weight: 800; 
             font-size: 13px;
-            transition: 0.3s; 
+            transition: background-color 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease; 
             display: flex; 
             align-items: center; 
             gap: 10px; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .btn-accion-fin:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .btn-accion-fin:hover { filter: brightness(1.08); box-shadow: 0 5px 14px rgba(0,0,0,0.12); }
         .btn-accion-fin i { width: 18px; height: 18px; }
 
         /* Estilo para el input de fecha */
@@ -61,13 +56,13 @@
             font-weight: 700;
             color: inherit;
             outline: none;
-            transition: 0.3s;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease;
         }
         body.dark-mode .input-fecha-moderno { background: rgba(255,255,255,0.05); border-color: #444; }
         .input-fecha-moderno:focus { border-color: var(--azul-gvi); box-shadow: 0 0 0 4px rgba(0,122,255,0.1); }
         
         body.dark-mode .card-stat-fin { background: var(--panel-oscuro); border-color: #333; }
-        .card-stat-fin:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
+        .card-stat-fin:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
         
         .fin-icon { width: 55px; height: 55px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; }
         .fin-info span { display: block; font-size: 11px; font-weight: 800; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; }
@@ -84,7 +79,7 @@
             background: var(--panel-claro);
             padding: 25px;
             border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            box-shadow: 0 5px 16px rgba(0,0,0,0.025);
             border: 1px solid rgba(0,0,0,0.05);
         }
         body.dark-mode .chart-card { background: var(--panel-oscuro); border-color: #333; }
@@ -95,7 +90,7 @@
             background: var(--panel-claro);
             padding: 30px;
             border-radius: 28px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+            box-shadow: 0 5px 18px rgba(0,0,0,0.03);
         }
         body.dark-mode .seccion-tabla { background: var(--panel-oscuro); }
         body.dark-mode td { border-bottom-color: rgba(255,255,255,0.03); }
@@ -125,7 +120,7 @@
             cursor: pointer;
             font-weight: 800;
             font-size: 13px;
-            transition: 0.3s;
+            transition: background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
             white-space: nowrap;
         }
         body.dark-mode .pastilla { background: rgba(255,255,255,0.08); color: white; }
@@ -145,9 +140,147 @@
         .btn-ver-boleta {
             width: 36px; height: 36px; border-radius: 50%; border: none;
             display: inline-flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s;
+            background: rgba(0,0,0,0.05); cursor: pointer; transition: background-color 0.14s ease, color 0.14s ease;
         }
-        .btn-ver-boleta:hover { background: var(--azul-gvi); color: white; transform: scale(1.1); }
+        .btn-ver-boleta:hover { background: var(--azul-gvi); color: white; }
+
+        .panel-detalle-venta {
+            width: min(660px, calc(100vw - 32px));
+            max-height: calc(100vh - 36px);
+            overflow-y: auto;
+            padding: 0;
+            border-radius: 28px;
+        }
+
+        .detalle-venta-header {
+            padding: 26px 30px 22px;
+            background:
+                radial-gradient(circle at top left, rgba(0,122,255,0.16), transparent 34%),
+                linear-gradient(135deg, rgba(0,122,255,0.12), rgba(52,199,89,0.08));
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-start;
+        }
+
+        body.dark-mode .detalle-venta-header { border-bottom-color: #333; }
+
+        .detalle-venta-header h2 {
+            margin: 0;
+            font-size: 27px;
+            letter-spacing: 0;
+        }
+
+        .detalle-venta-header p {
+            margin: 6px 0 0;
+            opacity: 0.58;
+            font-weight: 800;
+        }
+
+        .detalle-total {
+            text-align: right;
+            color: var(--azul-gvi);
+            font-size: 34px;
+            font-weight: 950;
+            white-space: nowrap;
+        }
+
+        .detalle-venta-body { padding: 24px 30px 28px; }
+
+        .detalle-resumen {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .detalle-chip {
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(0,0,0,0.035);
+            border: 1px solid rgba(0,0,0,0.035);
+        }
+
+        body.dark-mode .detalle-chip { background: rgba(255,255,255,0.05); }
+
+        .detalle-chip span {
+            display: block;
+            font-size: 10px;
+            font-weight: 900;
+            opacity: 0.55;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .detalle-chip b { font-size: 14px; }
+
+        .detalle-items {
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 18px;
+            overflow: hidden;
+            background: var(--panel-claro);
+        }
+
+        body.dark-mode .detalle-items { background: var(--panel-oscuro); border-color: #333; }
+
+        .detalle-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            padding: 15px 18px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            align-items: center;
+        }
+
+        body.dark-mode .detalle-item { border-bottom-color: #333; }
+        .detalle-item:last-child { border-bottom: none; }
+
+        .detalle-item-nombre b { display: block; font-size: 16px; }
+        .detalle-item-nombre span { display: block; margin-top: 3px; font-size: 12px; opacity: 0.58; font-weight: 800; }
+        .detalle-item-total { font-size: 18px; font-weight: 950; color: var(--azul-gvi); }
+
+        .detalle-acciones {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .detalle-acciones button {
+            min-height: 56px;
+            border-radius: 14px !important;
+        }
+
+        body.detalle-venta-abierto {
+            overflow: hidden;
+        }
+
+        @media print {
+            @page { margin: 0; size: 80mm auto; }
+            body * { display: none !important; }
+            #areaImpresion { display: block !important; }
+            #areaImpresion div { display: block !important; }
+            #areaImpresion table { display: table !important; }
+            #areaImpresion tbody { display: table-row-group !important; }
+            #areaImpresion tr { display: table-row !important; }
+            #areaImpresion td { display: table-cell !important; }
+            #areaImpresion span { display: inline !important; }
+            #areaImpresion {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 68mm;
+                padding: 3mm 4mm;
+                color: #000 !important;
+                background: #fff !important;
+                font-family: "Courier New", monospace !important;
+                font-weight: 800 !important;
+                box-sizing: border-box;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
 
      /* --- MODALES GENERAL --- */
     .modal-fondo { 
@@ -156,7 +289,6 @@
         top: 0; left: 0; 
         width: 100%; height: 100%; 
         background: rgba(0,0,0,0.6); 
-        backdrop-filter: blur(8px); 
         z-index: 5000; 
         align-items: center; 
         justify-content: center; 
@@ -164,9 +296,8 @@
     .panel-modal {
         background: var(--panel-claro);
         border-radius: 32px;
-        box-shadow: 0 30px 70px rgba(0,0,0,0.3);
+        box-shadow: 0 14px 34px rgba(0,0,0,0.22);
         border: 1px solid rgba(255,255,255,0.1);
-        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         overflow: hidden;
     }
     body.dark-mode .panel-modal { background: #1a1a1a; border-color: #333; }
@@ -241,7 +372,7 @@
         font-family: inherit;
         background: var(--panel-claro);
         color: inherit;
-        transition: 0.3s;
+        transition: border-color 0.16s ease, box-shadow 0.16s ease;
         box-sizing: border-box;
     }
     body.dark-mode .form-input { background: #222; border-color: #333; color: white; }
@@ -418,10 +549,48 @@
         </div>
     </div>
 
+    <div id="modalDetalleVenta" class="modal-fondo">
+        <div class="panel-modal panel-detalle-venta">
+            <div class="detalle-venta-header">
+                <div>
+                    <h2 id="detalleVentaTitulo">Venta</h2>
+                    <p id="detalleVentaFecha">Fecha</p>
+                </div>
+                <div class="detalle-total" id="detalleVentaTotal">$0</div>
+            </div>
+            <div class="detalle-venta-body">
+                <div class="detalle-resumen">
+                    <div class="detalle-chip">
+                        <span>Metodo</span>
+                        <b id="detalleVentaMetodo">-</b>
+                    </div>
+                    <div class="detalle-chip">
+                        <span>Pago con</span>
+                        <b id="detalleVentaPago">$0</b>
+                    </div>
+                    <div class="detalle-chip">
+                        <span>Vuelto</span>
+                        <b id="detalleVentaVuelto">$0</b>
+                    </div>
+                </div>
+                <div class="detalle-items" id="detalleVentaItems"></div>
+                <div class="detalle-acciones">
+                    <button class="btn-cancelar" onclick="cerrarDetalleVenta()">Cerrar</button>
+                    <button class="btn-success" onclick="reimprimirVentaSeleccionada()">
+                        <i data-lucide="printer"></i> Reimprimir Boleta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="areaImpresion" style="display:none;"></div>
+
     <script>
         let ventasFull = [];
         let chartLine, chartPie;
         let filtroMetodo = 'TODOS';
+        let ventaDetalleActual = null;
         let totalSistEfec = 0;
         let totalSistTarj = 0;
         let totalFisicoReal = 0;
@@ -530,7 +699,7 @@
                         pointBackgroundColor: '#007aff'
                     }]
                 },
-                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { opacity: 0.1 } } } }
+                options: { animation: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { opacity: 0.1 } } } }
             });
 
             // Lógica Pie (Métodos de Pago)
@@ -549,7 +718,7 @@
                         borderWidth: 0
                     }]
                 },
-                options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+                options: { animation: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
             });
         }
 
@@ -646,6 +815,80 @@
         function verBoleta(id) {
             const v = ventasFull.find(v => v.id === id);
             alert(`Detalle Venta #${id}\nTotal: $${v.total.toLocaleString('es-CL')}\nMétodo: ${v.metodoPago}`);
+        }
+
+        function verBoleta(id) {
+            const v = ventasFull.find(v => v.id === id);
+            if (!v) return;
+            ventaDetalleActual = v;
+
+            document.getElementById('detalleVentaTitulo').innerText = `Venta #${v.id}`;
+            document.getElementById('detalleVentaFecha').innerText = `${v.fecha} · ${v.hora}`;
+            document.getElementById('detalleVentaTotal').innerText = "$" + Number(v.total).toLocaleString('es-CL');
+            document.getElementById('detalleVentaMetodo').innerText = v.metodoPago || '-';
+            document.getElementById('detalleVentaPago').innerText = "$" + Number(v.pagoCon || v.total || 0).toLocaleString('es-CL');
+            document.getElementById('detalleVentaVuelto').innerText = "$" + Number(v.vuelto || 0).toLocaleString('es-CL');
+
+            const items = Array.isArray(v.items) ? v.items : [];
+            document.getElementById('detalleVentaItems').innerHTML = items.length
+                ? items.map(item => {
+                    const cantidad = item.vendidoPorPeso ? `${item.pesoGramos || Math.round((item.cantidad || 0) * 1000)}g` : `${item.cantidad} un.`;
+                    const precio = Number(item.precio || 0);
+                    const subtotal = precio * Number(item.cantidad || 0);
+                    return `<div class="detalle-item"><div class="detalle-item-nombre"><b>${item.nombre || 'Producto'}</b><span>${cantidad} · $${precio.toLocaleString('es-CL')}${item.vendidoPorPeso ? '/kg' : ''}</span></div><div class="detalle-item-total">$${subtotal.toLocaleString('es-CL')}</div></div>`;
+                }).join('')
+                : '<div class="detalle-item"><div class="detalle-item-nombre"><b>Sin detalle guardado</b><span>No hay productos registrados para esta venta.</span></div></div>';
+
+            document.body.classList.add('detalle-venta-abierto');
+            document.getElementById('modalDetalleVenta').style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        function cerrarDetalleVenta() {
+            document.getElementById('modalDetalleVenta').style.display = 'none';
+            document.body.classList.remove('detalle-venta-abierto');
+            ventaDetalleActual = null;
+        }
+
+        function reimprimirVentaSeleccionada() {
+            if (!ventaDetalleActual) return;
+            imprimirTicketHistorico(ventaDetalleActual);
+        }
+
+        function imprimirTicketHistorico(v) {
+            const items = Array.isArray(v.items) ? v.items : [];
+            document.getElementById('areaImpresion').innerHTML = `
+                <div style="font-family:'Courier New', monospace; width:100%; color:#000; font-weight:800; line-height:1.22;">
+                    <div style="text-align:center; font-size:18px; font-weight:900;">GVI MINIMARKET</div>
+                    <div style="text-align:center; font-size:12px; font-weight:900; margin-top:3px;">#${v.id}</div>
+                    <div style="text-align:center; font-size:11px; font-weight:900; margin-top:2px;">${v.fecha}, ${v.hora}</div>
+                    <div style="border-top:2px solid #000; margin:8px 0;"></div>
+                    <div style="font-size:12px; font-weight:900;">Metodo: ${v.metodoPago || '-'}</div>
+                    <div style="border-top:2px solid #000; margin:8px 0;"></div>
+                    <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:12px; font-weight:900;">
+                        ${items.map(i => {
+                            const cant = i.vendidoPorPeso ? `${i.pesoGramos || Math.round((i.cantidad || 0) * 1000)}g` : `${i.cantidad}`;
+                            return `<tr>
+                                <td style="width:68%; padding:5px 0; white-space:nowrap; overflow:hidden; font-weight:900;">${cant} x ${String(i.nombre || '').substring(0,18)}</td>
+                                <td style="width:32%; padding:5px 0; text-align:right; white-space:nowrap; font-weight:900;">$${(Number(i.precio || 0) * Number(i.cantidad || 0)).toLocaleString('es-CL')}</td>
+                            </tr>`;
+                        }).join('')}
+                    </table>
+                    <div style="border-top:2px solid #000; margin:8px 0;"></div>
+                    <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:14px; font-weight:900;">
+                        <tr>
+                            <td style="font-weight:900;">Total:</td>
+                            <td style="text-align:right; white-space:nowrap; font-weight:900;">$${Number(v.total || 0).toLocaleString('es-CL')}</td>
+                        </tr>
+                        ${v.metodoPago === 'Efectivo' ? `<tr>
+                            <td style="font-size:12px; font-weight:900; padding-top:3px;">Vuelto:</td>
+                            <td style="font-size:12px; text-align:right; white-space:nowrap; font-weight:900; padding-top:3px;">$${Number(v.vuelto || 0).toLocaleString('es-CL')}</td>
+                        </tr>` : ''}
+                    </table>
+                    <div style="border-top:2px solid #000; margin:8px 0;"></div>
+                    <div style="text-align:center; font-size:12px; font-weight:900;">Muchas gracias por su compra</div>
+                </div>`;
+            window.print();
         }
 
         function formatearMoneda(input) {

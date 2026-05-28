@@ -1,6 +1,6 @@
 {
   "name": "gvi-minimarket",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Gestor de Ventas Intuitivo - Version Modular",
   "author": "GVI",
   "main": "server.js",
@@ -8,36 +8,70 @@
     "start": "electron .",
     "dev": "electron .",
     "pack": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& set ELECTRON_CACHE=.cache\\electron&& set ELECTRON_BUILDER_CACHE=.cache\\electron-builder&& electron-builder --dir",
-    "dist": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& set ELECTRON_CACHE=.cache\\electron&& set ELECTRON_BUILDER_CACHE=.cache\\electron-builder&& electron-builder --win nsis"
+    "dist": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& set ELECTRON_CACHE=.cache\\electron&& set ELECTRON_BUILDER_CACHE=.cache\\electron-builder&& electron-builder --win nsis --publish never",
+    "release": "powershell -ExecutionPolicy Bypass -File scripts\\build-installer.ps1"
   },
   "build": {
     "appId": "cl.gvi.minimarket",
-    "productName": "GVI Minimarket",
+    "productName": "GVI",
     "npmRebuild": false,
     "directories": {
       "output": "dist"
     },
+    "artifactName": "GVI-Setup-${version}.${ext}",
+    "asarUnpack": [
+      "node_modules/sqlite3/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "build/icon.ico",
+        "to": "build/icon.ico"
+      },
+      {
+        "from": "build/icon.png",
+        "to": "build/icon.png"
+      },
+      {
+        "from": "build/app-update.yml",
+        "to": "app-update.yml"
+      }
+    ],
     "files": [
       "server.js",
       "package.json",
+      "build/icon.ico",
+      "build/icon.png",
+      "build/app-update.yml",
       "public/**/*",
       "views/**/*"
     ],
     "win": {
       "target": "nsis",
+      "icon": "build/icon.ico",
       "signAndEditExecutable": false
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "bastianIPG",
+        "repo": "gvi-minimarket",
+        "releaseType": "release"
+      }
+    ],
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "GVI Minimarket"
+      "shortcutName": "GVI",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
     }
   },
   "dependencies": {
     "adm-zip": "^0.5.17",
     "ejs": "^3.1.9",
+    "electron-updater": "^6.8.3",
     "express": "^4.18.2",
     "qrcode": "^1.5.4",
     "selfsigned": "^5.5.0",

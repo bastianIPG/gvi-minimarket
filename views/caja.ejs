@@ -47,7 +47,7 @@
         th { background: rgba(0,0,0,0.02); font-weight: 600; color: #666; text-transform: uppercase; font-size: 12px; }
         
         .control-cant { display: flex; align-items: center; gap: 10px; }
-        .btn-cant { background: #eee; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-cant { background: #eee; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background-color 0.14s ease, color 0.14s ease; }
         body.dark-mode .btn-cant { background: #444; color: white; }
 
         .panel-cobro { background: var(--panel-claro); border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); position: sticky; top: 20px; }
@@ -55,17 +55,367 @@
         
         .caja-total { font-size: 55px; font-weight: 900; color: var(--azul-gvi); margin: 10px 0 20px; text-align: center; }
         
-        .btn-cobrar { width: 100%; background: #34c759; color: white; border: none; padding: 20px; font-size: 22px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+        .btn-cobrar { width: 100%; background: #34c759; color: white; border: none; padding: 20px; font-size: 22px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: background-color 0.16s ease, opacity 0.16s ease; }
         .btn-cobrar:disabled { background: #ccc; opacity: 0.5; cursor: not-allowed; }
 
         .metodos-pago-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 25px 0; }
-        .btn-metodo { padding: 15px 10px; border-radius: 12px; border: 2px solid #eee; background: transparent; cursor: pointer; font-weight: 800; font-size: 14px; color: inherit; transition: 0.2s; }
+        .btn-metodo { padding: 15px 10px; border-radius: 12px; border: 2px solid #eee; background: transparent; cursor: pointer; font-weight: 800; font-size: 14px; color: inherit; transition: border-color 0.14s ease, background-color 0.14s ease, color 0.14s ease; }
         body.dark-mode .btn-metodo { border-color: #333; }
         .btn-metodo.activo { border-color: var(--azul-gvi); background: rgba(0, 122, 255, 0.1); color: var(--azul-gvi); }
         .btn-metodo.fiado-color { border-color: #ff9500; color: #ff9500; }
         .btn-metodo.fiado-color.activo { background: rgba(255, 149, 0, 0.1); }
 
         .badge-peso { display: inline-block; background: rgba(255,149,0,0.15); color: #ff9500; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
+
+        .badge-precio-carrito {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 6px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 900;
+            vertical-align: middle;
+        }
+
+        .badge-precio-oferta { background: rgba(255,59,48,0.1); color: #ff3b30; }
+        .badge-precio-mayor { background: rgba(0,122,255,0.1); color: var(--azul-gvi); }
+
+        .precio-editable {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+        }
+
+        .btn-editar-precio {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--azul-gvi);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            transition: background-color 0.14s ease, color 0.14s ease;
+        }
+
+        .btn-editar-precio:hover {
+            background: var(--azul-gvi);
+            color: white;
+        }
+
+        .modal-precio-panel {
+            width: min(430px, calc(100vw - 32px));
+            padding: 0;
+            overflow: hidden;
+            border-radius: 22px;
+        }
+
+        .modal-precio-header {
+            padding: 22px 24px 18px;
+            background: linear-gradient(135deg, rgba(0,122,255,0.12), rgba(52,199,89,0.08));
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        body.dark-mode .modal-precio-header { border-bottom-color: #333; }
+
+        .modal-precio-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: var(--azul-gvi);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            box-shadow: 0 6px 14px rgba(0,122,255,0.24);
+        }
+
+        .modal-precio-icon svg { width: 24px; height: 24px; }
+
+        .modal-precio-title h3 {
+            margin: 0;
+            font-size: 22px;
+            line-height: 1.1;
+        }
+
+        .modal-precio-title span {
+            display: block;
+            margin-top: 5px;
+            font-size: 12px;
+            font-weight: 800;
+            opacity: 0.55;
+            text-transform: uppercase;
+        }
+
+        .modal-precio-body { padding: 22px 24px 24px; }
+
+        .producto-precio-card {
+            background: rgba(0,122,255,0.06);
+            border: 1px solid rgba(0,122,255,0.12);
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 18px;
+        }
+
+        body.dark-mode .producto-precio-card {
+            background: rgba(0,122,255,0.1);
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .producto-precio-card span {
+            display: block;
+            font-size: 11px;
+            font-weight: 900;
+            opacity: 0.55;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .producto-precio-card b {
+            display: block;
+            font-size: 16px;
+            line-height: 1.25;
+        }
+
+        .precio-field {
+            margin-bottom: 14px;
+        }
+
+        .precio-field label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 12px;
+            font-weight: 900;
+            opacity: 0.65;
+            text-transform: uppercase;
+        }
+
+        .precio-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .precio-input-wrap i,
+        .precio-input-wrap svg {
+            position: absolute;
+            left: 14px;
+            width: 19px;
+            height: 19px;
+            color: var(--azul-gvi);
+            opacity: 0.75;
+        }
+
+        .precio-input-wrap .form-input {
+            padding-left: 44px !important;
+            min-height: 54px;
+            border-radius: 14px;
+        }
+
+        #editarPrecioPin {
+            letter-spacing: 7px;
+            text-align: center;
+        }
+
+        #editarPrecioValor {
+            color: var(--azul-gvi);
+            font-size: 25px;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .modal-precio-actions {
+            display: grid;
+            grid-template-columns: 0.9fr 1.2fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .modal-cobro-panel {
+            width: min(560px, calc(100vw - 32px));
+            padding: 0;
+            overflow: hidden;
+            border-radius: 22px;
+            text-align: left;
+        }
+
+        .modal-cobro-header {
+            padding: 24px 26px 20px;
+            background: linear-gradient(135deg, rgba(0,122,255,0.12), rgba(52,199,89,0.1));
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        body.dark-mode .modal-cobro-header { border-bottom-color: #333; }
+
+        .modal-cobro-header span {
+            display: block;
+            font-size: 12px;
+            font-weight: 900;
+            opacity: 0.58;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-cobro-total {
+            margin-top: 6px;
+            font-size: clamp(42px, 7vw, 58px);
+            line-height: 1;
+            font-weight: 950;
+            color: var(--azul-gvi);
+        }
+
+        .modal-cobro-body {
+            padding: 22px 26px 26px;
+        }
+
+        .metodos-cobro {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .metodos-cobro .btn-metodo {
+            min-height: 58px;
+            padding: 10px 8px;
+            border-radius: 16px;
+            background: rgba(0,0,0,0.025);
+            border-width: 2px;
+        }
+
+        body.dark-mode .metodos-cobro .btn-metodo { background: rgba(255,255,255,0.04); }
+
+        .campo-pago-card {
+            background: rgba(0,0,0,0.025);
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        body.dark-mode .campo-pago-card {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .campo-pago-card label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 900;
+            opacity: 0.62;
+            text-transform: uppercase;
+        }
+
+        .pago-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .pago-input-wrap i,
+        .pago-input-wrap svg {
+            position: absolute;
+            left: 15px;
+            width: 21px;
+            height: 21px;
+            color: var(--azul-gvi);
+            opacity: 0.8;
+        }
+
+        .pago-input-wrap .form-input {
+            min-height: 58px;
+            padding-left: 48px !important;
+            border-radius: 15px;
+            font-size: 24px;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .vuelto-card {
+            margin-top: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(52,199,89,0.1);
+            color: #2eb84e;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 900;
+            font-size: 20px;
+        }
+
+        .vuelto-card span:first-child {
+            font-size: 12px;
+            text-transform: uppercase;
+            opacity: 0.75;
+        }
+
+        .fiado-card {
+            background: rgba(255,149,0,0.08);
+            border: 1px solid rgba(255,149,0,0.18);
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        .acciones-cobro {
+            display: grid;
+            grid-template-columns: 0.85fr 1fr 1.25fr;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .acciones-cobro button {
+            min-height: 58px;
+            border-radius: 14px !important;
+        }
+
+        #modalFinalizar #seccionEfectivo > input {
+            width: 100%;
+            min-height: 58px;
+            border-radius: 15px !important;
+            border: 2px solid rgba(0,122,255,0.22) !important;
+            background: var(--panel-claro);
+            font-size: 24px !important;
+            font-weight: 900 !important;
+            text-align: center !important;
+            color: inherit;
+        }
+
+        body.dark-mode #modalFinalizar #seccionEfectivo > input { background: rgba(255,255,255,0.05); }
+
+        #modalFinalizar #seccionEfectivo > input::placeholder {
+            color: rgba(28,30,33,0.42);
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        #modalFinalizar #seccionEfectivo > div {
+            margin-top: 12px !important;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(52,199,89,0.1);
+            color: #2eb84e;
+            font-size: 20px !important;
+            font-weight: 900 !important;
+            text-align: center;
+        }
+
+        #modalFinalizar #seccionFiado {
+            background: rgba(255,149,0,0.08);
+            border: 1px solid rgba(255,149,0,0.18);
+            border-radius: 18px;
+            padding: 16px;
+        }
 
         .btn-manual-rapido {
             background: var(--azul-gvi);
@@ -78,15 +428,35 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: 0.3s;
+            transition: background-color 0.16s ease, filter 0.16s ease;
         }
-        .btn-manual-rapido:hover { filter: brightness(1.1); transform: scale(1.02); }
+        .btn-manual-rapido:hover { filter: brightness(1.08); }
         .btn-manual-rapido i { width: 18px; height: 18px; }
 
         @media print {
+            @page { margin: 0; size: 80mm auto; }
             body * { display: none !important; }
-            #areaImpresion, #areaImpresion * { display: block !important; }
-            #areaImpresion { position: absolute; left: 0; top: 0; width: 100%; }
+            #areaImpresion { display: block !important; }
+            #areaImpresion div { display: block !important; }
+            #areaImpresion table { display: table !important; }
+            #areaImpresion tbody { display: table-row-group !important; }
+            #areaImpresion tr { display: table-row !important; }
+            #areaImpresion td { display: table-cell !important; }
+            #areaImpresion span { display: inline !important; }
+            #areaImpresion {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 68mm;
+                padding: 3mm 4mm;
+                color: #000 !important;
+                background: #fff !important;
+                font-family: "Courier New", monospace !important;
+                font-weight: 800 !important;
+                box-sizing: border-box;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
     </style>
 </head>
@@ -132,21 +502,24 @@
     </div>
 
     <div id="modalFinalizar" class="modal-fondo">
-        <div class="panel" style="width: 500px; padding: 35px; text-align: center;">
-            <h2 style="margin: 0; opacity: 0.6; font-size: 15px; text-transform: uppercase;">Resumen de Venta</h2>
-            <div style="font-size: 45px; font-weight: 900; color: var(--azul-gvi); margin-bottom: 20px;" id="totalModal">$0</div>
+        <div class="panel modal-cobro-panel">
+            <div class="modal-cobro-header">
+                <span>Resumen de venta</span>
+                <div class="modal-cobro-total" id="totalModal">$0</div>
+            </div>
+            <div class="modal-cobro-body">
 
-            <div class="metodos-pago-grid">
+            <div class="metodos-cobro">
                 <button class="btn-metodo activo" id="btnEfec" onclick="setMetodo('Efectivo')">💵 EFECTIVO</button>
                 <button class="btn-metodo" id="btnTarj" onclick="setMetodo('Tarjeta')">💳 TARJETA</button>
                 <button class="btn-metodo fiado-color" id="btnFiado" onclick="setMetodo('Fiado')">📓 FIADO</button>
             </div>
 
-            <div id="seccionEfectivo">
+            <div id="seccionEfectivo" class="campo-pago-card">
                 <input type="text" id="inputPagoModal" class="form-input" placeholder="¿Cuánto entrega el cliente?" 
                        oninput="formatearVuelto(this)" style="font-size: 24px; text-align: center; font-weight: bold;">
-                <div style="margin-top: 15px; font-size: 22px; font-weight: 800; color: #34c759;">
-                    Vuelto: <span id="vueltoModal">$0</span>
+                <div id="estadoPagoModal" style="margin-top: 15px; font-size: 22px; font-weight: 800; color: #34c759;">
+                    <span id="estadoPagoTexto">Vuelto:</span> <span id="vueltoModal">$0</span>
                 </div>
             </div>
 
@@ -164,10 +537,11 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 35px;">
+            <div class="acciones-cobro">
                 <button class="btn-cancelar" style="flex: 1;" onclick="cerrarModalFinalizar()">Cancelar</button>
                 <button class="btn-cancelar" id="btnSoloGuardar" style="flex: 1.5;" onclick="procesarVentaReal(false)">Solo Guardar</button>
                 <button class="btn-success" id="btnGuardarImprimir" style="flex: 2;" onclick="procesarVentaReal(true)">✅ Guardar e Imprimir</button>
+            </div>
             </div>
         </div>
     </div>
@@ -233,6 +607,49 @@
         </div>
     </div>
 
+    <!-- MODAL EDITAR PRECIO -->
+    <div id="modalEditarPrecio" class="modal-fondo">
+        <div class="panel modal-precio-panel">
+            <div class="modal-precio-header">
+                <div class="modal-precio-icon"><i data-lucide="shield-check"></i></div>
+                <div class="modal-precio-title">
+                    <h3>Editar Precio</h3>
+                    <span>Autorizacion administrador</span>
+                </div>
+            </div>
+
+            <div class="modal-precio-body">
+                <div class="producto-precio-card">
+                    <span>Producto seleccionado</span>
+                    <b id="editarPrecioProducto"></b>
+                </div>
+
+                <div class="precio-field">
+                    <label>PIN Administrador</label>
+                    <div class="precio-input-wrap">
+                        <i data-lucide="lock-keyhole"></i>
+                        <input type="password" id="editarPrecioPin" class="form-input" maxlength="4" inputmode="numeric" placeholder="••••">
+                    </div>
+                </div>
+
+                <div class="precio-field">
+                    <label>Nuevo Precio</label>
+                    <div class="precio-input-wrap">
+                        <i data-lucide="badge-dollar-sign"></i>
+                        <input type="text" id="editarPrecioValor" class="form-input" inputmode="numeric" placeholder="$0" oninput="formatearPrecioEditor(this)">
+                    </div>
+                </div>
+
+                <div id="editarPrecioError" style="min-height: 18px; color: #ff3b30; font-size: 12px; font-weight: 800; margin-bottom: 14px;"></div>
+
+                <div class="modal-precio-actions">
+                    <button class="btn-cancelar" onclick="cerrarModalEditarPrecio()">Cancelar</button>
+                    <button class="btn-accion" onclick="confirmarEditarPrecio()">Guardar Precio</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="areaImpresion" style="display: none;"></div>
 
     <%- include('partials/scripts') %>
@@ -245,6 +662,7 @@
         let clientesFiadores = [];
         let timerBusqueda;
         let productoEsperaPeso = null;
+        let indicePrecioEditando = null;
 
         // --- LÓGICA VENTA MANUAL ---
         function abrirModalManual() {
@@ -274,6 +692,30 @@
 
         const inputCaja = document.getElementById('inputCodigoCaja');
         const listaSug = document.getElementById('listaSugerencias');
+        let timerRefocoSku = null;
+
+        function hayModalCajaAbierto() {
+            return ['modalFinalizar', 'modalPeso', 'modalManual', 'modalEditarPrecio'].some(id => {
+                const modal = document.getElementById(id);
+                return modal && modal.style.display !== 'none' && getComputedStyle(modal).display !== 'none';
+            });
+        }
+
+        function esCampoDeEscritura(el) {
+            if (!el) return false;
+            const tag = el.tagName;
+            return el.isContentEditable || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+        }
+
+        function programarRefocoSku() {
+            clearTimeout(timerRefocoSku);
+            timerRefocoSku = setTimeout(() => {
+                if (hayModalCajaAbierto()) return;
+                if (esCampoDeEscritura(document.activeElement) && document.activeElement !== inputCaja) return;
+                inputCaja.focus();
+                inputCaja.select();
+            }, 3000);
+        }
 
         async function cargarCatalogo() {
             const res = await fetch('/api/productos');
@@ -307,7 +749,7 @@
         inputCaja.addEventListener('input', function() {
             const busqueda = this.value.trim().toLowerCase();
             clearTimeout(timerBusqueda);
-            if (busqueda.length < 2) { listaSug.style.display = 'none'; return; }
+            if (busqueda.length < 1) { listaSug.style.display = 'none'; return; }
             const matchExacto = catalogo.find(p => p.codigo.toLowerCase() === busqueda);
             if (matchExacto) {
                 timerBusqueda = setTimeout(() => {
@@ -317,11 +759,20 @@
                 }, 150);
                 return;
             }
-            const filtrados = catalogo.filter(p => p.nombre.toLowerCase().includes(busqueda));
+            const empiezaCon = [];
+            const contiene = [];
+            catalogo.forEach(p => {
+                const nombre = p.nombre.toLowerCase();
+                const codigo = p.codigo.toLowerCase();
+                if (nombre.startsWith(busqueda) || codigo.startsWith(busqueda)) empiezaCon.push(p);
+                else if (nombre.includes(busqueda) || codigo.includes(busqueda)) contiene.push(p);
+            });
+            const filtrados = [...empiezaCon, ...contiene].slice(0, 12);
             if (filtrados.length > 0) {
                 listaSug.innerHTML = filtrados.map(p => {
                     const stockLabel = p.vendidoPorPeso ? `${p.stock} kg` : `${p.stock} un.`;
-                    const precioLabel = p.vendidoPorPeso ? `$${p.precio.toLocaleString('es-CL')}/kg` : `$${p.precio.toLocaleString('es-CL')}`;
+                    const precioSugerido = calcularPrecioAplicable(p, 1);
+                    const precioLabel = p.vendidoPorPeso ? `$${precioSugerido.precio.toLocaleString('es-CL')}/kg` : `$${precioSugerido.precio.toLocaleString('es-CL')}`;
                     const badge = p.vendidoPorPeso ? ' <span style="color:#ff9500;font-size:11px;">⚖️</span>' : '';
                     return `
                     <div class="sugerencia-item" onclick="seleccionarSugerencia('${p.codigo}')">
@@ -338,6 +789,27 @@
             if (p) { agregarAlCarrito(p); inputCaja.value = ""; listaSug.style.display = 'none'; inputCaja.focus(); }
         }
 
+        function calcularPrecioAplicable(producto, cantidad) {
+            const precioNormal = Number(producto.precioNormal ?? producto.precio ?? 0);
+            const opciones = [{ precio: precioNormal, tipo: 'NORMAL' }];
+
+            if (producto.ofertaActiva && Number(producto.precioOferta) > 0) {
+                opciones.push({ precio: Number(producto.precioOferta), tipo: 'OFERTA' });
+            }
+
+            if (producto.mayorActivo && Number(producto.cantidadMayor) > 0 && Number(producto.precioMayor) > 0 && cantidad >= Number(producto.cantidadMayor)) {
+                opciones.push({ precio: Number(producto.precioMayor), tipo: 'MAYOR' });
+            }
+
+            return opciones.reduce((mejor, actual) => actual.precio < mejor.precio ? actual : mejor);
+        }
+
+        function aplicarPrecioItem(item) {
+            const resultado = calcularPrecioAplicable(item, Number(item.cantidad || 0));
+            item.precio = resultado.precio;
+            item.tipoPrecio = resultado.tipo;
+        }
+
         function agregarAlCarrito(p) {
             if (p.stock <= 0) return alert("Sin stock");
             if (p.vendidoPorPeso) {
@@ -345,8 +817,18 @@
                 return;
             }
             const item = carrito.find(x => x.codigo === p.codigo);
-            if (item) item.cantidad < p.stock ? item.cantidad++ : alert("Límite stock");
-            else carrito.unshift({...p, cantidad: 1});
+            if (item) {
+                if (item.cantidad < p.stock) {
+                    item.cantidad++;
+                    aplicarPrecioItem(item);
+                } else {
+                    alert("Limite stock");
+                }
+            } else {
+                const nuevo = {...p, precioNormal: Number(p.precio), cantidad: 1, tipoPrecio: 'NORMAL'};
+                aplicarPrecioItem(nuevo);
+                carrito.unshift(nuevo);
+            }
             actualizarVista();
         }
 
@@ -396,13 +878,15 @@
         function calcularPrecioEnVivo() {
             if (!productoEsperaPeso) return;
             const resEl = document.getElementById('precioCalculadoPeso');
-            const pKilo = productoEsperaPeso.precio;
+            const pKilo = Number(productoEsperaPeso.precio);
 
             if (modoPesoCaja === 'gramos') {
                 const g = Number(document.getElementById('inputPesoGramos').value);
                 if (!g || g <= 0) { resEl.innerText = ''; return; }
-                const total = Math.round(pKilo * g / 1000);
-                resEl.innerText = `$${total.toLocaleString('es-CL')}`;
+                const kg = g / 1000;
+                const precioAplicado = calcularPrecioAplicable(productoEsperaPeso, kg);
+                const total = Math.round(precioAplicado.precio * kg);
+                resEl.innerText = `$${total.toLocaleString('es-CL')}${precioAplicado.tipo !== 'NORMAL' ? ` (${precioAplicado.tipo})` : ''}`;
             } else {
                 const monto = Number(document.getElementById('inputPesoMonto').value);
                 if (!monto || monto <= 0) { resEl.innerText = ''; return; }
@@ -424,12 +908,15 @@
             const pesoKg = gramos / 1000;
             if (pesoKg > productoEsperaPeso.stock) return alert(`⚠️ Stock insuficiente. Solo hay ${productoEsperaPeso.stock} kg disponibles.`);
 
-            carrito.unshift({
+            const nuevoPeso = {
                 ...productoEsperaPeso,
+                precioNormal: Number(productoEsperaPeso.precio),
                 cantidad: pesoKg,
                 pesoGramos: gramos,
                 vendidoPorPeso: true
-            });
+            };
+            aplicarPrecioItem(nuevoPeso);
+            carrito.unshift(nuevoPeso);
             actualizarVista();
             cerrarModalPeso();
         }
@@ -439,20 +926,24 @@
             tbody.innerHTML = "";
             totalCaja = 0;
             carrito.forEach((item, index) => {
+                if (item.codigo !== 'MANUAL') aplicarPrecioItem(item);
                 const subtotal = item.precio * item.cantidad;
                 totalCaja += subtotal;
+                const precioBadge = item.tipoPrecio === 'OFERTA'
+                    ? '<span class="badge-precio-carrito badge-precio-oferta">OFERTA</span>'
+                    : (item.tipoPrecio === 'MAYOR' ? '<span class="badge-precio-carrito badge-precio-mayor">MAYOR</span>' : '');
 
                 let cantidadCell, precioCell;
                 if (item.vendidoPorPeso) {
                     cantidadCell = `<td>⚖️ ${item.pesoGramos}g</td>`;
-                    precioCell = `<td>$${item.precio.toLocaleString('es-CL')}/kg</td>`;
+                    precioCell = `<td><span class="precio-editable">$${item.precio.toLocaleString('es-CL')}/kg <button class="btn-editar-precio" onclick="editarPrecioCarrito(${index})" title="Editar precio">✎</button></span></td>`;
                 } else {
                     cantidadCell = `<td><div class="control-cant"><button class="btn-cant" onclick="cambiarCant(${index},-1)">-</button><b>${item.cantidad}</b><button class="btn-cant" onclick="cambiarCant(${index},1)">+</button></div></td>`;
-                    precioCell = `<td>$${item.precio.toLocaleString('es-CL')}</td>`;
+                    precioCell = `<td><span class="precio-editable">$${item.precio.toLocaleString('es-CL')} <button class="btn-editar-precio" onclick="editarPrecioCarrito(${index})" title="Editar precio">✎</button></span></td>`;
                 }
 
                 tbody.innerHTML += `<tr>
-                    <td><b>${item.nombre}</b>${item.vendidoPorPeso ? '<span class="badge-peso">⚖️ PESO</span>' : ''}<br><small>${item.codigo}</small></td>
+                    <td><b>${item.nombre}</b>${item.vendidoPorPeso ? '<span class="badge-peso">⚖️ PESO</span>' : ''}${precioBadge}<br><small>${item.codigo}</small></td>
                     ${cantidadCell}
                     ${precioCell}
                     <td><b>$${subtotal.toLocaleString('es-CL')}</b></td>
@@ -463,11 +954,116 @@
             document.getElementById('btnCobrar').disabled = carrito.length === 0;
         }
 
+        function formatearPrecioEditor(input) {
+            const valor = input.value.replace(/\D/g, '');
+            input.value = valor === '' ? '' : '$' + Number(valor).toLocaleString('es-CL');
+        }
+
+        function editarPrecioCarrito(index) {
+            const item = carrito[index];
+            if (!item) return;
+
+            indicePrecioEditando = index;
+            document.getElementById('editarPrecioProducto').innerText = `${item.nombre} · Precio actual: $${Number(item.precio).toLocaleString('es-CL')}${item.vendidoPorPeso ? '/kg' : ''}`;
+            document.getElementById('editarPrecioPin').value = '';
+            document.getElementById('editarPrecioValor').value = '$' + Number(item.precio).toLocaleString('es-CL');
+            document.getElementById('editarPrecioError').innerText = '';
+            document.getElementById('modalEditarPrecio').style.display = 'flex';
+            setTimeout(() => document.getElementById('editarPrecioPin').focus(), 120);
+        }
+
+        function cerrarModalEditarPrecio() {
+            document.getElementById('modalEditarPrecio').style.display = 'none';
+            indicePrecioEditando = null;
+            inputCaja.focus();
+        }
+
+        async function confirmarEditarPrecio() {
+            const item = carrito[indicePrecioEditando];
+            if (!item) return cerrarModalEditarPrecio();
+
+            const pin = document.getElementById('editarPrecioPin').value.trim();
+            const nuevoPrecio = Number(document.getElementById('editarPrecioValor').value.replace(/\D/g, ''));
+            const errorEl = document.getElementById('editarPrecioError');
+
+            if (!pin) {
+                errorEl.innerText = 'Ingresa el PIN de administrador.';
+                document.getElementById('editarPrecioPin').focus();
+                return;
+            }
+
+            if (!nuevoPrecio || nuevoPrecio <= 0) {
+                errorEl.innerText = 'Ingresa un precio valido.';
+                document.getElementById('editarPrecioValor').focus();
+                return;
+            }
+
+            try {
+                const auth = await fetch('/api/verify-admin', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ pin })
+                });
+                const authData = await auth.json();
+                if (!authData.success) {
+                    errorEl.innerText = 'PIN de administrador incorrecto.';
+                    document.getElementById('editarPrecioPin').select();
+                    return;
+                }
+            } catch (e) {
+                errorEl.innerText = 'No se pudo verificar el PIN.';
+                return;
+            }
+
+            if (item.codigo !== 'MANUAL') {
+                const productoBase = catalogo.find(p => p.codigo === item.codigo) || item;
+                try {
+                    const productoActualizado = {
+                        ...productoBase,
+                        precio: nuevoPrecio,
+                        precioNormal: nuevoPrecio,
+                        ofertaActiva: false,
+                        precioOferta: 0,
+                        mayorActivo: false,
+                        cantidadMayor: 0,
+                        precioMayor: 0
+                    };
+                    const res = await fetch(`/api/productos/${encodeURIComponent(item.codigo)}`, {
+                        method: 'PUT',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(productoActualizado)
+                    });
+                    if (!res.ok) {
+                        errorEl.innerText = 'No se pudo actualizar el precio en bodega.';
+                        return;
+                    }
+                    await cargarCatalogo();
+                } catch (e) {
+                    errorEl.innerText = 'Error de red actualizando el precio.';
+                    return;
+                }
+            }
+
+            item.precio = nuevoPrecio;
+            item.precioNormal = nuevoPrecio;
+            item.ofertaActiva = false;
+            item.precioOferta = 0;
+            item.mayorActivo = false;
+            item.cantidadMayor = 0;
+            item.precioMayor = 0;
+            item.tipoPrecio = 'NORMAL';
+            actualizarVista();
+            cerrarModalEditarPrecio();
+        }
+
         function cambiarCant(i, n) {
             const item = carrito[i];
             const nuevo = item.cantidad + n;
             if (nuevo <= 0) carrito.splice(i, 1);
-            else if (nuevo <= item.stock) item.cantidad = nuevo;
+            else if (nuevo <= item.stock) {
+                item.cantidad = nuevo;
+                if (item.codigo !== 'MANUAL') aplicarPrecioItem(item);
+            }
             actualizarVista();
         }
 
@@ -477,6 +1073,8 @@
             document.getElementById('totalModal').innerText = "$" + totalCaja.toLocaleString('es-CL');
             document.getElementById('inputPagoModal').value = "";
             document.getElementById('vueltoModal').innerText = "$0";
+            document.getElementById('estadoPagoTexto').innerText = "Vuelto:";
+            document.getElementById('estadoPagoModal').style.color = "#34c759";
             document.getElementById('nombreClienteFiado').value = "";
             document.getElementById('avisoNuevoCliente').style.display = 'none';
             setMetodo('Efectivo');
@@ -510,7 +1108,17 @@
             input.value = valor === "" ? "" : "$" + Number(valor).toLocaleString('es-CL');
             let pago = Number(valor);
             let vuelto = pago - totalCaja;
-            document.getElementById('vueltoModal').innerText = (vuelto >= 0) ? "$" + vuelto.toLocaleString('es-CL') : "$0";
+            const estado = document.getElementById('estadoPagoModal');
+            const texto = document.getElementById('estadoPagoTexto');
+            if (!pago || pago >= totalCaja) {
+                texto.innerText = "Vuelto:";
+                estado.style.color = "#34c759";
+                document.getElementById('vueltoModal').innerText = "$" + Math.max(0, vuelto).toLocaleString('es-CL');
+            } else {
+                texto.innerText = "Faltan:";
+                estado.style.color = "#ff3b30";
+                document.getElementById('vueltoModal').innerText = "$" + Math.abs(vuelto).toLocaleString('es-CL');
+            }
         }
 
         async function procesarVentaReal(imprimir) {
@@ -559,29 +1167,58 @@
         function generarTicketPrint(id, datos) {
             const fecha = new Date().toLocaleString();
             document.getElementById('areaImpresion').innerHTML = `
-                <div style="text-align:center; font-family:monospace; width:100%;">
-                    <h3>GVI MINIMARKET</h3>
-                    <p>Ticket #${id}<br>${fecha}</p><hr>
-                    <table style="width:100%; font-size:12px;">
+                <div style="font-family:'Courier New', monospace; width:100%; color:#000; font-weight:800; line-height:1.22;">
+                    <div style="text-align:center; font-size:18px; font-weight:900;">GVI MINIMARKET</div>
+                    <div style="text-align:center; font-size:12px; font-weight:900; margin-top:3px;">#${id}</div>
+                    <div style="text-align:center; font-size:11px; font-weight:900; margin-top:2px;">${fecha}</div>
+                    <div style="border-top:2px solid #000; margin:8px 0;"></div>
+                    <div style="font-size:12px; font-weight:900;">Metodo: ${datos.metodoPago}</div>
+                    <div style="border-top:2px solid #000; margin:8px 0;"></div>
+                    <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:12px; font-weight:900;">
                         ${datos.items.map(i => {
-                            const desc = i.vendidoPorPeso
-                                ? `${i.pesoGramos}g ${i.nombre.substring(0,15)}`
-                                : `${i.cantidad}x ${i.nombre.substring(0,18)}`;
-                            return `<tr><td>${desc}</td><td style="text-align:right;">$${(i.precio*i.cantidad).toLocaleString('es-CL')}</td></tr>`;
+                            const cant = i.vendidoPorPeso ? `${i.pesoGramos}g` : `${i.cantidad}`;
+                            return `<tr>
+                                <td style="width:68%; padding:5px 0; white-space:nowrap; overflow:hidden; font-weight:900;">${cant} x ${String(i.nombre || '').substring(0,18)}</td>
+                                <td style="width:32%; padding:5px 0; text-align:right; white-space:nowrap; font-weight:900;">$${(Number(i.precio || 0)*Number(i.cantidad || 0)).toLocaleString('es-CL')}</td>
+                            </tr>`;
                         }).join('')}
-                    </table><hr>
-                    <p style="text-align:right;"><b>TOTAL: $${datos.total.toLocaleString('es-CL')}</b></p>
-                    <p>¡Gracias por su compra!</p>
+                    </table>
+                    <div style="border-top:2px solid #000; margin:8px 0;"></div>
+                    <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:14px; font-weight:900;">
+                        <tr>
+                            <td style="font-weight:900;">Total:</td>
+                            <td style="text-align:right; white-space:nowrap; font-weight:900;">$${Number(datos.total || 0).toLocaleString('es-CL')}</td>
+                        </tr>
+                        ${datos.metodoPago === 'Efectivo' ? `<tr>
+                            <td style="font-size:12px; font-weight:900; padding-top:3px;">Vuelto:</td>
+                            <td style="font-size:12px; text-align:right; white-space:nowrap; font-weight:900; padding-top:3px;">$${Number(datos.vuelto || 0).toLocaleString('es-CL')}</td>
+                        </tr>` : ''}
+                    </table>
+                    <div style="border-top:2px solid #000; margin:8px 0;"></div>
+                    <div style="text-align:center; font-size:12px; font-weight:900;">Muchas gracias por su compra</div>
                 </div>`;
             window.print();
         }
 
-        document.addEventListener('click', (e) => { if (!listaSug.contains(e.target) && e.target !== inputCaja) listaSug.style.display = 'none'; });
+        document.addEventListener('click', (e) => {
+            if (!listaSug.contains(e.target) && e.target !== inputCaja) {
+                listaSug.style.display = 'none';
+                programarRefocoSku();
+            }
+        });
 
         document.getElementById('inputPesoGramos').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') confirmarPeso();
             if (e.key === 'Escape') cerrarModalPeso();
         });
+
+        ['editarPrecioPin', 'editarPrecioValor'].forEach(id => {
+            document.getElementById(id).addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') confirmarEditarPrecio();
+                if (e.key === 'Escape') cerrarModalEditarPrecio();
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', cargarCatalogo);
     </script>
 </body>

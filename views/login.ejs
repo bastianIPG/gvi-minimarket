@@ -5,290 +5,529 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GVI - Login</title>
     <link rel="stylesheet" href="/css/global.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
-            margin: 0; padding: 0;
-            display: flex; justify-content: center; align-items: center;
+            margin: 0;
             min-height: 100vh;
             min-height: 100svh;
+            display: grid;
+            place-items: center;
+            padding: clamp(18px, 3vw, 30px);
             background:
-                radial-gradient(circle at top left, rgba(0, 122, 255, 0.14), transparent 34%),
-                linear-gradient(135deg, #eef3f8 0%, #f7f9fb 52%, #eef2f6 100%);
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            transition: background 0.3s;
-            box-sizing: border-box;
-            padding: clamp(10px, 2.5vw, 24px);
-        }
-        *, *::before, *::after { box-sizing: inherit; }
-        body.dark-mode {
-            background:
-                radial-gradient(circle at top left, rgba(0, 122, 255, 0.18), transparent 34%),
+                radial-gradient(circle at top left, rgba(0, 122, 255, 0.18), transparent 36%),
                 linear-gradient(135deg, #0f1115 0%, #151922 54%, #101114 100%);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            box-sizing: border-box;
         }
 
-        .login-container {
-            background: var(--panel-claro, #ffffff);
-            padding: clamp(20px, 4svh, 34px) clamp(18px, 3vw, 32px);
-            border-radius: 24px;
-            border: 1px solid rgba(15, 23, 42, 0.08);
-            box-shadow: 0 24px 70px rgba(20, 30, 45, 0.12);
+        *, *::before, *::after { box-sizing: inherit; }
+
+        .shell {
+            width: min(720px, 100%);
+            display: grid;
+            gap: 22px;
+        }
+
+        .brand {
             text-align: center;
-            width: min(100%, 420px);
-            max-width: 100%;
-            max-height: calc(100svh - 20px);
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            transition: 0.4s;
-            display: flex;
-            flex-direction: column;
-        }
-        body.dark-mode .login-container { background: rgba(30, 30, 30, 0.96); border-color: rgba(255,255,255,0.08); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(60px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .login-header h1 { margin: 0; font-size: clamp(26px, 5vw, 34px); font-weight: 800; color: var(--texto-claro, #333); letter-spacing: 0; }
-        body.dark-mode .login-header h1 { color: #fff; }
-        .login-header p { margin: 6px 0 clamp(18px, 3.5svh, 28px); color: #8e8e93; font-weight: 600; font-size: clamp(13px, 2vw, 15px); }
+        .brand h1 {
+            margin: 0;
+            font-size: clamp(42px, 7vw, 72px);
+            line-height: 0.95;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
 
-        .pin-display { display: flex; justify-content: center; gap: clamp(10px, 3vw, 18px); margin-bottom: clamp(20px, 4svh, 30px); }
-        .pin-dot {
-            width: clamp(20px, 6vw, 28px); height: clamp(20px, 6vw, 28px);
-            border-radius: 12px;
-            background: rgba(15, 23, 42, 0.08);
-            border: 2px solid rgba(15, 23, 42, 0.08);
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6);
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .brand p {
+            margin: 8px 0 0;
+            color: rgba(255,255,255,0.62);
+            font-size: clamp(14px, 1.8vw, 18px);
+            font-weight: 500;
         }
-        body.dark-mode .pin-dot { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); box-shadow: none; }
-        .pin-dot.filled {
-            background: var(--dot-color, var(--azul-gvi, #007aff));
-            border-color: rgba(255,255,255,0.9);
-            border-radius: var(--dot-radius, 50%);
-            transform: translateY(-3px) scale(1.22) rotate(var(--dot-rotate, 0deg));
-            box-shadow:
-                0 0 0 4px var(--dot-halo, rgba(0, 122, 255, 0.16)),
-                0 12px 26px var(--dot-shadow, rgba(0, 122, 255, 0.38));
-        }
-        .pin-dot.pop { animation: pinPop 0.26s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes pinPop {
-            0% { transform: scale(0.72); }
-            70% { transform: scale(1.22) rotate(var(--dot-rotate, 0deg)); }
-            100% { transform: translateY(-2px) scale(1.12) rotate(var(--dot-rotate, 0deg)); }
-        }
-        .pin-dot.filled.pin-color-1 { --dot-shadow: rgba(30, 144, 255, 0.6); --dot-halo: rgba(30, 144, 255, 0.28); --dot-radius: 50%; background-color: #1e90ff !important; }
-        .pin-dot.filled.pin-color-2 { --dot-shadow: rgba(50, 215, 75, 0.58); --dot-halo: rgba(50, 215, 75, 0.28); --dot-radius: 9px; --dot-rotate: 45deg; background-color: #32d74b !important; }
-        .pin-dot.filled.pin-color-3 { --dot-shadow: rgba(255, 179, 64, 0.6); --dot-halo: rgba(255, 179, 64, 0.28); --dot-radius: 7px; background-color: #ffb340 !important; }
-        .pin-dot.filled.pin-color-4 { --dot-shadow: rgba(213, 107, 255, 0.62); --dot-halo: rgba(213, 107, 255, 0.3); --dot-radius: 50% 50% 8px 50%; --dot-rotate: -45deg; background-color: #d56bff !important; }
 
-        .numpad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 2svh, 16px) clamp(10px, 3vw, 18px); }
-        
-        .num-btn {
-            background: rgba(0,0,0,0.03);
-            border: none; border-radius: 50%;
-            width: min(100%, clamp(54px, 10svh, 72px)); height: clamp(54px, 10svh, 72px);
-            font-size: clamp(22px, 4.8svh, 28px); font-weight: 700;
-            color: var(--texto-claro, #333);
+        .panel-login {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            border-radius: 0;
+            padding: 0;
+        }
+
+        .app-close {
+            position: fixed;
+            top: 20px;
+            right: 22px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.78);
+            display: grid;
+            place-items: center;
             cursor: pointer;
+            transition: background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+            z-index: 20;
+        }
+
+        .app-close:hover {
+            background: rgba(255,59,48,0.16);
+            border-color: rgba(255,59,48,0.28);
+            color: white;
+        }
+
+        .perfiles {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .perfil-card {
+            border: 1px solid transparent;
+            background: transparent;
+            color: white;
+            border-radius: 20px;
+            padding: 10px 12px 12px;
+            width: 132px;
+            min-height: 144px;
+            display: grid;
+            place-items: center;
+            align-content: center;
+            gap: 9px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background-color 0.16s ease, transform 0.16s ease, border-color 0.16s ease;
+        }
+
+        .perfil-card:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.12);
+            transform: translateY(-2px);
+        }
+
+        .avatar {
+            width: 82px;
+            height: 82px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #007aff, #34c759);
+            display: grid;
+            place-items: center;
+            font-size: 28px;
+            font-weight: 900;
+            box-shadow: 0 12px 28px rgba(0,122,255,0.28);
+            border: 3px solid rgba(255,255,255,0.18);
+        }
+
+        .perfil-card b {
+            font-size: 15px;
+            line-height: 1.15;
+            text-align: center;
+        }
+
+        .perfil-card span {
+            font-size: 10px;
+            color: rgba(255,255,255,0.58);
+            font-weight: 800;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .pin-view {
+            display: none;
+            width: min(360px, 100%);
             margin: 0 auto;
-            transition: transform 0.2s, background 0.2s, color 0.2s, box-shadow 0.2s;
-            display: flex; align-items: center; justify-content: center;
-            touch-action: manipulation;
-        }
-        body.dark-mode .num-btn { background: rgba(255,255,255,0.05); color: white; }
-        
-        /* Hover y Active (Feedback táctil visual) */
-        @media (hover: hover) {
-            .num-btn:hover { background: rgba(0,122,255,0.1); color: var(--azul-gvi); transform: scale(1.05); }
-            body.dark-mode .num-btn:hover { background: rgba(255,255,255,0.15); color: white; }
-        }
-        .num-btn:active { transform: scale(0.9); background: var(--azul-gvi) !important; color: white !important; }
-        
-        .num-btn.delete { color: #ff3b30; background: transparent; }
-        .num-btn.delete:active { background: rgba(255,59,48,0.2) !important; color: #ff3b30 !important; }
-
-        .shake { animation: shakeError 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shakeError {
-            10%, 90% { transform: translate3d(-4px, 0, 0); }
-            20%, 80% { transform: translate3d(8px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-12px, 0, 0); }
-            40%, 60% { transform: translate3d(12px, 0, 0); }
+            text-align: center;
+            background: rgba(255,255,255,0.055);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 22px;
+            padding: 18px;
         }
 
-        .error-msg { 
-            color: #ff3b30; font-size: 15px; font-weight: 600; 
-            margin-top: 30px; height: 20px; opacity: 0; 
-            transition: 0.3s; transform: translateY(-10px);
-        }
-        .error-msg.visible { opacity: 1; transform: translateY(0); }
-
-        @media (max-height: 620px) {
-            .login-container { padding-top: 22px; padding-bottom: 22px; }
-            .login-header p { margin-bottom: 22px; }
-            .pin-display { margin-bottom: 24px; }
-            .numpad { gap: 12px; }
-            .error-msg { margin-top: 18px; }
+        .pin-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 12px;
         }
 
-        @media (max-height: 760px) {
-            .login-container { border-radius: 20px; padding-top: 18px; padding-bottom: 18px; }
-            .login-header p { margin-bottom: 16px; }
-            .pin-display { margin-bottom: 18px; }
-            .pin-dot { width: 20px; height: 20px; }
-            .num-btn { width: 58px; height: 58px; font-size: 24px; }
-            .error-msg { margin-top: 12px; height: 18px; font-size: 13px; }
+        .btn-back {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            display: inline-grid;
+            place-items: center;
+            cursor: pointer;
         }
 
-        @media (max-height: 640px) {
-            .login-header h1 { font-size: 25px; }
-            .login-header p { margin-bottom: 12px; }
-            .pin-display { margin-bottom: 14px; }
-            .numpad { gap: 8px 12px; }
-            .num-btn { width: 50px; height: 50px; font-size: 22px; }
+        .pin-title h2 {
+            margin: 0;
+            font-size: 20px;
         }
 
-        @media (max-width: 420px) {
-            body { padding: 12px; }
-            .login-container { padding-left: 18px; padding-right: 18px; }
-            .numpad { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 12px; }
+        .pin-title p {
+            margin: 4px 0 0;
+            color: rgba(255,255,255,0.58);
+            font-size: 13px;
+        }
+
+        .pin-display {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 16px 0 18px;
+        }
+
+        .pin-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.16);
+            transition: transform 0.18s ease, background-color 0.18s ease, border-radius 0.18s ease;
+        }
+
+        .pin-dot.filled:nth-child(1) { background: #1e90ff; box-shadow: 0 0 0 5px rgba(30,144,255,0.18); }
+        .pin-dot.filled:nth-child(2) { background: #34c759; border-radius: 8px; transform: rotate(45deg) scale(1.08); }
+        .pin-dot.filled:nth-child(3) { background: #ffb340; border-radius: 7px; }
+        .pin-dot.filled:nth-child(4) { background: #d56bff; border-radius: 50% 50% 8px 50%; transform: rotate(-45deg) scale(1.08); }
+        .pin-dot.filled:nth-child(5), .pin-dot.filled:nth-child(6) { background: #ff3b30; }
+
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 9px;
+        }
+
+        .num-btn {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.08);
+            color: white;
+            font-family: inherit;
+            font-size: 21px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .num-btn:active { background: #007aff; }
+        .num-btn.delete { color: #ff7b72; background: transparent; }
+
+        .setup-view {
+            display: none;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .setup-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .field {
+            display: grid;
+            gap: 7px;
+        }
+
+        .field label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.62);
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .input {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.08);
+            color: white;
+            border-radius: 14px;
+            padding: 14px 16px;
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .input:focus { border-color: #007aff; box-shadow: 0 0 0 4px rgba(0,122,255,0.16); }
+
+        .extra-users {
+            display: grid;
+            gap: 10px;
+            margin: 18px 0;
+        }
+
+        .extra-row {
+            display: grid;
+            grid-template-columns: 1fr 130px 130px auto;
+            gap: 10px;
+        }
+
+        .btn-primary, .btn-secondary {
+            border: none;
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-family: inherit;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .btn-primary { background: #007aff; color: white; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: white; }
+        .error { min-height: 20px; margin-top: 14px; color: #ff7b72; font-weight: 700; text-align: center; }
+
+        @media (max-width: 680px) {
+            body { overflow: auto; }
+            .setup-grid, .extra-row { grid-template-columns: 1fr; }
+            .num-btn { width: 54px; height: 54px; }
+            .perfil-card { width: 116px; min-height: 132px; }
+            .avatar { width: 72px; height: 72px; }
         }
     </style>
 </head>
-<body class="dark-mode">
+<body>
     <script>
-        if (localStorage.getItem('gvi_theme') === 'light') document.body.classList.remove('dark-mode');
-        // Si ya está logueado, redirigir directo
-        if (localStorage.getItem('gvi_user')) window.location.href = '/';
+        localStorage.removeItem('gvi_user');
     </script>
 
-    <div class="login-container" id="loginBox">
-        <div class="login-header">
-            <h1>GVI POS</h1>
-            <p>Ingresa tu PIN de acceso</p>
-        </div>
+    <button class="app-close" onclick="cerrarApp()" title="Cerrar GVI"><i data-lucide="x"></i></button>
 
-        <div class="pin-display" id="pinDisplay">
-            <div class="pin-dot"></div>
-            <div class="pin-dot"></div>
-            <div class="pin-dot"></div>
-            <div class="pin-dot"></div>
-        </div>
+    <main class="shell">
+        <section class="brand">
+            <h1>GVI</h1>
+            <p>Gestor de Ventas Intuitivo</p>
+        </section>
 
-        <div class="numpad">
-            <button class="num-btn" data-num="1" onclick="addNumber(1)">1</button>
-            <button class="num-btn" data-num="2" onclick="addNumber(2)">2</button>
-            <button class="num-btn" data-num="3" onclick="addNumber(3)">3</button>
-            <button class="num-btn" data-num="4" onclick="addNumber(4)">4</button>
-            <button class="num-btn" data-num="5" onclick="addNumber(5)">5</button>
-            <button class="num-btn" data-num="6" onclick="addNumber(6)">6</button>
-            <button class="num-btn" data-num="7" onclick="addNumber(7)">7</button>
-            <button class="num-btn" data-num="8" onclick="addNumber(8)">8</button>
-            <button class="num-btn" data-num="9" onclick="addNumber(9)">9</button>
-            <div></div>
-            <button class="num-btn" data-num="0" onclick="addNumber(0)">0</button>
-            <button class="num-btn delete" onclick="deleteNumber()"><i data-lucide="delete"></i></button>
-        </div>
-        
-        <div class="error-msg" id="errorMsg">PIN Incorrecto</div>
-    </div>
+        <section class="panel-login">
+            <div id="profilesView">
+                <div class="perfiles" id="profilesList"></div>
+            </div>
+
+            <div class="pin-view" id="pinView">
+                <div class="pin-top">
+                    <button class="btn-back" onclick="volverPerfiles()"><i data-lucide="arrow-left"></i></button>
+                    <div class="pin-title">
+                        <h2 id="perfilNombre">Perfil</h2>
+                        <p>Ingresa tu PIN</p>
+                    </div>
+                </div>
+                <div class="pin-display" id="pinDisplay"></div>
+                <div class="numpad">
+                    <button class="num-btn" onclick="addNumber(1)">1</button>
+                    <button class="num-btn" onclick="addNumber(2)">2</button>
+                    <button class="num-btn" onclick="addNumber(3)">3</button>
+                    <button class="num-btn" onclick="addNumber(4)">4</button>
+                    <button class="num-btn" onclick="addNumber(5)">5</button>
+                    <button class="num-btn" onclick="addNumber(6)">6</button>
+                    <button class="num-btn" onclick="addNumber(7)">7</button>
+                    <button class="num-btn" onclick="addNumber(8)">8</button>
+                    <button class="num-btn" onclick="addNumber(9)">9</button>
+                    <div></div>
+                    <button class="num-btn" onclick="addNumber(0)">0</button>
+                    <button class="num-btn delete" onclick="deleteNumber()"><i data-lucide="delete"></i></button>
+                </div>
+                <div class="error" id="pinError"></div>
+            </div>
+
+            <div class="setup-view" id="setupView">
+                <div class="pin-title" style="text-align:center; margin-bottom:20px;">
+                    <h2>Crear primer administrador</h2>
+                    <p>Este perfil tendra control total del sistema.</p>
+                </div>
+                <div class="setup-grid">
+                    <div class="field">
+                        <label>Nombre administrador</label>
+                        <input class="input" id="setupAdminNombre" value="Administrador">
+                    </div>
+                    <div class="field">
+                        <label>PIN administrador</label>
+                        <input class="input" id="setupAdminPin" maxlength="6" inputmode="numeric" placeholder="1234">
+                    </div>
+                </div>
+                <div class="extra-users" id="extraUsers"></div>
+                <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                    <button class="btn-secondary" onclick="agregarUsuarioSetup()">Agregar otro rol</button>
+                    <button class="btn-primary" onclick="guardarSetup()">Crear perfiles</button>
+                </div>
+                <div class="error" id="setupError"></div>
+            </div>
+        </section>
+    </main>
 
     <script>
-        lucide.createIcons();
+        let perfiles = [];
+        let perfilSeleccionado = null;
         let currentPin = '';
-        const dots = document.querySelectorAll('.pin-dot');
-        const errorMsg = document.getElementById('errorMsg');
-        const loginBox = document.getElementById('loginBox');
-        let isProcessing = false;
+        let procesando = false;
 
-        function updateDots() {
-            dots.forEach((dot, index) => {
-                const shouldFill = index < currentPin.length;
-                dot.classList.remove('pin-color-1', 'pin-color-2', 'pin-color-3', 'pin-color-4');
-                dot.classList.toggle('filled', shouldFill);
-                if (shouldFill) dot.classList.add(`pin-color-${index + 1}`);
-                else dot.classList.remove('pop');
-            });
+        function iniciales(nombre) {
+            return String(nombre || 'G').trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
         }
 
-        function animateLatestDot() {
-            const dot = dots[currentPin.length - 1];
-            if (!dot) return;
-            dot.classList.remove('pop');
-            void dot.offsetWidth;
-            dot.classList.add('pop');
+        function renderDots() {
+            const max = Math.max(4, currentPin.length || 4);
+            document.getElementById('pinDisplay').innerHTML = Array.from({ length: max }, (_, i) =>
+                `<div class="pin-dot ${i < currentPin.length ? 'filled' : ''}"></div>`
+            ).join('');
+        }
+
+        async function cargarAuth() {
+            const res = await fetch('/api/auth-state');
+            const data = await res.json();
+            perfiles = data.users || [];
+            if (!data.hasUsers) {
+                document.getElementById('profilesView').style.display = 'none';
+                document.getElementById('setupView').style.display = 'block';
+                lucide.createIcons();
+                return;
+            }
+            renderPerfiles();
+        }
+
+        async function cerrarApp() {
+            try {
+                localStorage.removeItem('gvi_user');
+                await fetch('/api/app/quit', { method: 'POST' });
+            } catch (_) {
+                window.close();
+            }
+        }
+
+        function renderPerfiles() {
+            document.getElementById('profilesView').style.display = 'block';
+            document.getElementById('pinView').style.display = 'none';
+            document.getElementById('setupView').style.display = 'none';
+            document.getElementById('profilesList').innerHTML = perfiles.map(p => `
+                <button class="perfil-card" onclick="seleccionarPerfil(${p.id})">
+                    <div class="avatar">${iniciales(p.nombre)}</div>
+                    <b>${p.nombre}</b>
+                    <span>${p.temporal ? 'Perfil temporal · ' : ''}${p.rol}</span>
+                </button>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function seleccionarPerfil(id) {
+            perfilSeleccionado = perfiles.find(p => p.id === id);
+            currentPin = '';
+            document.getElementById('perfilNombre').innerText = perfilSeleccionado.nombre;
+            document.getElementById('pinError').innerText = '';
+            document.getElementById('profilesView').style.display = 'none';
+            document.getElementById('pinView').style.display = 'block';
+            renderDots();
+            lucide.createIcons();
+        }
+
+        function volverPerfiles() {
+            perfilSeleccionado = null;
+            currentPin = '';
+            renderPerfiles();
         }
 
         async function addNumber(num) {
-            if (currentPin.length < 4 && !isProcessing) {
-                currentPin += num;
-                updateDots();
-                animateLatestDot();
-                errorMsg.classList.remove('visible');
-                
-                if (currentPin.length === 4) {
-                    await attemptLogin();
-                }
-            }
+            if (procesando || !perfilSeleccionado || currentPin.length >= 6) return;
+            currentPin += String(num);
+            renderDots();
+            document.getElementById('pinError').innerText = '';
+            if (currentPin.length >= 4) await intentarLogin();
         }
 
         function deleteNumber() {
-            if (currentPin.length > 0 && !isProcessing) {
-                currentPin = currentPin.slice(0, -1);
-                updateDots();
-                errorMsg.classList.remove('visible');
-            }
+            if (procesando) return;
+            currentPin = currentPin.slice(0, -1);
+            renderDots();
         }
 
-        // Permitir usar el teclado físico (Numpad)
-        document.addEventListener('keydown', (e) => {
-            if (e.key >= '0' && e.key <= '9') addNumber(e.key);
-            if (e.key === 'Backspace') deleteNumber();
-        });
-
-        async function attemptLogin() {
-            isProcessing = true;
+        async function intentarLogin() {
+            procesando = true;
             try {
                 const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ pin: currentPin })
+                    body: JSON.stringify({ nombre: perfilSeleccionado.nombre, pin: currentPin })
                 });
                 const data = await res.json();
-                
                 if (data.success) {
                     localStorage.setItem('gvi_user', JSON.stringify(data.user));
-                    
-                    // Animación de éxito
-                    dots.forEach(d => d.style.background = '#34c759'); // Verde
-                    loginBox.style.transform = 'scale(0.95)';
-                    loginBox.style.opacity = '0';
-                    
-                    setTimeout(() => window.location.href = '/', 400);
-                } else {
-                    // Animación de error
-                    currentPin = '';
-                    updateDots();
-                    loginBox.classList.add('shake');
-                    errorMsg.innerText = "PIN Incorrecto";
-                    errorMsg.classList.add('visible');
-                    
-                    setTimeout(() => {
-                        loginBox.classList.remove('shake');
-                        isProcessing = false;
-                    }, 500);
+                    window.location.href = '/';
+                    return;
                 }
-            } catch (e) {
-                errorMsg.innerText = "Error de conexión";
-                errorMsg.classList.add('visible');
-                currentPin = ''; updateDots();
-                isProcessing = false;
+                document.getElementById('pinError').innerText = 'PIN incorrecto';
+            } catch (_) {
+                document.getElementById('pinError').innerText = 'Error de conexion';
+            }
+            currentPin = '';
+            renderDots();
+            procesando = false;
+        }
+
+        function agregarUsuarioSetup() {
+            const id = Date.now();
+            document.getElementById('extraUsers').insertAdjacentHTML('beforeend', `
+                <div class="extra-row" data-row="${id}">
+                    <input class="input extra-nombre" placeholder="Nombre perfil">
+                    <select class="input extra-rol">
+                        <option value="CAJA">Caja</option>
+                        <option value="ADMIN">Administrador</option>
+                    </select>
+                    <input class="input extra-pin" maxlength="6" inputmode="numeric" placeholder="PIN">
+                    <button class="btn-secondary" onclick="this.closest('.extra-row').remove()">Quitar</button>
+                </div>
+            `);
+        }
+
+        async function guardarSetup() {
+            const admin = {
+                nombre: document.getElementById('setupAdminNombre').value.trim(),
+                pin: document.getElementById('setupAdminPin').value.trim()
+            };
+            const usuarios = Array.from(document.querySelectorAll('.extra-row')).map(row => ({
+                nombre: row.querySelector('.extra-nombre').value.trim(),
+                rol: row.querySelector('.extra-rol').value,
+                pin: row.querySelector('.extra-pin').value.trim()
+            })).filter(u => u.nombre || u.pin);
+
+            try {
+                const res = await fetch('/api/setup-users', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ admin, usuarios })
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    document.getElementById('setupError').innerText = data.message || 'No se pudieron crear los perfiles';
+                    return;
+                }
+                await cargarAuth();
+            } catch (_) {
+                document.getElementById('setupError').innerText = 'Error de conexion';
             }
         }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') addNumber(e.key);
+            if (e.key === 'Backspace') deleteNumber();
+            if (e.key === 'Escape' && perfilSeleccionado) volverPerfiles();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarAuth();
+            lucide.createIcons();
+        });
     </script>
 </body>
 </html>

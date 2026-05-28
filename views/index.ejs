@@ -4,241 +4,281 @@
     <%- include('partials/head') %>
     <title>GVI - Panel de Control</title>
     <style>
-        /* --- LAYOUT PRINCIPAL --- */
+        body {
+            background:
+                radial-gradient(circle at 82% 24%, rgba(0, 122, 255, 0.08), transparent 28%),
+                radial-gradient(circle at 14% 34%, rgba(0, 122, 255, 0.09), transparent 34%),
+                linear-gradient(145deg, #f8fbff 0%, #f3f6fa 44%, #f6f7f9 100%);
+        }
+
+        body.dark-mode {
+            background:
+                radial-gradient(circle at 82% 24%, rgba(0, 122, 255, 0.13), transparent 28%),
+                radial-gradient(circle at 14% 34%, rgba(94, 169, 255, 0.12), transparent 34%),
+                linear-gradient(145deg, #10151d 0%, #14171d 46%, #111216 100%);
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         .dashboard-container {
+            height: 100svh;
+            padding: clamp(104px, 11vh, 128px) clamp(18px, 4vw, 42px) clamp(28px, 5vh, 48px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dashboard-hero {
+            width: min(100%, 1120px);
+            display: grid;
+            grid-template-columns: minmax(280px, 1fr) auto;
+            align-items: end;
+            gap: 24px;
+            margin-bottom: clamp(24px, 4vh, 34px);
+        }
+
+        .hero-copy { text-align: left; }
+
+        .hero-kicker {
+            margin: 0 0 8px;
+            color: var(--azul-gvi);
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            margin: 0;
+            color: var(--texto-claro);
+            font-size: clamp(32px, 4.6vw, 58px);
+            font-weight: 900;
+            line-height: 0.98;
+            letter-spacing: 0;
+        }
+
+        body.dark-mode .hero-title { color: #fff; }
+
+        .hero-subtitle {
+            margin: 12px 0 0;
+            max-width: 530px;
+            color: rgba(28, 30, 33, 0.56);
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        body.dark-mode .hero-subtitle { color: rgba(228, 230, 235, 0.6); }
+
+        .clock-panel {
+            min-width: 320px;
+            padding: 24px 28px;
+            border-radius: 26px;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.68)),
+                radial-gradient(circle at 20% 20%, rgba(0, 122, 255, 0.12), transparent 40%);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 24px 65px rgba(20, 30, 45, 0.12);
+            backdrop-filter: blur(16px);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100svh;
-            padding: clamp(62px, 8vh, 86px) clamp(14px, 3vw, 28px) clamp(18px, 3vh, 28px);
         }
 
-        /* Ocultar menú nav en el inicio */
-        .btn-menu-global { display: none !important; }
-
-        .dashboard-hero {
-            text-align: center;
-            margin-bottom: clamp(18px, 3.5vh, 30px);
+        body.dark-mode .clock-panel {
+            background:
+                linear-gradient(135deg, rgba(33, 38, 48, 0.94), rgba(22, 24, 30, 0.78)),
+                radial-gradient(circle at 20% 20%, rgba(94, 169, 255, 0.16), transparent 40%);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 24px 65px rgba(0, 0, 0, 0.28);
         }
 
-        /* --- RELOJ Y CLIMA --- */
+        .clock-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(120deg, rgba(0, 122, 255, 0.12), transparent 34%, rgba(52, 199, 89, 0.08));
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .clock-panel > * {
+            position: relative;
+            z-index: 1;
+        }
+
         .reloj-gigante {
-            font-size: clamp(44px, 9vw, 82px);
-            font-weight: 900;
             margin: 0;
-            letter-spacing: 0;
-            color: var(--texto-claro);
+            color: #12161d;
+            font-size: clamp(54px, 6.6vw, 86px);
+            font-weight: 900;
             line-height: 1;
+            letter-spacing: 0;
         }
+
         body.dark-mode .reloj-gigante { color: #fff; }
 
-        .reloj-periodo { font-size: clamp(16px, 3vw, 24px); opacity: 0.3; margin-left: 8px; letter-spacing: 0; }
-        .fecha-completa { font-size: clamp(14px, 2vw, 17px); opacity: 0.5; font-weight: 600; margin-top: 3px; text-transform: capitalize; }
+        .reloj-periodo {
+            margin-left: 8px;
+            font-size: clamp(16px, 2.5vw, 24px);
+            opacity: 0.36;
+            letter-spacing: 0;
+        }
 
-        /* --- GRID BALANCEADO --- */
+        .fecha-completa {
+            margin-top: 7px;
+            font-size: 15px;
+            font-weight: 700;
+            opacity: 0.58;
+            text-transform: capitalize;
+        }
+
         .grid-modulos-pro {
+            width: min(100%, 1120px);
             display: grid;
-            grid-template-columns: repeat(3, minmax(210px, 260px));
-            gap: clamp(12px, 1.8vw, 18px);
-            width: min(100%, 816px);
-            justify-content: center;
-        }
-        @media (max-width: 1000px) {
-            .grid-modulos-pro { grid-template-columns: repeat(2, 280px); }
-        }
-        @media (max-width: 700px) {
-            .grid-modulos-pro { grid-template-columns: 1fr; }
+            grid-template-columns: repeat(3, minmax(220px, 1fr));
+            gap: clamp(14px, 2vw, 20px);
         }
 
         .card-menu-pro {
-            background: var(--panel-claro);
-            padding: clamp(20px, 2.6vh, 28px) clamp(16px, 2.5vw, 22px);
-            border-radius: 18px;
-            text-decoration: none;
+            min-height: 150px;
+            padding: 22px;
+            border-radius: 22px;
             color: inherit;
-            display: flex;
-            flex-direction: column;
+            text-decoration: none;
+            background: var(--panel-claro);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 14px 38px rgba(20, 30, 45, 0.045);
+            display: grid;
+            grid-template-columns: 54px 1fr;
+            grid-template-rows: auto 1fr auto;
             align-items: center;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            align-content: center;
+            justify-content: center;
+            gap: 0 16px;
             position: relative;
+            overflow: hidden;
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
         }
-        body.dark-mode .card-menu-pro { background: var(--panel-oscuro); border-color: #333; }
+
+        body.dark-mode .card-menu-pro {
+            background: var(--panel-oscuro);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 14px 38px rgba(0, 0, 0, 0.16);
+        }
 
         .card-menu-pro:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            transform: translateY(-3px);
             border-color: var(--azul-gvi);
+            box-shadow: 0 18px 44px rgba(20, 30, 45, 0.09);
         }
 
-        .card-icono-pro { 
-            height: 48px;
+        .card-icono-pro {
+            grid-row: 1 / span 3;
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--azul-gvi);
-            margin-bottom: 8px;
+            background: rgba(0, 122, 255, 0.1);
         }
-        .card-icono-pro svg { width: 34px; height: 34px; stroke-width: 1.7px; }
-        body.dark-mode .card-icono-pro { color: #5ea9ff; }
-        .card-menu-pro h3 { margin: 8px 0 4px; font-size: clamp(17px, 2vw, 19px); font-weight: 700; }
-        .card-menu-pro p { margin: 0; font-size: 13px; opacity: 0.5; font-weight: 500; }
 
-        /* --- INDICADORES EN TIEMPO REAL (Live Badges) --- */
+        body.dark-mode .card-icono-pro {
+            color: #5ea9ff;
+            background: rgba(94, 169, 255, 0.12);
+        }
+
+        .card-icono-pro svg {
+            width: 28px;
+            height: 28px;
+            stroke-width: 2px;
+        }
+
+        .card-menu-pro h3 {
+            margin: 0 0 6px;
+            font-size: clamp(18px, 2vw, 22px);
+            font-weight: 800;
+        }
+
+        .card-menu-pro p {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0.56;
+        }
+
         .badge-stats {
-            margin-top: 12px;
+            width: fit-content;
+            margin-top: 14px;
             padding: 5px 12px;
             border-radius: 20px;
-            font-size: 11px;
-            font-weight: 800;
             background: rgba(0, 122, 255, 0.08);
             color: var(--azul-gvi);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
+
         .badge-alerta { background: rgba(255, 59, 48, 0.1); color: #ff3b30; }
         .badge-exito { background: rgba(52, 199, 89, 0.1); color: #34c759; }
 
-
-
-        /* Ocultar en escritorio (PC) */
-        @media (min-width: 769px) {
-            .solo-movil { display: none !important; }
+        @media (max-width: 1000px) {
+            .dashboard-hero { grid-template-columns: 1fr; }
+            .hero-copy,
+            .clock-panel { text-align: center; }
+            .hero-subtitle { margin-left: auto; margin-right: auto; }
+            .clock-panel { min-width: 0; }
+            .grid-modulos-pro { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
         }
-        /* --- ANIMACIONES DE ENTRADA (MOTION) --- */
-        @keyframes slideInUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        @keyframes pulseAmbient {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(0.98); }
-        }
-
-        .dashboard-hero {
-            animation: slideInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-        .card-menu-pro {
-            animation: slideInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-        /* Retraso escalonado para las tarjetas */
-        .card-menu-pro:nth-child(1) { animation-delay: 0.1s; }
-        .card-menu-pro:nth-child(2) { animation-delay: 0.2s; }
-        .card-menu-pro:nth-child(3) { animation-delay: 0.3s; }
-        .card-menu-pro:nth-child(4) { animation-delay: 0.4s; }
-        .card-menu-pro:nth-child(5) { animation-delay: 0.5s; }
-
-        .card-icono-pro {
-            display: inline-block;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .card-menu-pro:hover .card-icono-pro {
-            transform: scale(1.2) rotate(5deg);
-        }
-
-        .reloj-gigante {
-            animation: pulseAmbient 4s infinite ease-in-out;
-        }
-
-        /* --- HERRAMIENTAS SUPERIORES (Logout, Usuario, Tema) --- */
-        .header-tools {
-            position: fixed;
-            top: clamp(10px, 2vw, 18px);
-            right: clamp(10px, 2vw, 18px);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 2000;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            max-width: calc(100% - 24px);
-        }
-
-        .user-info-pill {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--panel-claro);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--texto-claro);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        body.dark-mode .user-info-pill { background: var(--panel-oscuro); color: white; }
-        .user-info-pill i { width: 16px; height: 16px; opacity: 0.7; }
-
-        .btn-logout {
-            display: flex; align-items: center; gap: 6px;
-            background: #ff3b30; color: white;
-            border: none; padding: 8px 16px;
-            border-radius: 20px; font-size: 14px; font-weight: 700;
-            cursor: pointer; box-shadow: 0 4px 15px rgba(255,59,48,0.3);
-            transition: 0.2s;
-        }
-        .btn-logout:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(255,59,48,0.4); }
-        .btn-logout i { width: 16px; height: 16px; }
 
         @media (max-width: 700px) {
-            .dashboard-container { justify-content: flex-start; }
-            .header-tools {
-                left: 12px;
-                right: 12px;
-                justify-content: center;
-            }
-            .user-info-pill,
-            .btn-logout { padding: 8px 12px; }
-            .grid-modulos-pro { width: 100%; }
+            .dashboard-container { padding-top: 112px; }
+            .grid-modulos-pro { grid-template-columns: 1fr; }
         }
 
         @media (max-height: 760px) and (min-width: 900px) {
-            .dashboard-container { justify-content: flex-start; padding-top: 58px; }
+            .dashboard-container { padding-top: 88px; }
             .dashboard-hero { margin-bottom: 16px; }
-            .reloj-gigante { font-size: 68px; }
-            .card-menu-pro { padding-top: 18px; padding-bottom: 18px; }
-            .card-icono-pro { height: 38px; margin-bottom: 4px; }
-            .card-icono-pro svg { width: 30px; height: 30px; }
+            .reloj-gigante { font-size: 60px; }
+            .card-menu-pro {
+                min-height: 126px;
+                padding-top: 18px;
+                padding-bottom: 18px;
+            }
+            .card-icono-pro { width: 48px; height: 48px; }
+            .card-icono-pro svg { width: 26px; height: 26px; }
             .badge-stats { margin-top: 8px; }
         }
-
     </style>
 </head>
 <body>
     <%- include('partials/nav') %>
 
-
-
-    <div class="header-tools">
-        <div class="user-info-pill">
-            <i data-lucide="user"></i> <span id="nombreUsuarioBadge">Usuario</span>
-        </div>
-        <button class="btn-logout" onclick="cerrarSesionIndex()">
-            <i data-lucide="log-out"></i> Salir
-        </button>
-        <label class="switch-tema">
-            <input type="checkbox" id="checkTema" onclick="toggleTema()">
-            <span class="slider"><span class="icono-sol">☀️</span><span class="icono-luna">🌙</span></span>
-        </label>
-    </div>
-
     <div class="dashboard-container">
-        
         <header class="dashboard-hero">
-            <h1 class="reloj-gigante">
-                <span id="relojHome">00:00</span><span id="relojPeriodo" class="reloj-periodo">--</span>
-            </h1>
-            <div class="fecha-completa" id="fechaHome">...</div>
+            <div class="hero-copy">
+                <p class="hero-kicker">GVI POS</p>
+                <h1 class="hero-title">Centro de ventas</h1>
+                <p class="hero-subtitle">Accede rapido a venta, caja, inventario y reportes desde un panel mas ordenado.</p>
+            </div>
+            <div class="clock-panel">
+                <h2 class="reloj-gigante">
+                    <span id="relojHome">00:00</span><span id="relojPeriodo" class="reloj-periodo">--</span>
+                </h2>
+                <div class="fecha-completa" id="fechaHome">...</div>
+            </div>
         </header>
 
         <div class="grid-modulos-pro">
@@ -263,6 +303,13 @@
                 <div class="badge-stats" id="statsStock">Cargando...</div>
             </a>
 
+            <a href="/productos" class="card-menu-pro">
+                <div class="card-icono-pro"><i data-lucide="scan-barcode"></i></div>
+                <h3>Productos</h3>
+                <p>Ingreso rapido</p>
+                <div class="badge-stats">Escanear o buscar</div>
+            </a>
+
             <a href="/finanzas" class="card-menu-pro admin-only">
                 <div class="card-icono-pro"><i data-lucide="bar-chart-3"></i></div>
                 <h3>Finanzas</h3>
@@ -270,42 +317,32 @@
                 <div class="badge-stats badge-exito">Cierre listo</div>
             </a>
 
-            <a href="/fiados" class="card-menu-pro">
-                <div class="card-icono-pro"><i data-lucide="book-open"></i></div>
-                <h3>Fiados</h3>
-                <p>Cuentas de clientes</p>
-                <div class="badge-stats">0 pendientes</div>
-            </a>
-
             <a href="/configuracion" class="card-menu-pro admin-only">
                 <div class="card-icono-pro"><i data-lucide="settings"></i></div>
                 <h3>Ajustes</h3>
-                <p>Sistema y Red</p>
-                <div class="badge-stats">Configuración</div>
+                <p>Sistema y red</p>
+                <div class="badge-stats">Configuracion</div>
             </a>
         </div>
     </div>
 
     <%- include('partials/scripts') %>
-    
+
     <script>
-        // --- FUNCIÓN PARA CARGAR ESTADÍSTICAS REALES ---
         async function cargarStatsDashboard() {
             try {
-                // 1. Obtener productos para contar stock bajo
                 const resProd = await fetch('/api/productos');
                 const productos = await resProd.json();
                 const stockBajo = productos.filter(p => p.stock <= 5).length;
-                
+
                 const elStock = document.getElementById('statsStock');
-                if(stockBajo > 0) {
+                if (stockBajo > 0) {
                     elStock.innerText = `${stockBajo} Stock Bajo`;
                     elStock.classList.add('badge-alerta');
                 } else {
-                    elStock.innerText = `Stock al día`;
+                    elStock.innerText = 'Stock al dia';
                 }
 
-                // 2. Obtener ventas y actualizar lista reciente
                 const resVentas = await fetch('/api/ventas');
                 const ventas = await resVentas.json();
                 const hoy = new Date().toLocaleDateString('es-CL');
@@ -314,8 +351,9 @@
                     .reduce((sum, v) => sum + v.total, 0);
 
                 document.getElementById('statsVentas').innerText = `Hoy: $${totalHoy.toLocaleString('es-CL')}`;
-
-            } catch (e) { console.error("Error cargando stats", e); }
+            } catch (e) {
+                console.error('Error cargando stats', e);
+            }
         }
 
         function actualizarDashboard() {
@@ -330,24 +368,13 @@
             document.getElementById('fechaHome').innerText = ahora.toLocaleDateString('es-CL', opciones);
         }
 
-        // LÓGICA DE USUARIO Y CIERRE DE SESIÓN
         function cargarDatosUsuario() {
             try {
                 const usrInfo = JSON.parse(localStorage.getItem('gvi_user'));
-                if(usrInfo) {
-                    document.getElementById('nombreUsuarioBadge').innerText = usrInfo.nombre;
-                    if(usrInfo.rol !== 'ADMIN') {
-                        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-                    }
+                if (usrInfo && usrInfo.rol !== 'ADMIN') {
+                    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
                 }
             } catch (e) {}
-        }
-
-        function cerrarSesionIndex() {
-            if(confirm("¿Seguro que deseas cerrar la sesión actual?")) {
-                localStorage.removeItem('gvi_user');
-                window.location.href = '/login';
-            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {

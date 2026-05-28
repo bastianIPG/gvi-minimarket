@@ -19,7 +19,12 @@ async function migrate() {
             nombre TEXT,
             precio INTEGER,
             stock REAL,
-            vendidoPorPeso INTEGER
+            vendidoPorPeso INTEGER,
+            ofertaActiva INTEGER DEFAULT 0,
+            precioOferta INTEGER DEFAULT 0,
+            mayorActivo INTEGER DEFAULT 0,
+            cantidadMayor REAL DEFAULT 0,
+            precioMayor INTEGER DEFAULT 0
         );
 
         CREATE TABLE IF NOT EXISTS ventas (
@@ -83,8 +88,19 @@ async function migrate() {
     const productos = leerJson('productos.json');
     for (const p of productos) {
         await db.run(
-            'INSERT OR IGNORE INTO productos (codigo, nombre, precio, stock, vendidoPorPeso) VALUES (?, ?, ?, ?, ?)',
-            [p.codigo, p.nombre, p.precio, p.stock, p.vendidoPorPeso ? 1 : 0]
+            'INSERT OR IGNORE INTO productos (codigo, nombre, precio, stock, vendidoPorPeso, ofertaActiva, precioOferta, mayorActivo, cantidadMayor, precioMayor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                p.codigo,
+                p.nombre,
+                p.precio,
+                p.stock,
+                p.vendidoPorPeso ? 1 : 0,
+                p.ofertaActiva ? 1 : 0,
+                p.ofertaActiva ? Number(p.precioOferta || 0) : 0,
+                p.mayorActivo ? 1 : 0,
+                p.mayorActivo ? Number(p.cantidadMayor || 0) : 0,
+                p.mayorActivo ? Number(p.precioMayor || 0) : 0
+            ]
         );
     }
 

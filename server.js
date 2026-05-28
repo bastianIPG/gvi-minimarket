@@ -5,18 +5,107 @@ const AdmZip = require('adm-zip');
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
 const { app, BrowserWindow } = require('electron');
+let autoUpdater = null;
+try {
+    autoUpdater = require('electron-updater').autoUpdater;
+} catch (_) {
+    autoUpdater = null;
+}
 
 const server = express();
 const PORT = 3000;
-const APP_NAME = 'GVI Minimarket';
+const APP_NAME = 'GVI';
+const APP_VERSION = (() => {
+    try {
+        return require('./package.json').version || '0.0.0';
+    } catch (_) {
+        return '0.0.0';
+    }
+})();
 if (app && app.setName) app.setName(APP_NAME);
+const updateState = {
+    configured: false,
+    checking: false,
+    downloading: false,
+    ready: false,
+    available: false,
+    version: null,
+    percent: 0,
+    message: 'Actualizador listo para configurar.'
+};
+
+function configureAutoUpdater() {
+    if (!autoUpdater || !app || !app.isPackaged) {
+        updateState.configured = false;
+        updateState.message = app && !app.isPackaged
+            ? 'Las actualizaciones se prueban desde la version instalada, no desde npm start.'
+            : 'electron-updater no esta disponible.';
+        return;
+    }
+
+    updateState.configured = true;
+    updateState.message = 'Listo para buscar actualizaciones.';
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = true;
+
+    autoUpdater.on('checking-for-update', () => {
+        updateState.checking = true;
+        updateState.message = 'Buscando actualizaciones...';
+    });
+
+    autoUpdater.on('update-available', (info) => {
+        updateState.checking = false;
+        updateState.available = true;
+        updateState.ready = false;
+        updateState.version = info.version;
+        updateState.message = `Nueva version disponible: v${info.version}.`;
+    });
+
+    autoUpdater.on('update-not-available', () => {
+        updateState.checking = false;
+        updateState.available = false;
+        updateState.ready = false;
+        updateState.message = 'GVI ya esta actualizado.';
+    });
+
+    autoUpdater.on('download-progress', (progress) => {
+        updateState.downloading = true;
+        updateState.percent = Math.round(progress.percent || 0);
+        updateState.message = `Descargando actualizacion: ${updateState.percent}%.`;
+    });
+
+    autoUpdater.on('update-downloaded', (info) => {
+        updateState.downloading = false;
+        updateState.ready = true;
+        updateState.available = true;
+        updateState.version = info.version;
+        updateState.percent = 100;
+        updateState.message = 'Actualizacion descargada. Puedes instalarla ahora.';
+    });
+
+    autoUpdater.on('error', (error) => {
+        updateState.checking = false;
+        updateState.downloading = false;
+        updateState.message = `No se pudo actualizar: ${error.message || error}`;
+    });
+}
+
+function getUpdatePayload() {
+    return {
+        ...updateState,
+        currentVersion: APP_VERSION,
+        provider: 'GitHub Releases',
+        owner: 'bastianIPG',
+        repo: 'gvi-minimarket'
+    };
+}
 const DATA_DIR = app && app.getPath ? app.getPath('userData') : path.join(__dirname, '.data');
 const DB_FILE = path.join(DATA_DIR, 'database.sqlite');
 const USERS_FILE = path.join(DATA_DIR, 'usuarios.json');
 const ERROR_LOG_FILE = path.join(DATA_DIR, 'errores_sistema.log');
+let mainWindow = null;
 const DEFAULT_USERS = [
-    { nombre: 'Administrador', pin: '1234', rol: 'ADMIN' },
-    { nombre: 'Caja 1', pin: '0000', rol: 'CAJA' }
+    { nombre: 'Pruebas', pin: '1234', rol: 'ADMIN', temporal: true }
 ];
 
 function ensureDataDir() {
@@ -45,6 +134,20 @@ function prepareRuntimeData() {
     }
 }
 
+function leerUsuarios() {
+    if (!fs.existsSync(USERS_FILE)) return [];
+    try {
+        const usuarios = JSON.parse(fs.readFileSync(USERS_FILE, 'utf-8'));
+        return Array.isArray(usuarios) ? usuarios : [];
+    } catch (_) {
+        return [];
+    }
+}
+
+function guardarUsuarios(usuarios) {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(usuarios, null, 2));
+}
+
 function findBundledFile(fileName) {
     const candidates = [
         path.join(__dirname, fileName),
@@ -61,7 +164,12 @@ async function ensureSchema() {
             nombre TEXT,
             precio INTEGER,
             stock REAL,
-            vendidoPorPeso INTEGER
+            vendidoPorPeso INTEGER,
+            ofertaActiva INTEGER DEFAULT 0,
+            precioOferta INTEGER DEFAULT 0,
+            mayorActivo INTEGER DEFAULT 0,
+            cantidadMayor REAL DEFAULT 0,
+            precioMayor INTEGER DEFAULT 0
         );
 
         CREATE TABLE IF NOT EXISTS ventas (
@@ -107,6 +215,19 @@ async function ensureSchema() {
             detalle TEXT
         );
     `);
+
+    await ensureColumn('productos', 'ofertaActiva', 'INTEGER DEFAULT 0');
+    await ensureColumn('productos', 'precioOferta', 'INTEGER DEFAULT 0');
+    await ensureColumn('productos', 'mayorActivo', 'INTEGER DEFAULT 0');
+    await ensureColumn('productos', 'cantidadMayor', 'REAL DEFAULT 0');
+    await ensureColumn('productos', 'precioMayor', 'INTEGER DEFAULT 0');
+}
+
+async function ensureColumn(tableName, columnName, definition) {
+    const columns = await db.all(`PRAGMA table_info(${tableName})`);
+    if (!columns.some(col => col.name === columnName)) {
+        await db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
+    }
 }
 
 prepareRuntimeData();
@@ -125,24 +246,207 @@ server.get('/login', (req, res) => res.render('login'));
 server.get('/', (req, res) => res.render('index'));
 server.get('/caja', (req, res) => res.render('caja'));
 server.get('/bodega', (req, res) => res.render('bodega'));
+server.get('/productos', (req, res) => res.render('productos'));
 server.get('/auditoria', (req, res) => res.render('centroAuditoria'));
 server.get('/finanzas', (req, res) => res.render('finanzas'));
 server.get('/fiados', (req, res) => res.render('fiados'));
 server.get('/cobrar', (req, res) => res.render('cobrar'));
 server.get('/configuracion', (req, res) => res.render('configuracion'));
 
+server.get('/api/app/info', (req, res) => {
+    res.json({
+        name: APP_NAME,
+        fullName: 'Gestor de Ventas Intuitivo',
+        version: APP_VERSION,
+        updateChannel: 'stable',
+        updateProvider: 'GitHub Releases',
+        updater: getUpdatePayload()
+    });
+});
+
+server.get('/api/app/update/status', (req, res) => {
+    res.json({ success: true, ...getUpdatePayload() });
+});
+
+server.post('/api/app/update/check', async (req, res) => {
+    if (!autoUpdater || !app || !app.isPackaged) {
+        return res.json({
+            success: true,
+            ...getUpdatePayload(),
+            configured: false,
+            title: 'Modo desarrollo',
+            message: 'Para probar actualizaciones debes instalar GVI desde el instalador. En npm start no se consulta GitHub Releases.'
+        });
+    }
+
+    try {
+        await autoUpdater.checkForUpdates();
+        res.json({ success: true, ...getUpdatePayload(), title: 'Busqueda iniciada' });
+    } catch (e) {
+        updateState.checking = false;
+        updateState.message = `No se pudo buscar actualizaciones: ${e.message || e}`;
+        res.status(500).json({ success: false, ...getUpdatePayload() });
+    }
+});
+
+server.post('/api/app/update/download', async (req, res) => {
+    if (!autoUpdater || !app || !app.isPackaged || !updateState.available) {
+        return res.status(400).json({
+            success: false,
+            ...getUpdatePayload(),
+            message: 'No hay una actualizacion disponible para descargar.'
+        });
+    }
+
+    try {
+        autoUpdater.downloadUpdate();
+        res.json({ success: true, ...getUpdatePayload(), message: 'Descarga iniciada.' });
+    } catch (e) {
+        updateState.downloading = false;
+        updateState.message = `No se pudo descargar: ${e.message || e}`;
+        res.status(500).json({ success: false, ...getUpdatePayload() });
+    }
+});
+
+server.post('/api/app/update/install', (req, res) => {
+    if (!autoUpdater || !updateState.ready) {
+        return res.status(400).json({
+            success: false,
+            ...getUpdatePayload(),
+            message: 'La actualizacion aun no esta lista para instalar.'
+        });
+    }
+
+    res.json({ success: true });
+    setTimeout(() => autoUpdater.quitAndInstall(false, true), 300);
+});
+
+server.post('/api/app/quit', (req, res) => {
+    res.json({ success: true });
+    setTimeout(() => {
+        if (app && app.quit) app.quit();
+        else process.exit(0);
+    }, 80);
+});
+
+server.post('/api/app/minimize', (req, res) => {
+    res.json({ success: true });
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.minimize();
+    }
+});
+
+server.post('/api/session/clear', (req, res) => {
+    res.json({ success: true });
+});
+
 // --- API DE AUTENTICACIÓN ---
+server.get('/api/auth-state', (req, res) => {
+    try {
+        const usuarios = leerUsuarios();
+        res.json({
+            hasUsers: usuarios.length > 0,
+            users: usuarios.map((u, index) => ({
+                id: index,
+                nombre: u.nombre,
+                rol: u.rol,
+                temporal: !!u.temporal
+            }))
+        });
+    } catch (e) {
+        logError('Auth State', e);
+        res.status(500).json({ hasUsers: false, users: [] });
+    }
+});
+
+server.post('/api/setup-users', (req, res) => {
+    try {
+        const { admin, usuarios = [] } = req.body;
+        if (!admin || !admin.nombre || !admin.pin) {
+            return res.status(400).json({ success: false, message: 'Falta el administrador.' });
+        }
+        if (!/^\d{4,6}$/.test(String(admin.pin))) {
+            return res.status(400).json({ success: false, message: 'El PIN del administrador debe tener 4 a 6 numeros.' });
+        }
+
+        const normalizados = [{
+            nombre: String(admin.nombre).trim(),
+            pin: String(admin.pin),
+            rol: 'ADMIN'
+        }];
+
+        for (const u of usuarios) {
+            if (!u || !u.nombre || !u.pin) continue;
+            if (!/^\d{4,6}$/.test(String(u.pin))) {
+                return res.status(400).json({ success: false, message: `PIN invalido para ${u.nombre}.` });
+            }
+            normalizados.push({
+                nombre: String(u.nombre).trim(),
+                pin: String(u.pin),
+                rol: u.rol === 'ADMIN' ? 'ADMIN' : 'CAJA'
+            });
+        }
+
+        guardarUsuarios(normalizados);
+        res.json({ success: true });
+    } catch (e) {
+        logError('Setup Usuarios', e);
+        res.status(500).json({ success: false });
+    }
+});
+
+server.get('/api/usuarios', (req, res) => {
+    try {
+        const usuarios = leerUsuarios().map((u, index) => ({
+            id: index,
+            nombre: u.nombre,
+            rol: u.rol,
+            temporal: !!u.temporal
+        }));
+        res.json(usuarios);
+    } catch (e) {
+        logError('Listar Usuarios', e);
+        res.status(500).json([]);
+    }
+});
+
+server.post('/api/usuarios', (req, res) => {
+    try {
+        const { nombre, rol, pin } = req.body;
+        const nombreLimpio = String(nombre || '').trim();
+        const rolFinal = rol === 'ADMIN' ? 'ADMIN' : 'CAJA';
+        const pinFinal = String(pin || '').trim();
+
+        if (!nombreLimpio) {
+            return res.status(400).json({ success: false, message: 'Ingresa un nombre.' });
+        }
+        if (!/^\d{4,6}$/.test(pinFinal)) {
+            return res.status(400).json({ success: false, message: 'El PIN debe tener 4 a 6 numeros.' });
+        }
+
+        const usuarios = leerUsuarios();
+        if (usuarios.some(u => String(u.nombre).trim().toLowerCase() === nombreLimpio.toLowerCase())) {
+            return res.status(400).json({ success: false, message: 'Ya existe un usuario con ese nombre.' });
+        }
+        if (usuarios.some(u => String(u.pin) === pinFinal)) {
+            return res.status(400).json({ success: false, message: 'Ese PIN ya esta en uso.' });
+        }
+
+        usuarios.push({ nombre: nombreLimpio, rol: rolFinal, pin: pinFinal });
+        guardarUsuarios(usuarios);
+        res.json({ success: true });
+    } catch (e) {
+        logError('Crear Usuario', e);
+        res.status(500).json({ success: false, message: 'No se pudo crear el usuario.' });
+    }
+});
+
 server.post('/api/login', (req, res) => {
     try {
         const pin = req.body.pin;
-        const archivoUsuarios = USERS_FILE;
-        
-        if (!fs.existsSync(archivoUsuarios)) {
-            return res.status(500).json({ success: false, message: 'Archivo de usuarios no encontrado.' });
-        }
-        
-        const usuarios = JSON.parse(fs.readFileSync(archivoUsuarios, 'utf-8'));
-        const user = usuarios.find(u => u.pin === pin);
+        const nombre = req.body.nombre;
+        const usuarios = leerUsuarios();
+        const user = usuarios.find(u => u.pin === pin && (!nombre || u.nombre === nombre));
         
         if (user) {
             res.json({ success: true, user: { nombre: user.nombre, rol: user.rol } });
@@ -158,11 +462,7 @@ server.post('/api/login', (req, res) => {
 server.post('/api/verify-admin', (req, res) => {
     try {
         const pin = req.body.pin;
-        const archivoUsuarios = USERS_FILE;
-        
-        if (!fs.existsSync(archivoUsuarios)) return res.json({ success: false });
-        
-        const usuarios = JSON.parse(fs.readFileSync(archivoUsuarios, 'utf-8'));
+        const usuarios = leerUsuarios();
         const admin = usuarios.find(u => u.pin === pin && u.rol === 'ADMIN');
         
         if (admin) res.json({ success: true });
@@ -235,7 +535,15 @@ async function registrarHistorial(accion, detalle) {
 server.get('/api/productos', async (req, res) => {
     try {
         const productos = await db.all('SELECT * FROM productos');
-        res.json(productos.map(p => ({ ...p, vendidoPorPeso: p.vendidoPorPeso === 1 })));
+        res.json(productos.map(p => ({
+            ...p,
+            vendidoPorPeso: p.vendidoPorPeso === 1,
+            ofertaActiva: p.ofertaActiva === 1,
+            mayorActivo: p.mayorActivo === 1,
+            precioOferta: Number(p.precioOferta || 0),
+            cantidadMayor: Number(p.cantidadMayor || 0),
+            precioMayor: Number(p.precioMayor || 0)
+        })));
     } catch (e) { res.status(500).json({ error: "Error" }); }
 });
 
@@ -250,13 +558,29 @@ server.post('/api/productos', async (req, res) => {
     }
     const precio = Number(nuevo.precio);
     const stock = Number(nuevo.stock);
+    const precioOferta = Number(nuevo.precioOferta || 0);
+    const cantidadMayor = Number(nuevo.cantidadMayor || 0);
+    const precioMayor = Number(nuevo.precioMayor || 0);
+    if (nuevo.ofertaActiva && (!precioOferta || precioOferta < 0)) return res.status(400).json({ success: false, message: 'Precio oferta invalido.' });
+    if (nuevo.mayorActivo && (!cantidadMayor || cantidadMayor <= 0 || !precioMayor || precioMayor < 0)) return res.status(400).json({ success: false, message: 'Datos mayoristas invalidos.' });
     if (isNaN(precio) || precio < 0) return res.status(400).json({ success: false, message: 'Precio inválido.' });
     if (isNaN(stock) || stock < 0) return res.status(400).json({ success: false, message: 'Stock inválido.' });
 
     try {
         await db.run(
-            'INSERT INTO productos (codigo, nombre, precio, stock, vendidoPorPeso) VALUES (?, ?, ?, ?, ?)',
-            [nuevo.codigo.trim(), nuevo.nombre.trim(), precio, stock, nuevo.vendidoPorPeso ? 1 : 0]
+            'INSERT INTO productos (codigo, nombre, precio, stock, vendidoPorPeso, ofertaActiva, precioOferta, mayorActivo, cantidadMayor, precioMayor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                nuevo.codigo.trim(),
+                nuevo.nombre.trim(),
+                precio,
+                stock,
+                nuevo.vendidoPorPeso ? 1 : 0,
+                nuevo.ofertaActiva ? 1 : 0,
+                nuevo.ofertaActiva ? precioOferta : 0,
+                nuevo.mayorActivo ? 1 : 0,
+                nuevo.mayorActivo ? cantidadMayor : 0,
+                nuevo.mayorActivo ? precioMayor : 0
+            ]
         );
         await registrarHistorial("NUEVO", `Se agregó "${nuevo.nombre}" con stock de ${stock} un.`);
         res.json({ success: true });
@@ -277,6 +601,11 @@ server.put('/api/productos/:codigoAnterior', async (req, res) => {
     if (!datos.codigo || !datos.nombre) return res.status(400).json({ success: false, message: 'Faltan datos requeridos.' });
     const precio = Number(datos.precio);
     const stock = Number(datos.stock);
+    const precioOferta = Number(datos.precioOferta || 0);
+    const cantidadMayor = Number(datos.cantidadMayor || 0);
+    const precioMayor = Number(datos.precioMayor || 0);
+    if (datos.ofertaActiva && (!precioOferta || precioOferta < 0)) return res.status(400).json({ success: false, message: 'Precio oferta invalido.' });
+    if (datos.mayorActivo && (!cantidadMayor || cantidadMayor <= 0 || !precioMayor || precioMayor < 0)) return res.status(400).json({ success: false, message: 'Datos mayoristas invalidos.' });
     if (isNaN(precio) || precio < 0 || isNaN(stock) || stock < 0) {
         return res.status(400).json({ success: false, message: 'Valores numéricos inválidos.' });
     }
@@ -290,8 +619,20 @@ server.put('/api/productos/:codigoAnterior', async (req, res) => {
         if(prodViejo.stock !== stock) cambios.push(`Stock: ${prodViejo.stock} ➔ ${stock}`);
         
         await db.run(
-            'UPDATE productos SET codigo = ?, nombre = ?, precio = ?, stock = ?, vendidoPorPeso = ? WHERE codigo = ?',
-            [datos.codigo.trim(), datos.nombre.trim(), precio, stock, datos.vendidoPorPeso ? 1 : 0, codigoAnterior]
+            'UPDATE productos SET codigo = ?, nombre = ?, precio = ?, stock = ?, vendidoPorPeso = ?, ofertaActiva = ?, precioOferta = ?, mayorActivo = ?, cantidadMayor = ?, precioMayor = ? WHERE codigo = ?',
+            [
+                datos.codigo.trim(),
+                datos.nombre.trim(),
+                precio,
+                stock,
+                datos.vendidoPorPeso ? 1 : 0,
+                datos.ofertaActiva ? 1 : 0,
+                datos.ofertaActiva ? precioOferta : 0,
+                datos.mayorActivo ? 1 : 0,
+                datos.mayorActivo ? cantidadMayor : 0,
+                datos.mayorActivo ? precioMayor : 0,
+                codigoAnterior
+            ]
         );
         await registrarHistorial("EDITAR", `Se editó "${datos.nombre}". ${cambios.join(" | ")}`);
         res.json({ success: true });
@@ -596,26 +937,58 @@ server.listen(PORT, '0.0.0.0', () => {
 
 // --- CONFIGURACIÓN ELECTRON ---
 function createWindow() {
+    const iconPath = app.isPackaged
+        ? path.join(process.resourcesPath, 'build', 'icon.ico')
+        : path.join(__dirname, 'build', 'icon.ico');
     const win = new BrowserWindow({
         width: 1180,
         height: 720,
         minWidth: 960,
         minHeight: 640,
         title: "GVI - Gestor de Ventas Intuitivo",
+        icon: fs.existsSync(iconPath) ? iconPath : undefined,
+        fullscreen: true,
+        show: false,
         webPreferences: { 
             nodeIntegration: false,    // SEGURIDAD: Previene ejecución de código OS desde la vista
             contextIsolation: true     // SEGURIDAD: Aísla el contexto JS
         }
     });
+    mainWindow = win;
     
     // Opcional: Ocultar menú nativo por defecto en Windows/Linux para un look más moderno
     win.setMenuBarVisibility(false);
+    win.once('ready-to-show', () => {
+        win.setFullScreen(true);
+        win.show();
+    });
+
+    win.webContents.on('before-input-event', (event, input) => {
+        if (input.key === 'F11' && input.type === 'keyDown') {
+            win.setFullScreen(!win.isFullScreen());
+            event.preventDefault();
+        }
+    });
+
+    win.on('close', (event) => {
+        if (win.__allowClose) return;
+        event.preventDefault();
+        win.webContents.executeJavaScript("localStorage.removeItem('gvi_user'); true;")
+            .catch(() => null)
+            .finally(() => {
+                win.__allowClose = true;
+                win.close();
+            });
+    });
     
-    win.loadURL(`http://localhost:${PORT}`);
+    win.loadURL(`http://localhost:${PORT}/login`);
 }
 
 if (app && app.whenReady) {
-    app.whenReady().then(createWindow);
+    app.whenReady().then(() => {
+        configureAutoUpdater();
+        createWindow();
+    });
 
     app.on('window-all-closed', () => {
         process.exit(0); 
