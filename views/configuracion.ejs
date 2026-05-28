@@ -490,6 +490,156 @@
                 text-align: center;
             }
         }
+
+        /* Estilos de la barra de progreso de descarga */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(20, 30, 45, 0.08);
+            border-radius: 99px;
+            margin-top: 12px;
+            overflow: hidden;
+            display: none;
+        }
+
+        body.dark-mode .progress-container {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .progress-container.visible {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--azul-gvi) 0%, #00c6ff 100%);
+            border-radius: 99px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 122, 255, 0.4);
+        }
+
+        /* Estilos del Modal Premium de Actualización */
+        .update-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 14, 22, 0.55);
+            backdrop-filter: blur(12px);
+            display: grid;
+            place-items: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .update-modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .update-modal {
+            background: var(--panel-claro, #ffffff);
+            border: 1px solid rgba(20, 30, 45, 0.08);
+            border-radius: 28px;
+            width: min(100% - 32px, 480px);
+            padding: 32px;
+            text-align: center;
+            box-shadow: 0 24px 64px rgba(10, 14, 22, 0.22);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body.dark-mode .update-modal {
+            background: var(--panel-oscuro, #1e1e24);
+            border-color: rgba(255, 255, 255, 0.09);
+        }
+
+        .update-modal-overlay.visible .update-modal {
+            transform: scale(1);
+        }
+
+        .update-modal-icon {
+            width: 72px;
+            height: 72px;
+            background: rgba(52, 199, 89, 0.12);
+            color: #34c759;
+            border-radius: 24px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 20px;
+            animation: pulse-green 2s infinite ease-in-out;
+        }
+
+        .update-modal-icon svg {
+            width: 36px;
+            height: 36px;
+            stroke-width: 2.5px;
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4); }
+            70% { box-shadow: 0 0 0 16px rgba(52, 199, 89, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+        }
+
+        .update-modal h3 {
+            font-size: 22px;
+            margin: 0 0 8px;
+            font-weight: 900;
+        }
+
+        .update-modal p {
+            color: var(--texto-suave, rgba(28, 30, 33, 0.56));
+            font-size: 14px;
+            line-height: 1.45;
+            margin: 0 0 24px;
+            font-weight: 600;
+        }
+
+        .update-modal-changelog {
+            background: rgba(20, 30, 45, 0.04);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: left;
+            margin-bottom: 26px;
+            max-height: 120px;
+            overflow-y: auto;
+            border: 1px solid rgba(20, 30, 45, 0.03);
+        }
+
+        body.dark-mode .update-modal-changelog {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .update-modal-changelog b {
+            font-size: 13px;
+            display: block;
+            margin-bottom: 4px;
+            color: var(--azul-gvi);
+        }
+
+        .update-modal-changelog p {
+            font-size: 13px;
+            margin: 0;
+            color: inherit;
+            opacity: 0.85;
+            line-height: 1.4;
+        }
+
+        .update-modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .update-modal-buttons button {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -512,6 +662,10 @@
                     <div class="config-info">
                         <b>Buscar actualizaciones</b>
                         <p id="updateDescription">GVI puede prepararse para recibir nuevas versiones desde GitHub Releases.</p>
+                        <!-- Barra de progreso de descarga -->
+                        <div class="progress-container" id="downloadProgressContainer">
+                            <div class="progress-bar" id="downloadProgressBar"></div>
+                        </div>
                     </div>
                     <div class="update-actions">
                         <button class="config-action" id="btnCheckUpdate" type="button" onclick="buscarActualizacion()">Buscar</button>
@@ -622,7 +776,28 @@
         </section>
     </main>
 
+    <!-- Modal Premium de Lanzamiento de Actualizaciones -->
+    <div class="update-modal-overlay" id="updateModalOverlay">
+        <div class="update-modal">
+            <div class="update-modal-icon">
+                <i data-lucide="sparkles"></i>
+            </div>
+            <h3 id="lblModalTitle">¡Actualización Lista!</h3>
+            <p>Se ha descargado e integrado una nueva versión de GVI con éxito.</p>
+            <div class="update-modal-changelog">
+                <b>Novedades de la v<span id="lblModalVersion">2.1.0</span>:</b>
+                <p id="lblModalChangelog">Cargando notas de la versión...</p>
+            </div>
+            <div class="update-modal-buttons">
+                <button class="config-action secondary" type="button" onclick="cerrarModalActualizacion()">Más tarde</button>
+                <button class="config-action success" type="button" onclick="instalarActualizacion()">Reiniciar ahora</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        let modalMostrado = false;
+
         async function cargarInfoRed() {
             try {
                 const res = await fetch('/api/info-red');
@@ -633,12 +808,21 @@
             }
         }
 
+        function cerrarModalActualizacion() {
+            document.getElementById('updateModalOverlay').classList.remove('visible');
+        }
+
         function aplicarEstadoActualizacion(data) {
             const status = document.getElementById('updateStatus');
             const mode = document.getElementById('updateMode');
             const btnCheck = document.getElementById('btnCheckUpdate');
             const btnDownload = document.getElementById('btnDownloadUpdate');
             const btnInstall = document.getElementById('btnInstallUpdate');
+
+            // Elementos de progreso y modal
+            const progressContainer = document.getElementById('downloadProgressContainer');
+            const progressBar = document.getElementById('downloadProgressBar');
+            const modalOverlay = document.getElementById('updateModalOverlay');
 
             mode.innerText = data.configured ? (data.ready ? 'Lista' : data.available ? 'Disponible' : 'Activo') : 'Pendiente';
             mode.classList.toggle('pending', !data.configured || data.checking || data.downloading);
@@ -647,6 +831,27 @@
             btnDownload.hidden = !data.available || data.ready;
             btnDownload.disabled = !!data.downloading;
             btnInstall.hidden = !data.ready;
+
+            // Manejo de la barra de progreso
+            if (data.downloading) {
+                progressContainer.classList.add('visible');
+                progressBar.style.width = `${data.percent || 0}%`;
+            } else {
+                progressContainer.classList.remove('visible');
+                progressBar.style.width = '0%';
+            }
+
+            // Manejo del modal popup premium
+            if (data.ready && !modalMostrado) {
+                modalMostrado = true;
+                document.getElementById('lblModalVersion').innerText = data.version || '2.1.0';
+                document.getElementById('lblModalChangelog').innerText = data.message || 'Actualización de componentes del sistema.';
+                modalOverlay.classList.add('visible');
+                // Re-inicializar iconos si lucide está disponible
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }
 
             if (data.message) {
                 status.classList.add('visible');

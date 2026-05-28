@@ -45,7 +45,7 @@ function configureAutoUpdater() {
 
     updateState.configured = true;
     updateState.message = 'Listo para buscar actualizaciones.';
-    autoUpdater.autoDownload = false;
+    autoUpdater.autoDownload = true;
     autoUpdater.autoInstallOnAppQuit = true;
 
     autoUpdater.on('checking-for-update', () => {
@@ -58,7 +58,7 @@ function configureAutoUpdater() {
         updateState.available = true;
         updateState.ready = false;
         updateState.version = info.version;
-        updateState.message = `Nueva version disponible: v${info.version}.`;
+        updateState.message = `Nueva version v${info.version} detectada. Descargando en segundo plano...`;
     });
 
     autoUpdater.on('update-not-available', () => {
@@ -80,7 +80,7 @@ function configureAutoUpdater() {
         updateState.available = true;
         updateState.version = info.version;
         updateState.percent = 100;
-        updateState.message = 'Actualizacion descargada. Puedes instalarla ahora.';
+        updateState.message = `Nueva version v${info.version} lista para instalar.`;
     });
 
     autoUpdater.on('error', (error) => {
@@ -88,6 +88,20 @@ function configureAutoUpdater() {
         updateState.downloading = false;
         updateState.message = `No se pudo actualizar: ${error.message || error}`;
     });
+
+    // 1. Busqueda automatica al arrancar (con retraso de 8s para no sobrecargar el inicio)
+    setTimeout(() => {
+        autoUpdater.checkForUpdates().catch(err => {
+            console.error("Error en chequeo de actualizaciones al inicio:", err);
+        });
+    }, 8000);
+
+    // 2. Busqueda periodica cada 4 horas
+    setInterval(() => {
+        autoUpdater.checkForUpdates().catch(err => {
+            console.error("Error en chequeo periodico de actualizaciones:", err);
+        });
+    }, 4 * 60 * 60 * 1000);
 }
 
 function getUpdatePayload() {
@@ -158,69 +172,113 @@ function findBundledFile(fileName) {
 }
 
 async function ensureSchema() {
+    // 1. Crear tabla de control de migraciones si no existe
     await db.exec(`
-        CREATE TABLE IF NOT EXISTS productos (
-            codigo TEXT PRIMARY KEY,
-            nombre TEXT,
-            precio INTEGER,
-            stock REAL,
-            vendidoPorPeso INTEGER,
-            ofertaActiva INTEGER DEFAULT 0,
-            precioOferta INTEGER DEFAULT 0,
-            mayorActivo INTEGER DEFAULT 0,
-            cantidadMayor REAL DEFAULT 0,
-            precioMayor INTEGER DEFAULT 0
-        );
-
-        CREATE TABLE IF NOT EXISTS ventas (
-            id INTEGER PRIMARY KEY,
-            fecha TEXT,
-            hora TEXT,
-            metodoPago TEXT,
-            total INTEGER,
-            pagoCon INTEGER,
-            vuelto INTEGER,
-            items TEXT
-        );
-
-        CREATE TABLE IF NOT EXISTS fiados (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cliente TEXT,
-            fecha TEXT,
-            total INTEGER,
-            estado TEXT,
-            items TEXT
-        );
-
-        CREATE TABLE IF NOT EXISTS cierres (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            fecha TEXT,
-            hora TEXT,
-            baseEfec INTEGER,
-            sisEfec INTEGER,
-            fisEfec INTEGER,
-            sisTarj INTEGER,
-            fisTarj INTEGER,
-            difEfec INTEGER,
-            difTarj INTEGER,
-            obs TEXT
-        );
-
-        CREATE TABLE IF NOT EXISTS historial (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp INTEGER,
-            fecha TEXT,
-            hora TEXT,
-            accion TEXT,
-            detalle TEXT
+        CREATE TABLE IF NOT EXISTS schema_migrations (
+            version INTEGER PRIMARY KEY,
+            run_at TEXT
         );
     `);
 
-    await ensureColumn('productos', 'ofertaActiva', 'INTEGER DEFAULT 0');
-    await ensureColumn('productos', 'precioOferta', 'INTEGER DEFAULT 0');
-    await ensureColumn('productos', 'mayorActivo', 'INTEGER DEFAULT 0');
-    await ensureColumn('productos', 'cantidadMayor', 'REAL DEFAULT 0');
-    await ensureColumn('productos', 'precioMayor', 'INTEGER DEFAULT 0');
+    // 2. Definición secuencial de migraciones
+    const migrations = [
+        {
+            version: 1,
+            description: "Crear tablas base del sistema (productos, ventas, fiados, cierres, historial)",
+            run: async () => {
+                await db.exec(`
+                    CREATE TABLE IF NOT EXISTS productos (
+                        codigo TEXT PRIMARY KEY,
+                        nombre TEXT,
+                        precio INTEGER,
+                        stock REAL,
+                        vendidoPorPeso INTEGER
+                    );
+
+                    CREATE TABLE IF NOT EXISTS ventas (
+                        id INTEGER PRIMARY KEY,
+                        fecha TEXT,
+                        hora TEXT,
+                        metodoPago TEXT,
+                        total INTEGER,
+                        pagoCon INTEGER,
+                        vuelto INTEGER,
+                        items TEXT
+                    );
+
+                    CREATE TABLE IF NOT EXISTS fiados (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        cliente TEXT,
+                        fecha TEXT,
+                        total INTEGER,
+                        estado TEXT,
+                        items TEXT
+                    );
+
+                    CREATE TABLE IF NOT EXISTS cierres (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        fecha TEXT,
+                        hora TEXT,
+                        baseEfec INTEGER,
+                        sisEfec INTEGER,
+                        fisEfec INTEGER,
+                        sisTarj INTEGER,
+                        fisTarj INTEGER,
+                        difEfec INTEGER,
+                        difTarj INTEGER,
+                        obs TEXT
+                    );
+
+                    CREATE TABLE IF NOT EXISTS historial (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        timestamp INTEGER,
+                        fecha TEXT,
+                        hora TEXT,
+                        accion TEXT,
+                        detalle TEXT
+                    );
+                `);
+            }
+        },
+        {
+            version: 2,
+            description: "Añadir columnas de oferta y mayorista a tabla productos",
+            run: async () => {
+                await ensureColumn('productos', 'ofertaActiva', 'INTEGER DEFAULT 0');
+                await ensureColumn('productos', 'precioOferta', 'INTEGER DEFAULT 0');
+                await ensureColumn('productos', 'mayorActivo', 'INTEGER DEFAULT 0');
+                await ensureColumn('productos', 'cantidadMayor', 'REAL DEFAULT 0');
+                await ensureColumn('productos', 'precioMayor', 'INTEGER DEFAULT 0');
+            }
+        }
+    ];
+
+    // 3. Obtener migraciones ya aplicadas
+    const appliedRows = await db.all('SELECT version FROM schema_migrations');
+    const appliedVersions = new Set(appliedRows.map(r => r.version));
+
+    // 4. Ejecutar migraciones pendientes transaccionalmente
+    for (const migration of migrations) {
+        if (appliedVersions.has(migration.version)) {
+            continue;
+        }
+
+        console.log(`[Migraciones] Aplicando migración #${migration.version}: ${migration.description}...`);
+        await db.exec('BEGIN TRANSACTION');
+        try {
+            await migration.run();
+            await db.run(
+                'INSERT INTO schema_migrations (version, run_at) VALUES (?, ?)',
+                [migration.version, new Date().toISOString()]
+            );
+            await db.exec('COMMIT');
+            console.log(`[Migraciones] Migración #${migration.version} aplicada con éxito.`);
+        } catch (e) {
+            await db.exec('ROLLBACK');
+            console.error(`[Migraciones] ERROR al aplicar migración #${migration.version}:`, e);
+            throw e;
+        }
+    }
 }
 
 async function ensureColumn(tableName, columnName, definition) {
