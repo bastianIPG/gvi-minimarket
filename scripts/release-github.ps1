@@ -15,8 +15,20 @@ if (-not (Test-Path $npm)) {
     throw "No se encontro npm en $npm"
 }
 
-if (-not $env:GITHUB_TOKEN) {
-    throw "Falta GITHUB_TOKEN. Ejecuta: `$env:GITHUB_TOKEN='TU_TOKEN'; npm run publish-release -- 2.1.1"
+function Get-GitHubToken {
+    if ($env:GITHUB_TOKEN) {
+        return $env:GITHUB_TOKEN
+    }
+
+    $credentialInput = "protocol=https`nhost=github.com`n`n"
+    $credentialOutput = $credentialInput | git credential fill
+    $credentialToken = (($credentialOutput -split "`n") | Where-Object { $_ -like 'password=*' } | Select-Object -First 1) -replace '^password=', ''
+
+    if ($credentialToken) {
+        return $credentialToken
+    }
+
+    throw "No hay credencial para publicar en GitHub. Inicia sesion con Git Credential Manager o define GITHUB_TOKEN."
 }
 
 Push-Location $root
@@ -62,8 +74,9 @@ try {
     git push origin $branch
     git push origin $tag
 
+    $githubToken = Get-GitHubToken
     $headers = @{
-        Authorization = "Bearer $env:GITHUB_TOKEN"
+        Authorization = "Bearer $githubToken"
         Accept = "application/vnd.github+json"
         "X-GitHub-Api-Version" = "2022-11-28"
         "User-Agent" = "GVI-release-script"
@@ -119,7 +132,7 @@ try {
     }
 
     Write-Host "Release publicado: https://github.com/$repoOwner/$repoName/releases/tag/$tag"
-    Write-Host "Comando futuro: `$env:GITHUB_TOKEN='TU_TOKEN'; npm run publish-release -- patch"
+    Write-Host "Comando futuro: npm run publish-release -- -Version 2.1.2"
 }
 finally {
     Pop-Location
