@@ -29,10 +29,65 @@ const updateState = {
     downloading: false,
     ready: false,
     available: false,
+    installing: false,
     version: null,
+    releaseName: null,
+    releaseNotes: null,
     percent: 0,
     message: 'Actualizador listo para configurar.'
 };
+function normalizeReleaseNotes(notes) {
+    if (!notes) return 'Mejoras internas, estabilidad y ajustes del sistema.';
+    if (typeof notes === 'string') return notes.replace(/<[^>]*>/g, '').trim() || 'Mejoras internas, estabilidad y ajustes del sistema.';
+    if (Array.isArray(notes)) {
+        return notes
+            .map(item => {
+                if (typeof item === 'string') return item;
+                return item?.note || item?.notes || item?.version || '';
+            })
+            .filter(Boolean)
+            .join('\n')
+            .replace(/<[^>]*>/g, '')
+            .trim() || 'Mejoras internas, estabilidad y ajustes del sistema.';
+    }
+    return String(notes).replace(/<[^>]*>/g, '').trim() || 'Mejoras internas, estabilidad y ajustes del sistema.';
+}
+
+function savePendingUpdateNotice() {
+    try {
+        fs.mkdirSync(path.dirname(UPDATE_NOTICE_FILE), { recursive: true });
+        fs.writeFileSync(UPDATE_NOTICE_FILE, JSON.stringify({
+            version: updateState.version,
+            releaseName: updateState.releaseName,
+            releaseNotes: updateState.releaseNotes,
+            createdAt: new Date().toISOString(),
+            pending: true
+        }, null, 2));
+    } catch (error) {
+        console.error('No se pudo guardar aviso de actualizacion:', error);
+    }
+}
+
+function readInstalledUpdateNotice() {
+    try {
+        if (!fs.existsSync(UPDATE_NOTICE_FILE)) return null;
+        const notice = JSON.parse(fs.readFileSync(UPDATE_NOTICE_FILE, 'utf-8'));
+        if (!notice?.pending || notice.version !== APP_VERSION) return null;
+        return notice;
+    } catch (_) {
+        return null;
+    }
+}
+
+function dismissInstalledUpdateNotice() {
+    try {
+        if (!fs.existsSync(UPDATE_NOTICE_FILE)) return;
+        const notice = JSON.parse(fs.readFileSync(UPDATE_NOTICE_FILE, 'utf-8'));
+        notice.pending = false;
+        notice.dismissedAt = new Date().toISOString();
+        fs.writeFileSync(UPDATE_NOTICE_FILE, JSON.stringify(notice, null, 2));
+    } catch (_) {}
+}
 
 function configureAutoUpdater() {
     if (!autoUpdater || !app || !app.isPackaged) {
@@ -46,10 +101,11 @@ function configureAutoUpdater() {
     updateState.configured = true;
     updateState.message = 'Listo para buscar actualizaciones.';
     autoUpdater.autoDownload = true;
-    autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.autoInstallOnAppQuit = false;
 
     autoUpdater.on('checking-for-update', () => {
         updateState.checking = true;
+        updateState.installing = false;
         updateState.message = 'Buscando actualizaciones...';
     });
 
@@ -58,6 +114,9 @@ function configureAutoUpdater() {
         updateState.available = true;
         updateState.ready = false;
         updateState.version = info.version;
+        updateState.releaseName = info.releaseName || info.version;
+        updateState.releaseNotes = normalizeReleaseNotes(info.releaseNotes);
+        updateState.percent = 0;
         updateState.message = `Nueva version v${info.version} detectada. Descargando en segundo plano...`;
     });
 
@@ -65,11 +124,15 @@ function configureAutoUpdater() {
         updateState.checking = false;
         updateState.available = false;
         updateState.ready = false;
+        updateState.downloading = false;
+        updateState.installing = false;
+        updateState.percent = 0;
         updateState.message = 'GVI ya esta actualizado.';
     });
 
     autoUpdater.on('download-progress', (progress) => {
         updateState.downloading = true;
+        updateState.ready = false;
         updateState.percent = Math.round(progress.percent || 0);
         updateState.message = `Descargando actualizacion: ${updateState.percent}%.`;
     });
@@ -79,13 +142,16 @@ function configureAutoUpdater() {
         updateState.ready = true;
         updateState.available = true;
         updateState.version = info.version;
+        updateState.releaseName = info.releaseName || info.version;
+        updateState.releaseNotes = normalizeReleaseNotes(info.releaseNotes);
         updateState.percent = 100;
-        updateState.message = `Nueva version v${info.version} lista para instalar.`;
+        updateState.message = `Nueva version v${info.version} lista. Puedes actualizar ahora.`;
     });
 
     autoUpdater.on('error', (error) => {
         updateState.checking = false;
         updateState.downloading = false;
+        updateState.installing = false;
         updateState.message = `No se pudo actualizar: ${error.message || error}`;
     });
 
@@ -117,6 +183,7 @@ const DATA_DIR = app && app.getPath ? app.getPath('userData') : path.join(__dirn
 const DB_FILE = path.join(DATA_DIR, 'database.sqlite');
 const USERS_FILE = path.join(DATA_DIR, 'usuarios.json');
 const ERROR_LOG_FILE = path.join(DATA_DIR, 'errores_sistema.log');
+const UPDATE_NOTICE_FILE = path.join(DATA_DIR, 'ultima-actualizacion.json');
 let mainWindow = null;
 const DEFAULT_USERS = [
     { nombre: 'Pruebas', pin: '1234', rol: 'ADMIN', temporal: true }
@@ -326,6 +393,15 @@ server.get('/api/app/update/status', (req, res) => {
     res.json({ success: true, ...getUpdatePayload() });
 });
 
+server.get('/api/app/update/notice', (req, res) => {
+    res.json({ success: true, notice: readInstalledUpdateNotice() });
+});
+
+server.post('/api/app/update/notice/dismiss', (req, res) => {
+    dismissInstalledUpdateNotice();
+    res.json({ success: true });
+});
+
 server.post('/api/app/update/check', async (req, res) => {
     if (!autoUpdater || !app || !app.isPackaged) {
         return res.json({
@@ -375,8 +451,14 @@ server.post('/api/app/update/install', (req, res) => {
         });
     }
 
+    updateState.installing = true;
+    updateState.message = 'Instalando actualizacion. GVI se reiniciara automaticamente...';
+    savePendingUpdateNotice();
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.__allowClose = true;
+    }
     res.json({ success: true });
-    setTimeout(() => autoUpdater.quitAndInstall(false, true), 300);
+    setTimeout(() => autoUpdater.quitAndInstall(true, true), 300);
 });
 
 server.post('/api/app/quit', (req, res) => {
@@ -1049,6 +1131,7 @@ if (app && app.whenReady) {
     });
 
     app.on('window-all-closed', () => {
+        if (updateState.installing) return;
         process.exit(0); 
     });
 }

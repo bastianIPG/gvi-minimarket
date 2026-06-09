@@ -661,7 +661,7 @@
                     <div class="config-icon icon-blue"><i data-lucide="download-cloud"></i></div>
                     <div class="config-info">
                         <b>Buscar actualizaciones</b>
-                        <p id="updateDescription">GVI puede prepararse para recibir nuevas versiones desde GitHub Releases.</p>
+                        <p id="updateDescription">GVI busca y descarga nuevas versiones en segundo plano desde GitHub Releases.</p>
                         <!-- Barra de progreso de descarga -->
                         <div class="progress-container" id="downloadProgressContainer">
                             <div class="progress-bar" id="downloadProgressBar"></div>
@@ -670,7 +670,7 @@
                     <div class="update-actions">
                         <button class="config-action" id="btnCheckUpdate" type="button" onclick="buscarActualizacion()">Buscar</button>
                         <button class="config-action secondary" id="btnDownloadUpdate" type="button" onclick="descargarActualizacion()" hidden>Descargar</button>
-                        <button class="config-action success" id="btnInstallUpdate" type="button" onclick="instalarActualizacion()" hidden>Instalar</button>
+                        <button class="config-action success" id="btnInstallUpdate" type="button" onclick="instalarActualizacion()" hidden>Actualizar ahora</button>
                     </div>
                 </div>
                 <div class="config-item">
@@ -776,21 +776,21 @@
         </section>
     </main>
 
-    <!-- Modal Premium de Lanzamiento de Actualizaciones -->
+    <!-- Modal de actualizaciones -->
     <div class="update-modal-overlay" id="updateModalOverlay">
         <div class="update-modal">
             <div class="update-modal-icon">
                 <i data-lucide="sparkles"></i>
             </div>
-            <h3 id="lblModalTitle">¡Actualización Lista!</h3>
-            <p>Se ha descargado e integrado una nueva versión de GVI con éxito.</p>
+            <h3 id="lblModalTitle">Actualizacion lista</h3>
+            <p>La nueva version ya se descargo. Al actualizar, GVI se cerrara, instalara todo en silencio y volvera a abrirse.</p>
             <div class="update-modal-changelog">
                 <b>Novedades de la v<span id="lblModalVersion">2.1.0</span>:</b>
-                <p id="lblModalChangelog">Cargando notas de la versión...</p>
+                <p id="lblModalChangelog">Cargando notas de la version...</p>
             </div>
             <div class="update-modal-buttons">
-                <button class="config-action secondary" type="button" onclick="cerrarModalActualizacion()">Más tarde</button>
-                <button class="config-action success" type="button" onclick="instalarActualizacion()">Reiniciar ahora</button>
+                <button class="config-action secondary" type="button" onclick="cerrarModalActualizacion()">Mas tarde</button>
+                <button class="config-action success" type="button" onclick="instalarActualizacion()">Actualizar ahora</button>
             </div>
         </div>
     </div>
@@ -828,14 +828,18 @@
             mode.classList.toggle('pending', !data.configured || data.checking || data.downloading);
 
             btnCheck.disabled = !!data.checking || !!data.downloading;
-            btnDownload.hidden = !data.available || data.ready;
-            btnDownload.disabled = !!data.downloading;
+            btnDownload.hidden = true;
+            btnDownload.disabled = true;
             btnInstall.hidden = !data.ready;
+            btnInstall.disabled = !!data.installing;
 
             // Manejo de la barra de progreso
             if (data.downloading) {
                 progressContainer.classList.add('visible');
                 progressBar.style.width = `${data.percent || 0}%`;
+            } else if (data.ready) {
+                progressContainer.classList.add('visible');
+                progressBar.style.width = '100%';
             } else {
                 progressContainer.classList.remove('visible');
                 progressBar.style.width = '0%';
@@ -845,7 +849,7 @@
             if (data.ready && !modalMostrado) {
                 modalMostrado = true;
                 document.getElementById('lblModalVersion').innerText = data.version || '2.1.0';
-                document.getElementById('lblModalChangelog').innerText = data.message || 'Actualización de componentes del sistema.';
+                document.getElementById('lblModalChangelog').innerText = data.releaseNotes || data.message || 'Mejoras internas, estabilidad y ajustes del sistema.';
                 modalOverlay.classList.add('visible');
                 // Re-inicializar iconos si lucide está disponible
                 if (window.lucide) {
@@ -954,11 +958,15 @@
         }
 
         async function instalarActualizacion() {
-            if (!confirm('GVI se cerrara para instalar la actualizacion. Continuar?')) return;
+            const status = document.getElementById('updateStatus');
+            status.classList.add('visible');
+            status.innerText = 'Instalando actualizacion. GVI se reiniciara automaticamente...';
+            document.getElementById('btnInstallUpdate').disabled = true;
             try {
                 await fetch('/api/app/update/install', { method: 'POST' });
             } catch (e) {
-                document.getElementById('updateStatus').innerText = 'No se pudo iniciar la instalacion.';
+                document.getElementById('btnInstallUpdate').disabled = false;
+                status.innerText = 'No se pudo iniciar la instalacion.';
             }
         }
 

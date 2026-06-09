@@ -1,6 +1,6 @@
 {
   "name": "gvi-minimarket",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Gestor de Ventas Intuitivo - Version Modular",
   "author": "GVI",
   "main": "server.js",
@@ -9,7 +9,8 @@
     "dev": "electron .",
     "pack": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& set ELECTRON_CACHE=.cache\\electron&& set ELECTRON_BUILDER_CACHE=.cache\\electron-builder&& electron-builder --dir",
     "dist": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& set ELECTRON_CACHE=.cache\\electron&& set ELECTRON_BUILDER_CACHE=.cache\\electron-builder&& electron-builder --win nsis --publish never",
-    "release": "powershell -ExecutionPolicy Bypass -File scripts\\build-installer.ps1"
+    "release": "powershell -ExecutionPolicy Bypass -File scripts\\build-installer.ps1",
+    "publish-release": "powershell -ExecutionPolicy Bypass -File scripts\\release-github.ps1"
   },
   "build": {
     "appId": "cl.gvi.minimarket",

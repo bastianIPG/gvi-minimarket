@@ -2,48 +2,43 @@
 <html lang="es">
 <head>
     <%- include('partials/head') %>
-    <title>GVI - Panel de Control</title>
+    <title>GVI - Inicio</title>
     <style>
+        html,
+        body {
+            min-height: 100%;
+        }
+
         body {
             background:
-                radial-gradient(circle at 82% 24%, rgba(0, 122, 255, 0.08), transparent 28%),
-                radial-gradient(circle at 14% 34%, rgba(0, 122, 255, 0.09), transparent 34%),
-                linear-gradient(145deg, #f8fbff 0%, #f3f6fa 44%, #f6f7f9 100%);
+                radial-gradient(circle at 82% 18%, rgba(119, 81, 68, 0.12), transparent 28%),
+                radial-gradient(circle at 12% 28%, rgba(192, 152, 145, 0.18), transparent 30%),
+                linear-gradient(145deg, #f7f2ef 0%, #f3ece9 46%, #f8f5f3 100%);
+            overflow-x: hidden;
         }
 
         body.dark-mode {
             background:
-                radial-gradient(circle at 82% 24%, rgba(0, 122, 255, 0.13), transparent 28%),
-                radial-gradient(circle at 14% 34%, rgba(94, 169, 255, 0.12), transparent 34%),
-                linear-gradient(145deg, #10151d 0%, #14171d 46%, #111216 100%);
+                radial-gradient(circle at 82% 18%, rgba(119, 81, 68, 0.2), transparent 28%),
+                radial-gradient(circle at 12% 28%, rgba(192, 152, 145, 0.12), transparent 30%),
+                linear-gradient(145deg, #141211 0%, #1b1817 48%, #100f0f 100%);
         }
 
-        html,
-        body {
-            height: 100%;
-            overflow: hidden;
+        .home-dashboard {
+            width: min(100% - 64px, 1480px);
+            margin: 0 auto;
+            padding: clamp(92px, 11vh, 118px) 0 34px;
         }
 
-        .dashboard-container {
-            height: 100svh;
-            padding: clamp(104px, 11vh, 128px) clamp(18px, 4vw, 42px) clamp(28px, 5vh, 48px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .dashboard-hero {
-            width: min(100%, 1120px);
+        .home-header {
             display: grid;
-            grid-template-columns: minmax(280px, 1fr) auto;
+            grid-template-columns: minmax(420px, 1fr) auto;
             align-items: end;
-            gap: 24px;
-            margin-bottom: clamp(24px, 4vh, 34px);
+            gap: 28px;
+            margin-bottom: 22px;
         }
 
-        .hero-copy { text-align: left; }
-
-        .hero-kicker {
+        .home-kicker {
             margin: 0 0 8px;
             color: var(--azul-gvi);
             font-size: 12px;
@@ -52,308 +47,576 @@
             text-transform: uppercase;
         }
 
-        .hero-title {
+        .home-title {
             margin: 0;
             color: var(--texto-claro);
-            font-size: clamp(32px, 4.6vw, 58px);
+            font-size: clamp(34px, 4.2vw, 58px);
             font-weight: 900;
             line-height: 0.98;
             letter-spacing: 0;
         }
 
-        body.dark-mode .hero-title { color: #fff; }
+        body.dark-mode .home-title { color: #fff; }
 
-        .hero-subtitle {
+        .home-subtitle {
             margin: 12px 0 0;
-            max-width: 530px;
-            color: rgba(28, 30, 33, 0.56);
+            max-width: 720px;
+            color: rgba(28, 30, 33, 0.58);
             font-size: 15px;
-            font-weight: 600;
+            font-weight: 700;
             line-height: 1.45;
         }
 
-        body.dark-mode .hero-subtitle { color: rgba(228, 230, 235, 0.6); }
+        body.dark-mode .home-subtitle { color: rgba(228, 230, 235, 0.62); }
 
-        .clock-panel {
-            min-width: 320px;
-            padding: 24px 28px;
-            border-radius: 26px;
+        .home-clock-card {
+            min-width: 260px;
+            padding: 18px 22px;
+            border-radius: 22px;
             background:
-                linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.68)),
-                radial-gradient(circle at 20% 20%, rgba(0, 122, 255, 0.12), transparent 40%);
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            box-shadow: 0 24px 65px rgba(20, 30, 45, 0.12);
-            backdrop-filter: blur(16px);
+                linear-gradient(135deg, rgba(250, 248, 246, 0.96), rgba(250, 248, 246, 0.74)),
+                radial-gradient(circle at 18% 22%, rgba(192, 152, 145, 0.2), transparent 44%);
+            border: 1px solid rgba(234, 221, 218, 0.9);
+            box-shadow: 0 20px 54px rgba(42, 8, 0, 0.09);
             text-align: center;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
         }
 
-        body.dark-mode .clock-panel {
+        body.dark-mode .home-clock-card {
             background:
-                linear-gradient(135deg, rgba(33, 38, 48, 0.94), rgba(22, 24, 30, 0.78)),
-                radial-gradient(circle at 20% 20%, rgba(94, 169, 255, 0.16), transparent 40%);
+                linear-gradient(135deg, rgba(33, 30, 29, 0.95), rgba(22, 20, 19, 0.78)),
+                radial-gradient(circle at 18% 22%, rgba(192, 152, 145, 0.16), transparent 44%);
             border-color: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 24px 65px rgba(0, 0, 0, 0.28);
+            box-shadow: 0 20px 54px rgba(0, 0, 0, 0.3);
         }
 
-        .clock-panel::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            background: linear-gradient(120deg, rgba(0, 122, 255, 0.12), transparent 34%, rgba(52, 199, 89, 0.08));
-            opacity: 0.9;
-            pointer-events: none;
-        }
-
-        .clock-panel > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        .reloj-gigante {
+        .home-clock {
             margin: 0;
             color: #12161d;
-            font-size: clamp(54px, 6.6vw, 86px);
+            font-size: clamp(38px, 4.2vw, 58px);
             font-weight: 900;
             line-height: 1;
-            letter-spacing: 0;
         }
 
-        body.dark-mode .reloj-gigante { color: #fff; }
+        body.dark-mode .home-clock { color: #fff; }
 
-        .reloj-periodo {
-            margin-left: 8px;
-            font-size: clamp(16px, 2.5vw, 24px);
-            opacity: 0.36;
-            letter-spacing: 0;
+        .home-clock-period {
+            margin-left: 6px;
+            font-size: 18px;
+            opacity: 0.38;
         }
 
-        .fecha-completa {
+        .home-date {
             margin-top: 7px;
-            font-size: 15px;
-            font-weight: 700;
-            opacity: 0.58;
+            font-size: 13px;
+            font-weight: 800;
+            color: rgba(28, 30, 33, 0.55);
             text-transform: capitalize;
         }
 
-        .grid-modulos-pro {
-            width: min(100%, 1120px);
+        body.dark-mode .home-date { color: rgba(228, 230, 235, 0.58); }
+
+        .metric-grid {
             display: grid;
-            grid-template-columns: repeat(3, minmax(220px, 1fr));
-            gap: clamp(14px, 2vw, 20px);
+            grid-template-columns: repeat(4, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 16px;
         }
 
-        .card-menu-pro {
-            min-height: 150px;
-            padding: 22px;
-            border-radius: 22px;
-            color: inherit;
-            text-decoration: none;
-            background: var(--panel-claro);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 14px 38px rgba(20, 30, 45, 0.045);
+        .metric-card,
+        .dashboard-panel {
+            background: rgba(250, 248, 246, 0.96);
+            border: 1px solid rgba(234, 221, 218, 0.9);
+            border-radius: 18px;
+            box-shadow: 0 16px 42px rgba(42, 8, 0, 0.045);
+        }
+
+        body.dark-mode .metric-card,
+        body.dark-mode .dashboard-panel {
+            background: rgba(33, 30, 29, 0.94);
+            border-color: rgba(234, 221, 218, 0.1);
+            box-shadow: 0 16px 42px rgba(0, 0, 0, 0.18);
+        }
+
+        .metric-card {
+            min-height: 108px;
+            padding: 18px;
             display: grid;
-            grid-template-columns: 54px 1fr;
-            grid-template-rows: auto 1fr auto;
+            grid-template-columns: 44px 1fr;
+            gap: 12px;
             align-items: center;
-            align-content: center;
-            justify-content: center;
-            gap: 0 16px;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
         }
 
-        body.dark-mode .card-menu-pro {
-            background: var(--panel-oscuro);
-            border-color: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 14px 38px rgba(0, 0, 0, 0.16);
-        }
-
-        .card-menu-pro:hover {
-            transform: translateY(-3px);
-            border-color: var(--azul-gvi);
-            box-shadow: 0 18px 44px rgba(20, 30, 45, 0.09);
-        }
-
-        .card-icono-pro {
-            grid-row: 1 / span 3;
-            width: 54px;
-            height: 54px;
-            border-radius: 16px;
-            display: flex;
+        .metric-icon,
+        .action-icon,
+        .alert-icon {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            border-radius: 14px;
+            background: rgba(23, 105, 255, 0.1);
             color: var(--azul-gvi);
-            background: rgba(0, 122, 255, 0.1);
+            flex: 0 0 auto;
         }
 
-        body.dark-mode .card-icono-pro {
-            color: #5ea9ff;
-            background: rgba(94, 169, 255, 0.12);
+        .metric-icon {
+            width: 44px;
+            height: 44px;
         }
 
-        .card-icono-pro svg {
-            width: 28px;
-            height: 28px;
-            stroke-width: 2px;
+        .metric-icon svg,
+        .action-icon svg,
+        .alert-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2.3px;
         }
 
-        .card-menu-pro h3 {
-            margin: 0 0 6px;
-            font-size: clamp(18px, 2vw, 22px);
-            font-weight: 800;
-        }
-
-        .card-menu-pro p {
-            margin: 0;
-            font-size: 13px;
-            font-weight: 600;
-            opacity: 0.56;
-        }
-
-        .badge-stats {
-            width: fit-content;
-            margin-top: 14px;
-            padding: 5px 12px;
-            border-radius: 20px;
-            background: rgba(0, 122, 255, 0.08);
-            color: var(--azul-gvi);
+        .metric-label {
+            margin: 0 0 7px;
+            color: rgba(119, 81, 68, 0.82);
             font-size: 11px;
             font-weight: 900;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
         }
 
-        .badge-alerta { background: rgba(255, 59, 48, 0.1); color: #ff3b30; }
-        .badge-exito { background: rgba(52, 199, 89, 0.1); color: #34c759; }
+        body.dark-mode .metric-label { color: rgba(228, 230, 235, 0.58); }
 
-        @media (max-width: 1000px) {
-            .dashboard-hero { grid-template-columns: 1fr; }
-            .hero-copy,
-            .clock-panel { text-align: center; }
-            .hero-subtitle { margin-left: auto; margin-right: auto; }
-            .clock-panel { min-width: 0; }
-            .grid-modulos-pro { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+        .metric-value {
+            margin: 0;
+            color: var(--texto-claro);
+            font-size: clamp(20px, 2vw, 28px);
+            font-weight: 900;
+            line-height: 1;
         }
 
-        @media (max-width: 700px) {
-            .dashboard-container { padding-top: 112px; }
-            .grid-modulos-pro { grid-template-columns: 1fr; }
+        body.dark-mode .metric-value { color: #fff; }
+
+        .metric-note {
+            margin: 7px 0 0;
+            color: rgba(119, 81, 68, 0.72);
+            font-size: 12px;
+            font-weight: 700;
         }
 
-        @media (max-height: 760px) and (min-width: 900px) {
-            .dashboard-container { padding-top: 88px; }
-            .dashboard-hero { margin-bottom: 16px; }
-            .reloj-gigante { font-size: 60px; }
-            .card-menu-pro {
-                min-height: 126px;
-                padding-top: 18px;
-                padding-bottom: 18px;
+        body.dark-mode .metric-note { color: rgba(228, 230, 235, 0.52); }
+
+        .home-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(340px, 0.75fr);
+            gap: 16px;
+        }
+
+        .left-stack,
+        .right-stack {
+            display: grid;
+            gap: 16px;
+            align-content: start;
+        }
+
+        .dashboard-panel {
+            padding: 18px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            color: var(--texto-claro);
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        body.dark-mode .panel-header h2 { color: #fff; }
+
+        .panel-header span,
+        .panel-link {
+            color: rgba(28, 30, 33, 0.48);
+            font-size: 12px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        body.dark-mode .panel-header span,
+        body.dark-mode .panel-link {
+            color: rgba(228, 230, 235, 0.58);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .quick-action {
+            min-height: 116px;
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(243, 236, 233, 0.88);
+            border: 1px solid rgba(234, 221, 218, 0.7);
+            color: inherit;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
+        }
+
+        body.dark-mode .quick-action {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.07);
+        }
+
+        .quick-action:hover {
+            transform: translateY(-2px);
+            background: rgba(234, 221, 218, 0.62);
+            box-shadow: 0 12px 24px rgba(42, 8, 0, 0.06);
+        }
+
+        .action-icon {
+            width: 42px;
+            height: 42px;
+            margin-bottom: 12px;
+        }
+
+        .quick-action strong {
+            display: block;
+            color: var(--texto-claro);
+            font-size: 15px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        body.dark-mode .quick-action strong { color: #fff; }
+
+        .quick-action span {
+            color: rgba(28, 30, 33, 0.52);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        body.dark-mode .quick-action span { color: rgba(228, 230, 235, 0.58); }
+
+        .sales-list,
+        .alert-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .sale-row {
+            display: grid;
+            grid-template-columns: minmax(110px, 1fr) auto auto;
+            gap: 12px;
+            align-items: center;
+            min-height: 56px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(243, 236, 233, 0.72);
+        }
+
+        body.dark-mode .sale-row {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .sale-title {
+            color: var(--texto-claro);
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        body.dark-mode .sale-title { color: #fff; }
+
+        .sale-subtitle {
+            margin-top: 3px;
+            color: rgba(28, 30, 33, 0.48);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        body.dark-mode .sale-subtitle { color: rgba(228, 230, 235, 0.54); }
+
+        .sale-method {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--azul-gvi);
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .sale-total {
+            color: var(--azul-gvi);
+            font-size: 15px;
+            font-weight: 900;
+            text-align: right;
+        }
+
+        .alert-item {
+            display: grid;
+            grid-template-columns: 42px 1fr;
+            gap: 12px;
+            align-items: center;
+            padding: 13px;
+            border-radius: 15px;
+            background: rgba(243, 236, 233, 0.72);
+        }
+
+        body.dark-mode .alert-item {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .alert-icon {
+            width: 42px;
+            height: 42px;
+        }
+
+        .alert-item.warning .alert-icon {
+            background: rgba(255, 149, 0, 0.12);
+            color: #ff9500;
+        }
+
+        .alert-item.danger .alert-icon {
+            background: rgba(255, 59, 48, 0.12);
+            color: #ff3b30;
+        }
+
+        .alert-item.success .alert-icon {
+            background: rgba(52, 199, 89, 0.12);
+            color: #34c759;
+        }
+
+        .alert-item strong {
+            display: block;
+            color: var(--texto-claro);
+            font-size: 14px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        body.dark-mode .alert-item strong { color: #fff; }
+
+        .alert-item span {
+            color: rgba(28, 30, 33, 0.52);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        body.dark-mode .alert-item span { color: rgba(228, 230, 235, 0.58); }
+
+        .empty-state {
+            min-height: 90px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            border-radius: 14px;
+            background: rgba(243, 236, 233, 0.68);
+            color: rgba(28, 30, 33, 0.48);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        body.dark-mode .empty-state {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(228, 230, 235, 0.56);
+        }
+
+        @media (max-width: 1180px) {
+            .metric-grid { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+            .home-layout { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+        }
+
+        @media (max-width: 760px) {
+            .home-dashboard {
+                width: min(100% - 28px, 1480px);
+                padding-top: 148px;
             }
-            .card-icono-pro { width: 48px; height: 48px; }
-            .card-icono-pro svg { width: 26px; height: 26px; }
-            .badge-stats { margin-top: 8px; }
+
+            .home-header {
+                grid-template-columns: 1fr;
+            }
+
+            .metric-grid,
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .sale-row {
+                grid-template-columns: 1fr;
+                align-items: start;
+            }
+
+            .sale-total { text-align: left; }
         }
     </style>
 </head>
 <body>
     <%- include('partials/nav') %>
 
-    <div class="dashboard-container">
-        <header class="dashboard-hero">
-            <div class="hero-copy">
-                <p class="hero-kicker">GVI POS</p>
-                <h1 class="hero-title">Centro de ventas</h1>
-                <p class="hero-subtitle">Accede rapido a venta, caja, inventario y reportes desde un panel mas ordenado.</p>
+    <main class="home-dashboard">
+        <header class="home-header">
+            <div>
+                <p class="home-kicker">GVI POS</p>
+                <h1 class="home-title">Resumen de hoy</h1>
+                <p class="home-subtitle" id="homeSubtitle">Panel operativo para revisar ventas, stock, caja y acciones rapidas.</p>
             </div>
-            <div class="clock-panel">
-                <h2 class="reloj-gigante">
-                    <span id="relojHome">00:00</span><span id="relojPeriodo" class="reloj-periodo">--</span>
+            <div class="home-clock-card">
+                <h2 class="home-clock">
+                    <span id="relojHome">00:00</span><span id="relojPeriodo" class="home-clock-period">--</span>
                 </h2>
-                <div class="fecha-completa" id="fechaHome">...</div>
+                <div class="home-date" id="fechaHome">...</div>
             </div>
         </header>
 
-        <div class="grid-modulos-pro">
-            <a href="/caja" class="card-menu-pro">
-                <div class="card-icono-pro"><i data-lucide="shopping-cart"></i></div>
-                <h3>Punto de Venta</h3>
-                <p>Registrar ventas</p>
-                <div class="badge-stats" id="statsVentas">Hoy: $0</div>
-            </a>
+        <section class="metric-grid" aria-label="Metricas del dia">
+            <article class="metric-card">
+                <div class="metric-icon"><i data-lucide="banknote"></i></div>
+                <div>
+                    <p class="metric-label">Ventas hoy</p>
+                    <h2 class="metric-value" id="metricVentas">$0</h2>
+                    <p class="metric-note" id="metricVentasNota">0 transacciones</p>
+                </div>
+            </article>
 
-            <a href="/cobrar" class="card-menu-pro">
-                <div class="card-icono-pro"><i data-lucide="credit-card"></i></div>
-                <h3>Cobrar</h3>
-                <p>Pedidos en cola</p>
-                <div class="badge-stats" id="statsPedidos">0 en cola</div>
-            </a>
+            <article class="metric-card">
+                <div class="metric-icon"><i data-lucide="receipt-text"></i></div>
+                <div>
+                    <p class="metric-label">Ticket promedio</p>
+                    <h2 class="metric-value" id="metricTicket">$0</h2>
+                    <p class="metric-note">Promedio del dia</p>
+                </div>
+            </article>
 
-            <a href="/bodega" class="card-menu-pro">
-                <div class="card-icono-pro"><i data-lucide="package"></i></div>
-                <h3>Bodega</h3>
-                <p>Inventario total</p>
-                <div class="badge-stats" id="statsStock">Cargando...</div>
-            </a>
+            <article class="metric-card">
+                <div class="metric-icon"><i data-lucide="package-search"></i></div>
+                <div>
+                    <p class="metric-label">Stock critico</p>
+                    <h2 class="metric-value" id="metricStock">0</h2>
+                    <p class="metric-note" id="metricStockNota">Productos bajo minimo</p>
+                </div>
+            </article>
 
-            <a href="/productos" class="card-menu-pro">
-                <div class="card-icono-pro"><i data-lucide="scan-barcode"></i></div>
-                <h3>Productos</h3>
-                <p>Ingreso rapido</p>
-                <div class="badge-stats">Escanear o buscar</div>
-            </a>
+            <article class="metric-card">
+                <div class="metric-icon"><i data-lucide="clipboard-list"></i></div>
+                <div>
+                    <p class="metric-label">Pedidos en cola</p>
+                    <h2 class="metric-value" id="metricPedidos">0</h2>
+                    <p class="metric-note">Pendientes por cobrar</p>
+                </div>
+            </article>
+        </section>
 
-            <a href="/finanzas" class="card-menu-pro admin-only">
-                <div class="card-icono-pro"><i data-lucide="bar-chart-3"></i></div>
-                <h3>Finanzas</h3>
-                <p>Reportes y caja</p>
-                <div class="badge-stats badge-exito">Cierre listo</div>
-            </a>
+        <section class="home-layout">
+            <div class="left-stack">
+                <article class="dashboard-panel">
+                    <div class="panel-header">
+                        <h2>Acciones rapidas</h2>
+                        <span>Operaciones frecuentes</span>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="/caja" class="quick-action">
+                            <div>
+                                <div class="action-icon"><i data-lucide="shopping-cart"></i></div>
+                                <strong>Nueva venta</strong>
+                                <span>Ir directo al punto de venta.</span>
+                            </div>
+                        </a>
+                        <a href="/productos" class="quick-action">
+                            <div>
+                                <div class="action-icon"><i data-lucide="scan-barcode"></i></div>
+                                <strong>Agregar producto</strong>
+                                <span>Escanear, buscar o sumar stock.</span>
+                            </div>
+                        </a>
+                        <a href="/bodega" class="quick-action">
+                            <div>
+                                <div class="action-icon"><i data-lucide="boxes"></i></div>
+                                <strong>Revisar bodega</strong>
+                                <span>Control de stock e inventario.</span>
+                            </div>
+                        </a>
+                        <a href="/finanzas" class="quick-action admin-only">
+                            <div>
+                                <div class="action-icon"><i data-lucide="bar-chart-3"></i></div>
+                                <strong>Cierre y caja</strong>
+                                <span>Resumen financiero del dia.</span>
+                            </div>
+                        </a>
+                    </div>
+                </article>
 
-            <a href="/configuracion" class="card-menu-pro admin-only">
-                <div class="card-icono-pro"><i data-lucide="settings"></i></div>
-                <h3>Ajustes</h3>
-                <p>Sistema y red</p>
-                <div class="badge-stats">Configuracion</div>
-            </a>
-        </div>
-    </div>
+                <article class="dashboard-panel">
+                    <div class="panel-header">
+                        <h2>Ultimas ventas</h2>
+                        <a href="/finanzas" class="panel-link admin-only">Ver finanzas</a>
+                    </div>
+                    <div class="sales-list" id="ventasRecientes">
+                        <div class="empty-state">Cargando ultimas ventas...</div>
+                    </div>
+                </article>
+            </div>
+
+            <aside class="right-stack">
+                <article class="dashboard-panel">
+                    <div class="panel-header">
+                        <h2>Alertas</h2>
+                        <span id="alertCount">0 activas</span>
+                    </div>
+                    <div class="alert-list" id="alertasOperativas">
+                        <div class="empty-state">Cargando alertas...</div>
+                    </div>
+                </article>
+
+                <article class="dashboard-panel">
+                    <div class="panel-header">
+                        <h2>Estado rapido</h2>
+                        <span>Sistema</span>
+                    </div>
+                    <div class="alert-list">
+                        <div class="alert-item success">
+                            <div class="alert-icon"><i data-lucide="shield-check"></i></div>
+                            <div>
+                                <strong>Sesion activa</strong>
+                                <span id="estadoUsuario">Perfil listo para operar.</span>
+                            </div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-icon"><i data-lucide="wifi"></i></div>
+                            <div>
+                                <strong>Modo local</strong>
+                                <span>La app sigue funcionando como programa de escritorio.</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </aside>
+        </section>
+    </main>
 
     <%- include('partials/scripts') %>
 
     <script>
-        async function cargarStatsDashboard() {
-            try {
-                const resProd = await fetch('/api/productos');
-                const productos = await resProd.json();
-                const stockBajo = productos.filter(p => p.stock <= 5).length;
+        const money = new Intl.NumberFormat('es-CL', {
+            style: 'currency',
+            currency: 'CLP',
+            maximumFractionDigits: 0
+        });
 
-                const elStock = document.getElementById('statsStock');
-                if (stockBajo > 0) {
-                    elStock.innerText = `${stockBajo} Stock Bajo`;
-                    elStock.classList.add('badge-alerta');
-                } else {
-                    elStock.innerText = 'Stock al dia';
-                }
+        function formatoMonto(valor) {
+            return money.format(Number(valor) || 0);
+        }
 
-                const resVentas = await fetch('/api/ventas');
-                const ventas = await resVentas.json();
-                const hoy = new Date().toLocaleDateString('es-CL');
-                const totalHoy = ventas
-                    .filter(v => v.fecha === hoy)
-                    .reduce((sum, v) => sum + v.total, 0);
-
-                document.getElementById('statsVentas').innerText = `Hoy: $${totalHoy.toLocaleString('es-CL')}`;
-            } catch (e) {
-                console.error('Error cargando stats', e);
-            }
+        function esFechaHoy(fecha) {
+            return fecha === new Date().toLocaleDateString('es-CL');
         }
 
         function actualizarDashboard() {
@@ -364,13 +627,133 @@
             horas = horas % 12 || 12;
             document.getElementById('relojHome').innerText = `${String(horas).padStart(2, '0')}:${minutos}`;
             document.getElementById('relojPeriodo').innerText = periodo;
-            const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
-            document.getElementById('fechaHome').innerText = ahora.toLocaleDateString('es-CL', opciones);
+            document.getElementById('fechaHome').innerText = ahora.toLocaleDateString('es-CL', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long'
+            });
+        }
+
+        async function cargarDashboardOperativo() {
+            try {
+                const [productosRes, ventasRes, pedidosRes] = await Promise.all([
+                    fetch('/api/productos'),
+                    fetch('/api/ventas'),
+                    fetch('/api/pedidos')
+                ]);
+
+                const productos = await productosRes.json();
+                const ventas = await ventasRes.json();
+                const pedidos = await pedidosRes.json();
+
+                const ventasHoy = ventas.filter(v => esFechaHoy(v.fecha));
+                const totalHoy = ventasHoy.reduce((sum, v) => sum + Number(v.total || 0), 0);
+                const ticketPromedio = ventasHoy.length ? totalHoy / ventasHoy.length : 0;
+                const stockCritico = productos.filter(p => Number(p.stock || 0) <= 5);
+                const sinStock = productos.filter(p => Number(p.stock || 0) <= 0);
+
+                document.getElementById('metricVentas').innerText = formatoMonto(totalHoy);
+                document.getElementById('metricVentasNota').innerText = `${ventasHoy.length} transaccion${ventasHoy.length === 1 ? '' : 'es'}`;
+                document.getElementById('metricTicket').innerText = formatoMonto(ticketPromedio);
+                document.getElementById('metricStock').innerText = stockCritico.length;
+                document.getElementById('metricStockNota').innerText = sinStock.length ? `${sinStock.length} sin stock` : 'Productos bajo minimo';
+                document.getElementById('metricPedidos').innerText = pedidos.length;
+
+                renderVentasRecientes(ventas.slice(0, 5));
+                renderAlertas({ stockCritico, sinStock, pedidos, ventasHoy });
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            } catch (error) {
+                console.error('Error cargando dashboard', error);
+                document.getElementById('ventasRecientes').innerHTML = '<div class="empty-state">No se pudieron cargar las ventas.</div>';
+                document.getElementById('alertasOperativas').innerHTML = '<div class="empty-state">No se pudieron cargar las alertas.</div>';
+            }
+        }
+
+        function renderVentasRecientes(ventas) {
+            const contenedor = document.getElementById('ventasRecientes');
+            if (!ventas.length) {
+                contenedor.innerHTML = '<div class="empty-state">Aun no hay ventas registradas.</div>';
+                return;
+            }
+
+            contenedor.innerHTML = ventas.map(v => `
+                <div class="sale-row">
+                    <div>
+                        <div class="sale-title">Venta #${v.id}</div>
+                        <div class="sale-subtitle">${v.fecha || '--'} · ${v.hora || '--'}</div>
+                    </div>
+                    <div class="sale-method">${v.metodoPago || 'Venta'}</div>
+                    <div class="sale-total">${formatoMonto(v.total)}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderAlertas({ stockCritico, sinStock, pedidos, ventasHoy }) {
+            const alertas = [];
+            if (sinStock.length) {
+                alertas.push({
+                    tipo: 'danger',
+                    icono: 'package-x',
+                    titulo: `${sinStock.length} producto${sinStock.length === 1 ? '' : 's'} sin stock`,
+                    texto: 'Revisa bodega antes de vender.'
+                });
+            }
+
+            if (stockCritico.length) {
+                alertas.push({
+                    tipo: 'warning',
+                    icono: 'triangle-alert',
+                    titulo: `${stockCritico.length} producto${stockCritico.length === 1 ? '' : 's'} con stock bajo`,
+                    texto: stockCritico.slice(0, 3).map(p => p.nombre).join(', ')
+                });
+            }
+
+            if (pedidos.length) {
+                alertas.push({
+                    tipo: '',
+                    icono: 'clipboard-list',
+                    titulo: `${pedidos.length} pedido${pedidos.length === 1 ? '' : 's'} en cola`,
+                    texto: 'Hay ventas pendientes por cobrar.'
+                });
+            }
+
+            if (!ventasHoy.length) {
+                alertas.push({
+                    tipo: '',
+                    icono: 'sun',
+                    titulo: 'Dia sin ventas registradas',
+                    texto: 'Cuando vendas, el resumen se actualizara aqui.'
+                });
+            }
+
+            if (!alertas.length) {
+                alertas.push({
+                    tipo: 'success',
+                    icono: 'check-circle-2',
+                    titulo: 'Todo al dia',
+                    texto: 'No hay alertas operativas importantes.'
+                });
+            }
+
+            document.getElementById('alertCount').innerText = `${alertas.length} activa${alertas.length === 1 ? '' : 's'}`;
+            document.getElementById('alertasOperativas').innerHTML = alertas.map(alerta => `
+                <div class="alert-item ${alerta.tipo}">
+                    <div class="alert-icon"><i data-lucide="${alerta.icono}"></i></div>
+                    <div>
+                        <strong>${alerta.titulo}</strong>
+                        <span>${alerta.texto}</span>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function cargarDatosUsuario() {
             try {
                 const usrInfo = JSON.parse(localStorage.getItem('gvi_user'));
+                if (usrInfo?.nombre) {
+                    document.getElementById('homeSubtitle').innerText = `Panel operativo de ${usrInfo.nombre}. Revisa ventas, stock, caja y acciones rapidas.`;
+                    document.getElementById('estadoUsuario').innerText = `${usrInfo.nombre} · ${usrInfo.rol || 'Perfil activo'}`;
+                }
                 if (usrInfo && usrInfo.rol !== 'ADMIN') {
                     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
                 }
@@ -380,10 +763,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             actualizarDashboard();
             setInterval(actualizarDashboard, 1000);
-            cargarStatsDashboard();
-            setInterval(cargarStatsDashboard, 5000);
             cargarDatosUsuario();
-            lucide.createIcons();
+            cargarDashboardOperativo();
+            setInterval(cargarDashboardOperativo, 5000);
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         });
     </script>
 </body>

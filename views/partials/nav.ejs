@@ -4,33 +4,72 @@
 
 <nav class="app-topbar" id="appTopbar">
     <div class="app-topbar-left">
-        <button class="topbar-icon-btn" onclick="window.history.back()" title="Volver">
-            <i data-lucide="arrow-left"></i>
-        </button>
         <div class="topbar-brand" title="GVI">
-            <span class="brand-mark">GVI</span>
+            <span class="brand-text">GVI</span>
         </div>
     </div>
 
     <div class="topbar-links">
-        <span class="topbar-active-indicator" id="topbarActiveIndicator"></span>
-        <a href="/" class="topbar-link" data-label="Inicio"><i data-lucide="home"></i><span>Inicio</span></a>
-        <a href="/caja" class="topbar-link" data-label="Venta"><i data-lucide="shopping-cart"></i><span>Venta</span></a>
-        <a href="/cobrar" class="topbar-link" data-label="Cobrar"><i data-lucide="credit-card"></i><span>Cobrar</span></a>
-        <a href="/bodega" class="topbar-link" data-label="Bodega"><i data-lucide="package"></i><span>Bodega</span></a>
-        <a href="/productos" class="topbar-link" data-label="Productos"><i data-lucide="scan-barcode"></i><span>Productos</span></a>
-        <a href="/finanzas" class="topbar-link admin-only" data-label="Finanzas"><i data-lucide="bar-chart-3"></i><span>Finanzas</span></a>
-        <a href="/configuracion" class="topbar-link admin-only" data-label="Ajustes"><i data-lucide="settings"></i><span>Ajustes</span></a>
-        <div class="topbar-clock-chip" id="topbarClockChip">
-            <strong id="topbarClock">00:00</strong>
-            <span id="topbarDate">--</span>
+        <div class="topbar-nav-pill">
+            <span class="topbar-active-indicator" id="topbarActiveIndicator"></span>
+            <a href="/" class="topbar-link" data-label="Inicio"><i data-lucide="home"></i><span>Inicio</span></a>
+            <a href="/caja" class="topbar-link" data-label="Venta"><i data-lucide="shopping-cart"></i><span>Venta</span></a>
+            <a href="/cobrar" class="topbar-link" data-label="Cobrar"><i data-lucide="credit-card"></i><span>Cobrar</span></a>
+            <a href="/bodega" class="topbar-link" data-label="Bodega"><i data-lucide="package"></i><span>Bodega</span></a>
+            <a href="/productos" class="topbar-link" data-label="Productos"><i data-lucide="scan-barcode"></i><span>Productos</span></a>
+            <a href="/finanzas" class="topbar-link admin-only" data-label="Finanzas"><i data-lucide="bar-chart-3"></i><span>Finanzas</span></a>
+            <a href="/configuracion" class="topbar-link admin-only" data-label="Ajustes"><i data-lucide="settings"></i><span>Ajustes</span></a>
         </div>
-        <a href="#" onclick="togglePerfil(event)" class="topbar-link user-switch" data-label="Perfil"><i data-lucide="user"></i><span id="topbarUserName">Usuario</span></a>
-        <button class="topbar-window-btn theme-toggle" onclick="toggleTemaNav()" title="Cambiar tema" data-label="Tema"><i data-lucide="moon" id="themeToggleIcon"></i></button>
-        <button class="topbar-window-btn" onclick="minimizarAppNav()" title="Minimizar GVI" data-label="Minimizar"><i data-lucide="minus"></i></button>
-        <button class="topbar-window-btn danger" onclick="cerrarProgramaNav()" title="Cerrar programa" data-label="Cerrar"><i data-lucide="power"></i></button>
+        <div class="topbar-actions">
+            <button class="topbar-window-btn notification-toggle" onclick="toggleNotificaciones(event)" title="Notificaciones" data-label="Notificaciones">
+                <i data-lucide="bell"></i>
+                <span class="notification-dot"></span>
+            </button>
+            <button class="topbar-window-btn theme-toggle" onclick="toggleTemaNav()" title="Cambiar tema" data-label="Tema"><i data-lucide="moon" id="themeToggleIcon"></i></button>
+            <button class="topbar-window-btn" onclick="minimizarAppNav()" title="Minimizar GVI" data-label="Minimizar"><i data-lucide="minus"></i></button>
+            <div class="topbar-clock-chip" id="topbarClockChip">
+                <strong id="topbarClock">00:00</strong>
+                <span id="topbarDate">--</span>
+            </div>
+            <a href="#" onclick="togglePerfil(event)" class="topbar-link user-switch" data-label="Perfil"><i data-lucide="user"></i><span id="topbarUserName">Usuario</span></a>
+            <button class="topbar-window-btn danger" onclick="cerrarProgramaNav()" title="Cerrar programa" data-label="Cerrar"><i data-lucide="power"></i></button>
+        </div>
     </div>
 </nav>
+
+<div class="notifications-popover" id="notificationsPopover">
+    <div class="notifications-header">
+        <strong>Notificaciones</strong>
+        <span>Centro GVI</span>
+    </div>
+    <div class="notification-item update" id="notificationUpdateItem">
+        <i data-lucide="download-cloud" id="notificationUpdateIcon"></i>
+        <div>
+            <strong id="notificationUpdateTitle">Actualizaciones</strong>
+            <span id="notificationUpdateText">GVI revisa nuevas versiones en segundo plano.</span>
+            <div class="notification-progress" id="notificationUpdateProgress">
+                <div id="notificationUpdateProgressBar"></div>
+            </div>
+            <button class="notification-action" id="notificationUpdateAction" type="button" onclick="instalarActualizacionNav(event)" hidden>Actualizar ahora</button>
+        </div>
+    </div>
+    <div class="notification-item" id="notificationInstalledNotice" hidden>
+        <i data-lucide="sparkles"></i>
+        <div>
+            <strong id="notificationInstalledTitle">GVI actualizado</strong>
+            <span id="notificationInstalledText">La nueva version se instalo correctamente.</span>
+            <button class="notification-action secondary" type="button" onclick="descartarAvisoActualizacion(event)">Entendido</button>
+        </div>
+    </div>
+    <div class="notification-item urgent">
+        <i data-lucide="triangle-alert"></i>
+        <div>
+            <strong>Stock por revisar</strong>
+            <span>Productos con poco stock apareceran aqui.</span>
+        </div>
+    </div>
+    <div class="notifications-empty" id="notificationsEmpty">Las alertas reales se conectaran a stock, caja y ventas.</div>
+</div>
 
 <div class="profile-popover" id="profilePopover">
     <div class="profile-avatar" id="profileAvatar">U</div>
@@ -48,8 +87,17 @@
     </button>
 </div>
 
+<div class="update-installed-toast" id="updateInstalledToast" hidden>
+    <div>
+        <strong id="updateInstalledToastTitle">GVI actualizado</strong>
+        <span id="updateInstalledToastText">La nueva version se instalo correctamente.</span>
+    </div>
+    <button type="button" onclick="abrirNovedadesActualizacion(event)">Ver mejoras</button>
+    <button type="button" class="toast-close" onclick="descartarAvisoActualizacion(event)" title="Cerrar"><i data-lucide="x"></i></button>
+</div>
+
 <script>
-    if (esInicio) document.getElementById('appTopbar')?.classList.add('compact');
+    if (esInicio) document.getElementById('appTopbar')?.classList.add('home-topbar');
 
     function cerrarSesion(e) {
         if (e) e.preventDefault();
@@ -60,24 +108,153 @@
     }
 
     function prepararCambioRuta(destino) {
-        const topbar = document.getElementById('appTopbar');
-        const vaInicio = destino === '/';
-        const origen = esInicio ? 'compact' : 'full';
-        const destinoTipo = vaInicio ? 'compact' : 'full';
-        sessionStorage.setItem('gvi_bar_motion', `${origen}-to-${destinoTipo}`);
-        if (topbar) topbar.classList.add('route-shift');
-        document.body.classList.add('content-leaving');
+        document.body.classList.add('content-leaving', 'is-routing');
     }
 
     function navegarConMovimiento(destino) {
         prepararCambioRuta(destino);
-        setTimeout(() => { window.location.href = destino; }, 190);
+        setTimeout(() => { window.location.href = destino; }, 90);
     }
 
     function togglePerfil(e) {
         if (e) e.preventDefault();
         const popover = document.getElementById('profilePopover');
+        document.getElementById('notificationsPopover')?.classList.remove('open');
         popover?.classList.toggle('open');
+    }
+
+    function toggleNotificaciones(e) {
+        if (e) e.preventDefault();
+        const popover = document.getElementById('notificationsPopover');
+        document.getElementById('profilePopover')?.classList.remove('open');
+        popover?.classList.toggle('open');
+        consultarActualizacionNav();
+        consultarAvisoActualizacionNav();
+    }
+
+    function normalizarTextoActualizacion(texto) {
+        return String(texto || '').replace(/<[^>]*>/g, '').trim();
+    }
+
+    async function instalarActualizacionNav(e) {
+        if (e) e.preventDefault();
+        const action = document.getElementById('notificationUpdateAction');
+        if (action) {
+            action.disabled = true;
+            action.innerText = 'Actualizando...';
+        }
+        try {
+            await fetch('/api/app/update/install', { method: 'POST' });
+        } catch (_) {
+            if (action) {
+                action.disabled = false;
+                action.innerText = 'Actualizar ahora';
+            }
+        }
+    }
+
+    async function descartarAvisoActualizacion(e) {
+        if (e) e.preventDefault();
+        document.getElementById('notificationInstalledNotice')?.setAttribute('hidden', '');
+        document.getElementById('updateInstalledToast')?.setAttribute('hidden', '');
+        await fetch('/api/app/update/notice/dismiss', { method: 'POST' }).catch(() => null);
+    }
+
+    function abrirNovedadesActualizacion(e) {
+        if (e) e.preventDefault();
+        document.getElementById('profilePopover')?.classList.remove('open');
+        document.getElementById('notificationsPopover')?.classList.add('open');
+    }
+
+    function aplicarActualizacionNav(data) {
+        const title = document.getElementById('notificationUpdateTitle');
+        const text = document.getElementById('notificationUpdateText');
+        const progress = document.getElementById('notificationUpdateProgress');
+        const bar = document.getElementById('notificationUpdateProgressBar');
+        const action = document.getElementById('notificationUpdateAction');
+        const icon = document.getElementById('notificationUpdateIcon');
+        if (!title || !text || !progress || !bar || !action) return;
+
+        action.hidden = true;
+        action.disabled = false;
+        action.innerText = 'Actualizar ahora';
+        progress.classList.remove('visible');
+        bar.style.width = '0%';
+        if (icon) icon.setAttribute('data-lucide', 'download-cloud');
+
+        if (!data.configured) {
+            title.innerText = 'Actualizaciones';
+            text.innerText = data.message || 'Disponible solo en la version instalada.';
+            return;
+        }
+
+        if (data.installing) {
+            title.innerText = 'Actualizando GVI';
+            text.innerText = 'Instalando en silencio. La app se reiniciara automaticamente.';
+            if (icon) icon.setAttribute('data-lucide', 'loader-circle');
+            return;
+        }
+
+        if (data.downloading) {
+            title.innerText = `Descargando v${data.version || ''}`;
+            text.innerText = data.message || 'Descarga en segundo plano.';
+            progress.classList.add('visible');
+            bar.style.width = `${data.percent || 0}%`;
+            if (icon) icon.setAttribute('data-lucide', 'download');
+            return;
+        }
+
+        if (data.ready) {
+            title.innerText = `Version v${data.version} lista`;
+            text.innerText = 'Presiona actualizar. GVI instalara todo sin preguntas y volvera a abrirse.';
+            action.hidden = false;
+            if (icon) icon.setAttribute('data-lucide', 'refresh-cw');
+            return;
+        }
+
+        if (data.checking) {
+            title.innerText = 'Buscando actualizaciones';
+            text.innerText = 'Revisando GitHub Releases...';
+            if (icon) icon.setAttribute('data-lucide', 'loader-circle');
+            return;
+        }
+
+        title.innerText = 'Actualizaciones';
+        text.innerText = data.message || 'GVI revisa nuevas versiones en segundo plano.';
+    }
+
+    async function consultarActualizacionNav() {
+        try {
+            const res = await fetch('/api/app/update/status');
+            const data = await res.json();
+            aplicarActualizacionNav(data);
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        } catch (_) {}
+    }
+
+    async function consultarAvisoActualizacionNav() {
+        try {
+            const res = await fetch('/api/app/update/notice');
+            const data = await res.json();
+            const notice = data.notice;
+            const item = document.getElementById('notificationInstalledNotice');
+            if (!item) return;
+            if (!notice) {
+                item.hidden = true;
+                document.getElementById('updateInstalledToast')?.setAttribute('hidden', '');
+                return;
+            }
+            item.hidden = false;
+            const notes = normalizarTextoActualizacion(notice.releaseNotes) || 'Actualizacion aplicada correctamente.';
+            document.getElementById('notificationInstalledTitle').innerText = `GVI v${notice.version} instalado`;
+            document.getElementById('notificationInstalledText').innerText = notes;
+            const toast = document.getElementById('updateInstalledToast');
+            if (toast) {
+                toast.hidden = false;
+                document.getElementById('updateInstalledToastTitle').innerText = `GVI v${notice.version} instalado`;
+                document.getElementById('updateInstalledToastText').innerText = notes.slice(0, 110);
+            }
+        } catch (_) {}
     }
 
     function actualizarTemaNav() {
@@ -167,6 +344,7 @@
             if (instant) indicator.style.transition = 'none';
             indicator.style.width = `${rect.width}px`;
             indicator.style.height = `${rect.height}px`;
+            indicator.style.top = `${rect.top - parentRect.top}px`;
             indicator.style.transform = `translateX(${rect.left - parentRect.left + link.parentElement.scrollLeft}px)`;
             if (instant) {
                 indicator.offsetHeight;
@@ -202,28 +380,26 @@
             });
         });
 
-        const motion = sessionStorage.getItem('gvi_bar_motion');
-        sessionStorage.removeItem('gvi_bar_motion');
-        const topbar = document.getElementById('appTopbar');
-        if (topbar && motion === 'compact-to-full' && !esInicio) {
-            topbar.classList.add('from-compact');
-        }
-        if (topbar && motion === 'full-to-compact' && esInicio) {
-            topbar.classList.add('from-full');
-        }
-
         document.addEventListener('click', (event) => {
             const popover = document.getElementById('profilePopover');
+            const notifications = document.getElementById('notificationsPopover');
             const userButton = document.querySelector('.topbar-link.user-switch');
-            if (!popover?.classList.contains('open')) return;
-            if (popover.contains(event.target) || userButton?.contains(event.target)) return;
-            popover.classList.remove('open');
+            const notificationButton = document.querySelector('.notification-toggle');
+            if (popover?.classList.contains('open') && !popover.contains(event.target) && !userButton?.contains(event.target)) {
+                popover.classList.remove('open');
+            }
+            if (notifications?.classList.contains('open') && !notifications.contains(event.target) && !notificationButton?.contains(event.target)) {
+                notifications.classList.remove('open');
+            }
         });
 
         window.addEventListener('resize', () => moverIndicador(document.querySelector('.topbar-link.active'), true));
-        document.querySelector('.topbar-links')?.addEventListener('scroll', () => moverIndicador(document.querySelector('.topbar-link.active'), true));
+        document.querySelector('.topbar-nav-pill')?.addEventListener('scroll', () => moverIndicador(document.querySelector('.topbar-link.active'), true));
         actualizarRelojTopbar();
         setInterval(actualizarRelojTopbar, 1000);
+        consultarActualizacionNav();
+        consultarAvisoActualizacionNav();
+        setInterval(consultarActualizacionNav, 3500);
 
         if (typeof lucide !== 'undefined') lucide.createIcons();
     });
@@ -231,48 +407,51 @@
 
 <style>
     .app-topbar {
-        width: min(100% - 32px, 1240px);
-        margin: 14px auto 0;
-        padding: 8px;
-        border-radius: 18px;
-        background: #fff;
-        border: 1px solid rgba(0, 0, 0, 0.06);
-        box-shadow: 0 4px 14px rgba(20, 30, 45, 0.05);
+        width: min(100% - 48px, 1480px);
+        margin: 22px auto 0;
+        padding: 8px 14px;
+        border-radius: 12px;
+        background: rgba(250, 248, 246, 0.96);
+        border: 1px solid rgba(234, 221, 218, 0.9);
+        box-shadow: 0 18px 55px rgba(42, 8, 0, 0.07);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 14px;
         position: sticky;
-        top: 10px;
+        top: 14px;
         z-index: 1800;
     }
 
     body.dark-mode .app-topbar {
-        background: #1e1e1e;
-        border-color: rgba(255, 255, 255, 0.08);
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+        background: rgba(33, 30, 29, 0.92);
+        border-color: rgba(234, 221, 218, 0.1);
+        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.26);
     }
 
     .app-topbar-left {
         display: flex;
         align-items: center;
-        gap: 8px;
-        flex: 0 0 auto;
+        gap: 0;
+        flex: 0 0 86px;
+        min-width: 86px;
     }
 
     .topbar-icon-btn,
     .topbar-window-btn,
     .topbar-link,
     .topbar-brand {
-        min-height: 38px;
-        border-radius: 12px;
+        min-height: 34px;
+        border-radius: 999px;
         border: none;
         text-decoration: none;
         color: inherit;
-        transition: background-color 0.24s ease, color 0.24s ease, box-shadow 0.24s ease, transform 0.24s ease;
+        transition: background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 7px;
+        gap: 8px;
         font-weight: 800;
         line-height: 1;
         white-space: nowrap;
@@ -280,9 +459,9 @@
 
     .topbar-icon-btn,
     .topbar-window-btn {
-        width: 38px;
+        width: 34px;
         padding: 0;
-        background: rgba(0, 0, 0, 0.04);
+        background: var(--superficie-suave);
         cursor: pointer;
         flex: 0 0 auto;
     }
@@ -303,8 +482,8 @@
     .topbar-icon-btn:hover,
     .topbar-window-btn:hover,
     .topbar-link:hover {
-        background: rgba(0, 122, 255, 0.1);
-        color: var(--azul-gvi);
+        background: rgba(234, 221, 218, 0.72);
+        color: #111318;
     }
 
     .topbar-icon-btn i,
@@ -313,46 +492,83 @@
     .topbar-window-btn svg,
     .topbar-link i,
     .topbar-link svg {
-        width: 18px;
-        height: 18px;
-        stroke-width: 2.5px;
+        width: 15px;
+        height: 15px;
+        stroke-width: 2.35px;
     }
 
     .topbar-brand {
-        padding: 0 4px;
+        min-height: 34px;
+        padding: 0;
+        background: transparent;
+        color: var(--texto-claro);
         cursor: default;
+        gap: 0;
     }
 
-    .brand-mark {
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--azul-gvi);
-        color: white;
-        font-size: 12px;
+    body.dark-mode .topbar-brand {
+        background: transparent;
+        color: rgba(245, 247, 250, 0.94);
+    }
+
+    .brand-text {
+        font-size: 22px;
+        font-weight: 900;
         letter-spacing: 0;
     }
 
     .topbar-links {
         display: flex;
         align-items: center;
-        gap: 4px;
-        overflow-x: auto;
-        scrollbar-width: thin;
-        padding-bottom: 1px;
+        justify-content: space-between;
+        gap: 14px;
+        overflow: visible;
+        padding: 0;
         flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .topbar-nav-pill {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 4px;
+        border-radius: 999px;
+        background: var(--superficie-suave);
         position: relative;
+        margin: 0 auto;
+        overflow: visible;
+        width: fit-content;
+        flex: 0 1 auto;
+        min-width: max-content;
+    }
+
+    body.dark-mode .topbar-nav-pill {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .topbar-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 7px;
+        flex: 0 0 auto;
+        min-width: 0;
     }
 
     .topbar-link {
-        padding: 0 11px;
-        font-size: 13px;
-        color: rgba(28, 30, 33, 0.78);
+        min-height: 32px;
+        padding: 0 16px;
+        font-size: 12px;
+        color: rgba(28, 30, 33, 0.74);
         position: relative;
         z-index: 1;
+        font-weight: 700;
+    }
+
+    .topbar-nav-pill .topbar-link svg {
+        display: none;
     }
 
     body.dark-mode .topbar-link { color: rgba(228, 230, 235, 0.78); }
@@ -367,23 +583,38 @@
         position: absolute;
         left: 0;
         top: 0;
-        border-radius: 12px;
-        background: var(--azul-gvi);
-        box-shadow: 0 3px 9px rgba(0, 122, 255, 0.18);
+        border-radius: 999px;
+        background: var(--negro-gvi);
+        box-shadow: 0 10px 22px rgba(42, 8, 0, 0.18);
         pointer-events: none;
-        transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1), width 0.42s cubic-bezier(0.16, 1, 0.3, 1), height 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: transform, width;
+        transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
         z-index: 0;
     }
 
+    body.dark-mode .topbar-active-indicator {
+        background: var(--azul-gvi);
+        box-shadow: 0 10px 22px rgba(0, 122, 255, 0.22);
+    }
+
     .topbar-link.user-switch {
-        width: 38px;
-        padding: 0;
-        background: rgba(0, 0, 0, 0.04);
+        width: auto;
+        min-width: 132px;
+        height: 34px;
+        min-height: 34px;
+        padding: 0 12px 0 8px;
+        background: var(--superficie-suave);
         color: rgba(28, 30, 33, 0.78);
+        border-radius: 999px;
+        margin-left: 0;
+        gap: 8px;
     }
 
     .topbar-link.user-switch span {
-        display: none;
+        display: inline;
+        max-width: 92px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     body.dark-mode .topbar-link.user-switch {
@@ -396,12 +627,32 @@
         color: var(--azul-gvi);
     }
 
+    .notification-toggle {
+        position: relative;
+    }
+
+    .notification-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #ff3b30;
+        border: 2px solid var(--superficie-suave);
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.08);
+    }
+
+    body.dark-mode .notification-dot {
+        border-color: #2a2f38;
+    }
+
     .topbar-clock-chip {
-        margin-left: auto;
-        min-height: 38px;
+        margin-left: 0;
+        min-height: 34px;
         padding: 0 13px;
-        border-radius: 14px;
-        background: rgba(0, 0, 0, 0.04);
+        border-radius: 999px;
+        background: var(--superficie-suave);
         color: rgba(28, 30, 33, 0.74);
         display: inline-flex;
         flex-direction: column;
@@ -418,14 +669,14 @@
     }
 
     .topbar-clock-chip strong {
-        font-size: 14px;
+        font-size: 12px;
         font-weight: 900;
         color: inherit;
     }
 
     .topbar-clock-chip span {
-        margin-top: 3px;
-        font-size: 10px;
+        margin-top: 2px;
+        font-size: 9px;
         font-weight: 800;
         opacity: 0.58;
         text-transform: capitalize;
@@ -442,152 +693,290 @@
         box-shadow: 0 4px 12px rgba(255, 59, 48, 0.2);
     }
 
-    .app-topbar.compact {
-        width: fit-content;
-        max-width: calc(100% - 32px);
-        margin-left: auto;
-        margin-right: 24px;
-        border-radius: 999px;
-        transform-origin: right top;
-        animation: topbarCompactIn 0.34s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+    .app-topbar.home-topbar {
+        animation: none;
     }
 
-    .app-topbar.compact .app-topbar-left {
+    .app-topbar.home-topbar .topbar-clock-chip {
         display: none;
     }
 
-    .app-topbar.compact .topbar-links {
-        flex: 0 1 auto;
-        overflow: visible;
-    }
-
-    .app-topbar.compact .topbar-active-indicator {
-        display: none;
-    }
-
-    .app-topbar.compact .topbar-clock-chip {
-        display: none;
-    }
-
-    .app-topbar.compact .topbar-link:not(.user-switch) {
-        display: none;
-    }
-
-    .app-topbar.compact .topbar-link.user-switch {
-        display: inline-flex;
-    }
-
-    .app-topbar.compact .topbar-link,
-    .app-topbar.compact .topbar-window-btn {
-        width: 42px;
-        min-width: 42px;
-        height: 42px;
-        min-height: 42px;
-        padding: 0;
-        border-radius: 50%;
-        background: rgba(0, 0, 0, 0.04);
-        color: rgba(28, 30, 33, 0.78);
-        position: relative;
-        overflow: visible;
-        transition: background-color 0.14s ease, color 0.14s ease, transform 0.14s ease;
-    }
-
-    body.dark-mode .app-topbar.compact .topbar-link,
-    body.dark-mode .app-topbar.compact .topbar-window-btn {
-        background: rgba(255, 255, 255, 0.08);
-        color: rgba(228, 230, 235, 0.78);
-    }
-
-    .app-topbar.compact .topbar-link span {
-        max-width: 0;
-        opacity: 0;
-        overflow: hidden;
-        display: none;
-    }
-
-    .app-topbar.compact .topbar-link.active {
-        background: rgba(0, 0, 0, 0.04);
-        color: rgba(28, 30, 33, 0.78);
-    }
-
-    body.dark-mode .app-topbar.compact .topbar-link.active {
-        background: rgba(255, 255, 255, 0.08);
-        color: rgba(228, 230, 235, 0.78);
-    }
-
-    .app-topbar.compact .topbar-link:hover {
-        background: var(--azul-gvi);
-        color: white;
-    }
-
-    .app-topbar.compact .topbar-window-btn::after {
-        content: attr(data-label);
-        position: absolute;
-        top: calc(100% + 9px);
-        left: 50%;
-        transform: translateX(-50%) translateY(-3px);
-        background: rgba(28, 30, 33, 0.94);
-        color: white;
-        padding: 7px 9px;
-        border-radius: 9px;
-        font-size: 11px;
-        font-weight: 800;
-        opacity: 0;
-        pointer-events: none;
-        white-space: nowrap;
-        transition: opacity 0.22s ease, transform 0.22s ease;
-        z-index: 20;
-    }
-
-    .app-topbar.compact .topbar-window-btn:hover::after {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-
-    .app-topbar.compact .topbar-link.user-switch:hover {
-        background: rgba(0, 122, 255, 0.1);
-        color: var(--azul-gvi);
-    }
-
-    .app-topbar.compact .topbar-window-btn.danger {
-        background: #ff3b30;
-        color: white;
-    }
-
-    .app-topbar.compact .topbar-window-btn.theme-toggle {
-        display: inline-flex;
-    }
-
+    .notifications-popover,
     .profile-popover {
         position: fixed;
         top: 82px;
-        right: 168px;
         z-index: 1810;
-        width: 230px;
-        padding: 14px;
-        border-radius: 18px;
-        background: rgba(255, 255, 255, 0.96);
-        border: 1px solid rgba(0, 0, 0, 0.07);
-        box-shadow: 0 18px 44px rgba(18, 24, 36, 0.16);
-        display: grid;
-        grid-template-columns: 44px 1fr;
-        gap: 10px;
         opacity: 0;
         transform: translateY(-10px) scale(0.96);
         pointer-events: none;
         transition: opacity 0.34s ease, transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    body.dark-mode .profile-popover {
-        background: rgba(30, 30, 30, 0.96);
+    .notifications-popover {
+        right: 310px;
+        width: 310px;
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(250, 248, 246, 0.96);
+        border: 1px solid rgba(0, 0, 0, 0.07);
+        box-shadow: 0 18px 44px rgba(18, 24, 36, 0.16);
+    }
+
+    body.dark-mode .notifications-popover {
+        background: rgba(33, 30, 29, 0.96);
         border-color: rgba(255, 255, 255, 0.08);
         box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
     }
 
+    .notifications-popover.open,
     .profile-popover.open {
         opacity: 1;
         transform: translateY(0) scale(1);
         pointer-events: auto;
+    }
+
+    .notifications-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 4px 4px 12px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    body.dark-mode .notifications-header {
+        border-bottom-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .notifications-header strong {
+        font-size: 16px;
+        font-weight: 900;
+        color: var(--texto-claro);
+    }
+
+    body.dark-mode .notifications-header strong {
+        color: var(--texto-oscuro);
+    }
+
+    .notifications-header span {
+        font-size: 11px;
+        font-weight: 800;
+        color: rgba(28, 30, 33, 0.46);
+    }
+
+    body.dark-mode .notifications-header span {
+        color: rgba(228, 230, 235, 0.55);
+    }
+
+    .notification-item {
+        display: grid;
+        grid-template-columns: 38px 1fr;
+        gap: 10px;
+        padding: 12px 4px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    body.dark-mode .notification-item {
+        border-bottom-color: rgba(255, 255, 255, 0.07);
+    }
+
+    .notification-item i,
+    .notification-item svg {
+        width: 38px;
+        height: 38px;
+        padding: 9px;
+        border-radius: 12px;
+        background: rgba(0, 122, 255, 0.1);
+        color: var(--azul-gvi);
+    }
+
+    .notification-item.urgent i,
+    .notification-item.urgent svg {
+        background: rgba(255, 59, 48, 0.1);
+        color: #ff3b30;
+    }
+
+    .notification-item strong {
+        display: block;
+        font-size: 13px;
+        font-weight: 900;
+        color: var(--texto-claro);
+        margin-bottom: 4px;
+    }
+
+    body.dark-mode .notification-item strong {
+        color: var(--texto-oscuro);
+    }
+
+    .notification-item span,
+    .notifications-empty {
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1.35;
+        color: rgba(28, 30, 33, 0.52);
+    }
+
+    body.dark-mode .notification-item span,
+    body.dark-mode .notifications-empty {
+        color: rgba(228, 230, 235, 0.58);
+    }
+
+    .notifications-empty {
+        padding: 12px 4px 2px;
+    }
+
+    .notification-progress {
+        display: none;
+        height: 7px;
+        margin-top: 10px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(23, 105, 255, 0.12);
+    }
+
+    .notification-progress.visible {
+        display: block;
+    }
+
+    .notification-progress div {
+        height: 100%;
+        width: 0%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--azul-gvi), #28c76f);
+        transition: width 0.24s ease;
+    }
+
+    .notification-action {
+        width: 100%;
+        min-height: 34px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 11px;
+        background: var(--azul-gvi);
+        color: white;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+    }
+
+    .notification-action.secondary {
+        background: rgba(23, 105, 255, 0.1);
+        color: var(--azul-gvi);
+    }
+
+    .notification-action:disabled {
+        opacity: 0.65;
+        cursor: wait;
+    }
+
+    .profile-popover {
+        right: 168px;
+        width: 230px;
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(250, 248, 246, 0.96);
+        border: 1px solid rgba(0, 0, 0, 0.07);
+        box-shadow: 0 18px 44px rgba(18, 24, 36, 0.16);
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        gap: 10px;
+    }
+
+    body.dark-mode .profile-popover {
+        background: rgba(33, 30, 29, 0.96);
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+    }
+
+    .update-installed-toast {
+        position: fixed;
+        right: 34px;
+        bottom: 28px;
+        z-index: 1820;
+        width: min(420px, calc(100% - 48px));
+        min-height: 78px;
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(250, 248, 246, 0.96);
+        border: 1px solid rgba(20, 30, 45, 0.08);
+        box-shadow: 0 18px 48px rgba(42, 8, 0, 0.16);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        animation: updateToastIn 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .update-installed-toast[hidden] {
+        display: none;
+    }
+
+    body.dark-mode .update-installed-toast {
+        background: rgba(33, 30, 29, 0.96);
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+    }
+
+    .update-installed-toast strong,
+    .update-installed-toast span {
+        display: block;
+    }
+
+    .update-installed-toast strong {
+        font-size: 14px;
+        font-weight: 900;
+        margin-bottom: 3px;
+    }
+
+    .update-installed-toast span {
+        color: var(--texto-suave);
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.35;
+    }
+
+    .update-installed-toast button {
+        min-height: 36px;
+        border: none;
+        border-radius: 12px;
+        padding: 0 13px;
+        background: var(--azul-gvi);
+        color: white;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+    }
+
+    .update-installed-toast .toast-close {
+        width: 36px;
+        padding: 0;
+        background: var(--superficie-suave);
+        color: var(--texto-claro);
+    }
+
+    body.dark-mode .update-installed-toast .toast-close {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--texto-oscuro);
+    }
+
+    .update-installed-toast .toast-close svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    @keyframes updateToastIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
     }
 
     .profile-avatar {
@@ -661,58 +1050,8 @@
         height: 17px;
     }
 
-    .app-topbar.route-shift {
-        animation: topbarRouteShift 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    .app-topbar.from-compact {
-        transform-origin: right top;
-        animation: topbarFromCompact 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    .app-topbar.compact.from-full {
-        transform-origin: right top;
-        animation: topbarFromFull 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    @keyframes topbarCompactIn {
-        from {
-            opacity: 0;
-            transform: translateY(-8px) scale(0.98);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-    }
-
-    @keyframes topbarRouteShift {
-        from { transform: translateY(0); opacity: 1; }
-        to { transform: translateY(-4px); opacity: 0.92; }
-    }
-
-    @keyframes topbarFromCompact {
-        from {
-            opacity: 0.9;
-            transform: translateY(-6px);
-            border-radius: 999px;
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-            border-radius: 18px;
-        }
-    }
-
-    @keyframes topbarFromFull {
-        from {
-            opacity: 0.9;
-            transform: translateY(-6px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    body.is-routing .app-topbar {
+        pointer-events: none;
     }
 
     @media (max-width: 760px) {
@@ -725,6 +1064,20 @@
 
         .topbar-links {
             width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .topbar-nav-pill {
+            justify-content: flex-start;
+            max-width: 100%;
+        }
+
+        .topbar-actions {
+            min-width: 0;
+            width: 100%;
+            justify-content: flex-end;
         }
 
         .topbar-link.user-switch {
@@ -735,6 +1088,24 @@
             right: 16px;
             top: 76px;
             width: min(230px, calc(100% - 32px));
+        }
+
+        .notifications-popover {
+            right: 16px;
+            top: 76px;
+            width: min(310px, calc(100% - 32px));
+        }
+
+        .update-installed-toast {
+            right: 12px;
+            bottom: 12px;
+            width: calc(100% - 24px);
+            grid-template-columns: 1fr auto;
+        }
+
+        .update-installed-toast .toast-close {
+            grid-column: 2;
+            grid-row: 1;
         }
     }
 </style>
