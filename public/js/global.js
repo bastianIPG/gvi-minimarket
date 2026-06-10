@@ -6,11 +6,16 @@ function actualizarRelojGlobal() {
 }
 
 function toggleTema() {
-    const body = document.body;
-    body.classList.toggle('dark-mode');
-    const esOscuro = body.classList.contains('dark-mode');
-    localStorage.setItem('temaGVI', esOscuro ? 'oscuro' : 'claro');
-    actualizarIconoTema(esOscuro);
+    const esOscuro = document.body.classList.contains('dark-mode');
+    let nuevoEsOscuro;
+    if (typeof gviSetThemePreference === 'function') {
+        nuevoEsOscuro = gviSetThemePreference(esOscuro ? 'claro' : 'oscuro');
+    } else {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('temaGVI', document.body.classList.contains('dark-mode') ? 'oscuro' : 'claro');
+        nuevoEsOscuro = document.body.classList.contains('dark-mode');
+    }
+    actualizarIconoTema(nuevoEsOscuro);
 }
 
 function actualizarIconoTema(esOscuro) {
@@ -24,25 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarRelojGlobal(); 
     setInterval(actualizarRelojGlobal, 1000);
 
-    // 2. Revisamos si el usuario prefiere el modo oscuro
-    if (localStorage.getItem('temaGVI') === 'oscuro') {
-        document.body.classList.add('dark-mode');
-        actualizarIconoTema(true);
-    }
-});
+    // 2. Aplicamos el tema del sistema o la preferencia manual.
+    const esOscuro = typeof gviApplyTheme === 'function' ? gviApplyTheme() : localStorage.getItem('temaGVI') === 'oscuro';
+    if (esOscuro) document.body.classList.add('dark-mode');
+    actualizarIconoTema(esOscuro);
 
-// Dentro de tu función toggleTema()
-function toggleTema() {
-    const body = document.body;
-    body.classList.toggle('dark-mode');
-    const esOscuro = body.classList.contains('dark-mode');
-    localStorage.setItem('temaGVI', esOscuro ? 'oscuro' : 'claro');
-    // Sincronizar el checkbox por si acaso
     const check = document.getElementById('checkTema');
     if(check) check.checked = esOscuro;
-}
-
-// Dentro del DOMContentLoaded de global.js, agrega esto:
-const esOscuro = localStorage.getItem('temaGVI') === 'oscuro';
-const check = document.getElementById('checkTema');
-if(check) check.checked = esOscuro;
+});

@@ -6,51 +6,65 @@
     <style>
         /* Rediseño visual: panel de ajustes */
         :root {
-            --settings-ink: #171b21;
-            --settings-muted: #695c57;
-            --settings-line: rgba(29, 38, 52, 0.09);
-            --settings-card: rgba(255, 255, 255, 0.72);
-            --settings-card-strong: rgba(255, 255, 255, 0.9);
-            --settings-blue: #1769ff;
-            --settings-blue-deep: #0e4dcc;
-            --settings-green: #20b15a;
-            --settings-amber: #c97912;
-            --settings-shadow: 0 22px 70px rgba(55, 48, 45, 0.1);
+            --settings-blue: #3d73ff;
+            --settings-blue-soft: rgba(61, 115, 255, 0.14);
+            --settings-green: #2aa65a;
+            --settings-amber: #ffc15a;
         }
 
+        html,
         body {
-            background:
-                radial-gradient(circle at 7% 14%, rgba(23, 105, 255, 0.13), transparent 26%),
-                radial-gradient(circle at 89% 7%, rgba(32, 177, 90, 0.11), transparent 24%),
-                linear-gradient(142deg, #f6f7f9 0%, #eef2f6 48%, #f8f5f2 100%);
-            color: var(--settings-ink);
+            min-height: 100dvh;
         }
 
-        body.dark-mode {
-            --settings-ink: #f5f2ee;
-            --settings-muted: rgba(245, 242, 238, 0.62);
-            --settings-line: rgba(255, 255, 255, 0.1);
-            --settings-card: rgba(24, 26, 31, 0.7);
-            --settings-card-strong: rgba(31, 33, 39, 0.92);
-            --settings-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
-            background:
-                radial-gradient(circle at 8% 12%, rgba(23, 105, 255, 0.18), transparent 28%),
-                radial-gradient(circle at 88% 7%, rgba(32, 177, 90, 0.12), transparent 24%),
-                linear-gradient(142deg, #111419 0%, #17181d 48%, #111214 100%);
+        html {
+            background-color: #eef2f7;
         }
 
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: -1;
-            opacity: 0.42;
+        html.dark-mode {
+            background-color: #11151c;
+        }
+
+        body.settings-page {
+            --settings-ink: #151922;
+            --settings-muted: rgba(21, 25, 34, 0.58);
+            --settings-soft: rgba(21, 25, 34, 0.72);
+            --settings-line: rgba(15, 23, 42, 0.1);
+            --settings-card: rgba(255, 255, 255, 0.7);
+            --settings-card-strong: rgba(255, 255, 255, 0.92);
+            --settings-card-hover: rgba(255, 255, 255, 0.98);
+            --settings-shadow: 0 24px 70px rgba(28, 38, 58, 0.12);
+            background-color: #eef2f7 !important;
             background-image:
-                linear-gradient(rgba(23, 105, 255, 0.035) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(23, 105, 255, 0.035) 1px, transparent 1px);
-            background-size: 42px 42px;
-            mask-image: linear-gradient(to bottom, black, transparent 78%);
+                radial-gradient(circle at 8% 8%, rgba(61, 115, 255, 0.13), transparent 26%),
+                linear-gradient(180deg, #f4f7fb 0%, #eef2f7 100%) !important;
+            color: var(--settings-ink);
+            color-scheme: light;
+        }
+
+        body.settings-page.dark-mode {
+            --settings-ink: #f6f7fb;
+            --settings-muted: rgba(246, 247, 251, 0.58);
+            --settings-soft: rgba(246, 247, 251, 0.74);
+            --settings-line: rgba(255, 255, 255, 0.08);
+            --settings-card: rgba(20, 22, 28, 0.72);
+            --settings-card-strong: rgba(32, 34, 42, 0.92);
+            --settings-card-hover: rgba(38, 41, 50, 0.96);
+            --settings-green: #6fe28f;
+            --settings-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+            background-color: #12151c !important;
+            background-image: none !important;
+            color: var(--settings-ink);
+            color-scheme: dark;
+        }
+
+        body.settings-page::before {
+            display: none;
+        }
+
+        body.settings-page > * {
+            position: relative;
+            z-index: 1;
         }
 
         .config-container {
@@ -73,7 +87,7 @@
             border-radius: 30px;
             background:
                 linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.58)),
-                radial-gradient(circle at 94% 15%, rgba(23, 105, 255, 0.14), transparent 32%);
+                radial-gradient(circle at 94% 15%, rgba(61, 115, 255, 0.14), transparent 32%);
             border: 1px solid rgba(255, 255, 255, 0.8);
             box-shadow: var(--settings-shadow);
             backdrop-filter: blur(18px);
@@ -82,7 +96,7 @@
         body.dark-mode .config-header {
             background:
                 linear-gradient(135deg, rgba(31, 34, 41, 0.9), rgba(23, 24, 30, 0.66)),
-                radial-gradient(circle at 94% 15%, rgba(23, 105, 255, 0.18), transparent 34%);
+                radial-gradient(circle at 94% 15%, rgba(61, 115, 255, 0.18), transparent 34%);
             border-color: rgba(255, 255, 255, 0.1);
         }
 
@@ -94,7 +108,7 @@
             right: -80px;
             bottom: -120px;
             border-radius: 999px;
-            background: rgba(23, 105, 255, 0.1);
+            background: rgba(61, 115, 255, 0.12);
             filter: blur(8px);
         }
 
@@ -112,8 +126,8 @@
             margin: 0 0 18px;
             padding: 7px 10px;
             border-radius: 999px;
-            background: rgba(23, 105, 255, 0.1);
-            color: var(--settings-blue-deep);
+            background: rgba(61, 115, 255, 0.12);
+            color: #9bb8ff;
             font-size: 11px;
             font-weight: 900;
             letter-spacing: 0.13em;
@@ -122,7 +136,7 @@
 
         body.dark-mode .config-eyebrow {
             color: #8fb5ff;
-            background: rgba(23, 105, 255, 0.16);
+            background: rgba(61, 115, 255, 0.16);
         }
 
         .config-header h1 {
@@ -212,8 +226,8 @@
             padding: 18px;
             border-radius: 28px;
             background: var(--settings-card);
-            border: 1px solid rgba(255, 255, 255, 0.72);
-            box-shadow: 0 18px 48px rgba(55, 48, 45, 0.075);
+            border: 1px solid var(--settings-line);
+            box-shadow: var(--settings-shadow);
             backdrop-filter: blur(14px);
             animation: settingsPanelIn 0.44s cubic-bezier(0.2, 0.8, 0.2, 1) both;
         }
@@ -260,7 +274,7 @@
             height: 8px;
             border-radius: 999px;
             background: var(--settings-blue);
-            box-shadow: 0 0 0 5px rgba(23, 105, 255, 0.1);
+            box-shadow: 0 0 0 5px var(--settings-blue-soft);
         }
 
         .config-list {
@@ -286,13 +300,13 @@
             border: 1px solid var(--settings-line);
             border-radius: 20px;
             background: var(--settings-card-strong);
-            box-shadow: 0 10px 28px rgba(55, 48, 45, 0.045);
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.16);
             transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         body.dark-mode .config-item {
-            background: rgba(255, 255, 255, 0.055);
-            border-color: rgba(255, 255, 255, 0.08);
+            background: var(--settings-card-strong);
+            border-color: var(--settings-line);
         }
 
         .config-item::after {
@@ -301,7 +315,7 @@
             inset: 0;
             opacity: 0;
             pointer-events: none;
-            background: linear-gradient(110deg, rgba(23, 105, 255, 0.11), transparent 42%);
+            background: linear-gradient(110deg, rgba(61, 115, 255, 0.13), transparent 42%);
             transition: opacity 0.2s ease;
         }
 
@@ -311,8 +325,9 @@
 
         .config-item.clickable:hover {
             transform: translateY(-2px);
-            border-color: rgba(23, 105, 255, 0.24);
-            box-shadow: 0 16px 34px rgba(23, 105, 255, 0.11);
+            border-color: rgba(61, 115, 255, 0.28);
+            background: var(--settings-card-hover);
+            box-shadow: 0 16px 34px rgba(0, 0, 0, 0.2);
         }
 
         .config-item.clickable:hover::after {
@@ -341,12 +356,12 @@
             stroke-width: 2.35px;
         }
 
-        .icon-blue { background: linear-gradient(145deg, #2c78ff, #1558d6); }
-        .icon-green { background: linear-gradient(145deg, #36c46b, #1c9c4d); }
-        .icon-orange { background: linear-gradient(145deg, #e69b2b, #bc6b0b); }
-        .icon-purple { background: linear-gradient(145deg, #6857d8, #4534bd); }
-        .icon-gray { background: linear-gradient(145deg, #9aa0aa, #686e78); }
-        .icon-dark { background: linear-gradient(145deg, #232832, #101318); }
+        .icon-blue { background: linear-gradient(145deg, #3d73ff, #234fca); }
+        .icon-green { background: linear-gradient(145deg, #53ca72, #248b43); }
+        .icon-orange { background: linear-gradient(145deg, #d69b42, #965f18); }
+        .icon-purple { background: linear-gradient(145deg, #6e67e8, #423bb8); }
+        .icon-gray { background: linear-gradient(145deg, #8d949f, #5f6570); }
+        .icon-dark { background: linear-gradient(145deg, #20242d, #0d1017); }
 
         .config-info {
             flex: 1;
@@ -366,7 +381,7 @@
             margin: 0;
             color: var(--settings-muted);
             font-size: 13px;
-            font-weight: 700;
+            font-weight: 760;
             line-height: 1.35;
         }
 
@@ -388,13 +403,13 @@
             background: var(--settings-blue);
             color: #fff;
             cursor: pointer;
-            box-shadow: 0 12px 22px rgba(23, 105, 255, 0.2);
+            box-shadow: 0 12px 22px rgba(61, 115, 255, 0.22);
             transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease, opacity 0.16s ease;
         }
 
         .config-action:hover {
             transform: translateY(-1px);
-            box-shadow: 0 16px 26px rgba(23, 105, 255, 0.25);
+            box-shadow: 0 16px 26px rgba(61, 115, 255, 0.28);
         }
 
         .config-action:active {
@@ -402,7 +417,7 @@
         }
 
         .config-action.secondary {
-            background: rgba(17, 19, 24, 0.08);
+            background: rgba(246, 247, 251, 0.1);
             color: var(--settings-ink);
             box-shadow: none;
         }
@@ -426,7 +441,7 @@
         .config-action:focus-visible,
         .config-input:focus-visible,
         .config-item.clickable:focus-visible {
-            outline: 3px solid rgba(23, 105, 255, 0.24);
+            outline: 3px solid rgba(61, 115, 255, 0.28);
             outline-offset: 3px;
         }
 
@@ -434,21 +449,21 @@
             max-width: 100%;
             padding: 9px 12px;
             overflow: hidden;
-            background: rgba(23, 105, 255, 0.1);
-            color: var(--settings-blue-deep);
+            background: rgba(61, 115, 255, 0.13);
+            color: #9bb8ff;
             font-family: "SFMono-Regular", Consolas, monospace;
             text-overflow: ellipsis;
         }
 
         body.dark-mode .ip-badge {
             color: #9bbcff;
-            background: rgba(23, 105, 255, 0.16);
+            background: rgba(61, 115, 255, 0.16);
         }
 
         .status-badge {
             padding: 8px 12px;
-            background: rgba(32, 177, 90, 0.13);
-            color: #168a43;
+            background: rgba(111, 226, 143, 0.12);
+            color: var(--settings-green);
         }
 
         body.dark-mode .status-badge {
@@ -457,7 +472,7 @@
         }
 
         .status-badge.pending {
-            background: rgba(201, 121, 18, 0.13);
+            background: rgba(255, 193, 90, 0.13);
             color: var(--settings-amber);
         }
 
@@ -465,17 +480,17 @@
             display: none;
             margin-top: 12px;
             padding: 14px 16px;
-            border: 1px solid rgba(23, 105, 255, 0.14);
+            border: 1px solid rgba(61, 115, 255, 0.18);
             border-radius: 17px;
-            background: rgba(23, 105, 255, 0.08);
-            color: var(--settings-blue-deep);
+            background: rgba(61, 115, 255, 0.1);
+            color: #a9bdff;
             font-weight: 900;
             line-height: 1.4;
         }
 
         body.dark-mode .update-status {
             color: #a8c4ff;
-            background: rgba(23, 105, 255, 0.13);
+            background: rgba(61, 115, 255, 0.13);
         }
 
         .update-status.visible {
@@ -501,7 +516,7 @@
             width: 100%;
             min-height: 48px;
             border: 1px solid var(--settings-line);
-            background: rgba(255, 255, 255, 0.72);
+            background: rgba(246, 247, 251, 0.08);
             color: inherit;
             border-radius: 16px;
             padding: 12px 14px;
@@ -518,8 +533,8 @@
         }
 
         .config-input:focus {
-            border-color: rgba(23, 105, 255, 0.42);
-            box-shadow: 0 0 0 4px rgba(23, 105, 255, 0.1);
+            border-color: rgba(61, 115, 255, 0.48);
+            box-shadow: 0 0 0 4px rgba(61, 115, 255, 0.12);
         }
 
         .users-list {
@@ -536,12 +551,12 @@
             gap: 12px;
             padding: 12px 14px;
             border-radius: 16px;
-            background: rgba(23, 105, 255, 0.065);
+            background: rgba(61, 115, 255, 0.1);
             font-weight: 900;
         }
 
         body.dark-mode .user-row {
-            background: rgba(23, 105, 255, 0.12);
+            background: rgba(61, 115, 255, 0.13);
         }
 
         .user-row span {
@@ -575,32 +590,295 @@
             height: 100%;
             border-radius: inherit;
             background: linear-gradient(90deg, var(--settings-blue) 0%, #33b1ff 100%);
-            box-shadow: 0 0 14px rgba(23, 105, 255, 0.42);
+            box-shadow: 0 0 14px rgba(61, 115, 255, 0.42);
             transition: width 0.3s ease;
         }
 
+        /* Layout tipo panel de preferencias */
+        body.settings-page .app-topbar {
+            position: relative !important;
+            top: auto !important;
+        }
+
+        .settings-shell {
+            width: min(100% - 56px, 1320px);
+            margin: clamp(20px, 2.4vh, 30px) auto 72px;
+            display: grid;
+            grid-template-columns: 280px minmax(0, 1fr);
+            align-items: start;
+            align-content: start;
+            gap: 28px;
+            position: relative;
+            min-height: 0;
+        }
+
+        body.dark-mode .settings-shell {
+            background: transparent;
+        }
+
+        .settings-sidebar {
+            min-width: 0;
+            padding: 0;
+            background: transparent;
+            border-right: none;
+        }
+
+        body.dark-mode .settings-sidebar {
+            background: transparent;
+            border-right-color: transparent;
+        }
+
+        .settings-account {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 4px 18px;
+        }
+
+        .settings-account-avatar {
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            border-radius: 16px;
+            background: rgba(246, 247, 251, 0.12);
+            border: 1px solid var(--settings-line);
+            color: #fff;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+        }
+
+        body.dark-mode .settings-account-avatar {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .settings-account strong,
+        .settings-account span {
+            display: block;
+        }
+
+        .settings-account strong {
+            font-size: 15px;
+            font-weight: 900;
+        }
+
+        .settings-account span {
+            margin-top: 2px;
+            color: var(--settings-muted);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .settings-search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 42px;
+            margin-bottom: 18px;
+            padding: 0 12px;
+            border: 1px solid var(--settings-line);
+            border-radius: 15px;
+            background: rgba(246, 247, 251, 0.08);
+            color: var(--settings-muted);
+        }
+
+        body.dark-mode .settings-search {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .settings-search svg {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 auto;
+        }
+
+        .settings-search input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: inherit;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .settings-menu {
+            display: grid;
+            gap: 5px;
+        }
+
+        .settings-nav-item {
+            width: 100%;
+            min-height: 44px;
+            display: grid;
+            grid-template-columns: 30px 1fr auto;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            border-radius: 14px;
+            padding: 7px 10px;
+            background: transparent;
+            color: var(--settings-ink);
+            cursor: pointer;
+            font: inherit;
+            text-align: left;
+            transition: background-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+        }
+
+        .settings-nav-item:hover {
+            background: rgba(246, 247, 251, 0.08);
+        }
+
+        .settings-nav-item.active {
+            background: var(--settings-blue);
+            color: #fff;
+            box-shadow: 0 14px 26px rgba(61, 115, 255, 0.24);
+        }
+
+        .settings-nav-item svg {
+            width: 18px;
+            height: 18px;
+            justify-self: center;
+        }
+
+        .settings-nav-item span {
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .settings-nav-item small {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(61, 115, 255, 0.35);
+        }
+
+        .settings-nav-item.active small {
+            background: rgba(255, 255, 255, 0.78);
+        }
+
+        .settings-content {
+            min-width: 0;
+            padding: 0;
+        }
+
+        .settings-panel {
+            display: none;
+        }
+
+        .settings-panel.active {
+            display: block;
+            animation: settingsPanelIn 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+
+        .settings-panel .config-section {
+            display: block;
+            margin-bottom: 16px;
+            animation: none;
+            padding: 22px;
+        }
+
+        .settings-panel .config-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-panel .config-section h2 {
+            margin-bottom: 14px;
+            font-size: 14px;
+            letter-spacing: 0.08em;
+        }
+
+        body.settings-page .app-topbar {
+            background: rgba(255, 255, 255, 0.82);
+            border-color: rgba(15, 23, 42, 0.08);
+            box-shadow: 0 18px 48px rgba(28, 38, 58, 0.1);
+        }
+
+        body.settings-page.dark-mode .app-topbar {
+            background: rgba(22, 24, 30, 0.9);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.26);
+        }
+
+        body.settings-page .topbar-nav-pill,
+        body.settings-page .topbar-window-btn,
+        body.settings-page .topbar-clock-chip,
+        body.settings-page .topbar-link.user-switch {
+            background: rgba(15, 23, 42, 0.06);
+        }
+
+        body.settings-page.dark-mode .topbar-nav-pill,
+        body.settings-page.dark-mode .topbar-window-btn,
+        body.settings-page.dark-mode .topbar-clock-chip,
+        body.settings-page.dark-mode .topbar-link.user-switch {
+            background: rgba(246, 247, 251, 0.08);
+        }
+
+        body.settings-page .topbar-link {
+            color: rgba(21, 25, 34, 0.66);
+        }
+
+        body.settings-page.dark-mode .topbar-link {
+            color: rgba(246, 247, 251, 0.7);
+        }
+
+        body.settings-page .topbar-link.active {
+            color: #fff;
+        }
+
+        body.settings-page .config-section,
+        body.settings-page .config-item,
+        body.settings-page .settings-search,
+        body.settings-page .config-input {
+            border-color: var(--settings-line);
+        }
+
         @media (max-width: 980px) {
-            .config-container {
+            .settings-shell {
                 grid-template-columns: 1fr;
                 width: min(100% - 28px, 760px);
+                overflow: visible;
+                gap: 18px;
             }
 
-            .config-section:nth-of-type(3) {
-                grid-row: auto;
+            .settings-sidebar {
+                border-right: none;
+                border-bottom: none;
             }
+
+            .settings-menu {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                padding-bottom: 2px;
+            }
+
+            .settings-nav-item {
+                min-width: max-content;
+            }
+
+            .settings-content {
+                max-height: none;
+            }
+
         }
 
         @media (max-width: 720px) {
-            .config-container {
+            .settings-shell {
                 width: min(100% - 24px, 760px);
                 margin-top: 18px;
-                gap: 16px;
             }
 
-            .config-header {
-                grid-template-columns: 1fr;
-                padding: 24px;
-                border-radius: 24px;
+            .settings-sidebar,
+            .settings-content {
+                padding: 0;
+            }
+
+            .settings-account {
+                padding-left: 0;
+                padding-right: 0;
             }
 
             .config-item {
@@ -642,13 +920,10 @@
         /* Estilos del Modal Premium de Actualización */
         .update-modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            inset: 0;
             background: rgba(10, 14, 22, 0.55);
             backdrop-filter: blur(12px);
-            display: grid;
+            display: none;
             place-items: center;
             z-index: 10000;
             opacity: 0;
@@ -657,6 +932,7 @@
         }
 
         .update-modal-overlay.visible {
+            display: grid;
             opacity: 1;
             visibility: visible;
         }
@@ -773,150 +1049,184 @@
         }
     </style>
 </head>
-<body>
+<body class="settings-page">
     <%- include('partials/nav') %>
 
-    <main class="config-container">
-        <header class="config-header">
-            <div class="config-hero-copy">
+    <main class="settings-shell">
+        <aside class="settings-sidebar" aria-label="Categorias de ajustes">
+            <div class="settings-account">
+                <div class="settings-account-avatar">GVI</div>
                 <div>
-                    <p class="config-eyebrow">Centro de control</p>
-                    <h1>Ajustes</h1>
-                    <p>Sistema, datos, red y mantenimiento de GVI. Revisa lo importante sin salir del flujo de venta.</p>
+                    <strong>Ajustes GVI</strong>
+                    <span>Centro de configuracion</span>
                 </div>
             </div>
-            <div class="config-hero-side">
-                <div class="version-pill" id="lblVersionTop">v...</div>
-                <div class="config-quick-status">
-                    <div class="quick-status-card">
-                        <span>Actualizaciones</span>
-                        <strong id="heroUpdateState">Preparado</strong>
-                    </div>
-                    <div class="quick-status-card">
-                        <span>Red local</span>
-                        <strong id="heroNetworkState">Conectando</strong>
-                    </div>
-                </div>
-            </div>
-        </header>
 
-        <section class="config-section">
-            <h2>Actualizacion</h2>
-            <div class="config-list">
-                <div class="config-item">
-                    <div class="config-icon icon-blue"><i data-lucide="download-cloud"></i></div>
-                    <div class="config-info">
-                        <b>Buscar actualizaciones</b>
-                        <p id="updateDescription">GVI busca y descarga nuevas versiones en segundo plano desde GitHub Releases.</p>
-                        <div class="progress-container" id="downloadProgressContainer">
-                            <div class="progress-bar" id="downloadProgressBar"></div>
+            <label class="settings-search">
+                <i data-lucide="search"></i>
+                <input id="settingsSearch" type="search" placeholder="Buscar ajuste">
+            </label>
+
+            <nav class="settings-menu" id="settingsMenu">
+                <button class="settings-nav-item active" type="button" data-settings-tab="general" data-title="General" data-description="Resumen del sistema, version instalada y acciones rapidas de mantenimiento." data-icon="settings">
+                    <i data-lucide="settings"></i><span>General</span><small></small>
+                </button>
+                <button class="settings-nav-item" type="button" data-settings-tab="actualizacion" data-title="Actualizacion" data-description="Busca versiones nuevas, revisa el canal estable y controla la instalacion de GVI." data-icon="download-cloud">
+                    <i data-lucide="download-cloud"></i><span>Actualizacion</span><small></small>
+                </button>
+                <button class="settings-nav-item" type="button" data-settings-tab="red" data-title="Red local" data-description="Datos para conectar cajas, celulares o equipos secundarios dentro de la misma red." data-icon="monitor">
+                    <i data-lucide="monitor"></i><span>Red local</span><small></small>
+                </button>
+                <button class="settings-nav-item" type="button" data-settings-tab="usuarios" data-title="Usuarios" data-description="Administra perfiles de caja y administrador con PIN de acceso." data-icon="users">
+                    <i data-lucide="users"></i><span>Usuarios</span><small></small>
+                </button>
+                <button class="settings-nav-item" type="button" data-settings-tab="datos" data-title="Datos y respaldo" data-description="Respalda la informacion del negocio y revisa el almacenamiento local." data-icon="database">
+                    <i data-lucide="database"></i><span>Datos y respaldo</span><small></small>
+                </button>
+            </nav>
+        </aside>
+
+        <section class="settings-content">
+            <div hidden>
+                <span id="lblVersionTop">v...</span>
+                <span id="heroUpdateState">Preparado</span>
+                <span id="heroNetworkState">Conectando</span>
+            </div>
+
+            <div class="settings-panel active" data-settings-panel="general">
+                <section class="config-section">
+                    <h2>Sistema</h2>
+                    <div class="config-list">
+                        <div class="config-item">
+                            <div class="config-icon icon-gray"><i data-lucide="info"></i></div>
+                            <div class="config-info">
+                                <b>Version del software</b>
+                                <p id="appFullName">GVI - Gestor de Ventas Intuitivo</p>
+                            </div>
+                            <span class="status-badge" id="lblVersion">v...</span>
+                        </div>
+                        <div class="config-item clickable" onclick="window.location.reload()">
+                            <div class="config-icon icon-dark"><i data-lucide="refresh-cw"></i></div>
+                            <div class="config-info">
+                                <b>Reiniciar vista</b>
+                                <p>Refresca la pantalla actual sin cerrar el programa.</p>
+                            </div>
+                            <button class="config-action secondary" type="button">Reiniciar</button>
                         </div>
                     </div>
-                    <div class="update-actions">
-                        <button class="config-action" id="btnCheckUpdate" type="button" onclick="buscarActualizacion()">Buscar</button>
-                        <button class="config-action secondary" id="btnDownloadUpdate" type="button" onclick="descargarActualizacion()" hidden>Descargar</button>
-                        <button class="config-action success" id="btnInstallUpdate" type="button" onclick="instalarActualizacion()" hidden>Actualizar ahora</button>
-                    </div>
-                </div>
-                <div class="config-item">
-                    <div class="config-icon icon-purple"><i data-lucide="git-branch"></i></div>
-                    <div class="config-info">
-                        <b>Canal estable</b>
-                        <p id="updateProvider">Proveedor pendiente.</p>
-                    </div>
-                    <span class="status-badge pending" id="updateMode">Preparado</span>
-                </div>
+                </section>
             </div>
-            <div class="update-status" id="updateStatus"></div>
-        </section>
 
-        <section class="config-section">
-            <h2>Conectividad</h2>
-            <div class="config-list">
-                <div class="config-item">
-                    <div class="config-icon icon-blue"><i data-lucide="monitor"></i></div>
-                    <div class="config-info">
-                        <b>Servidor local</b>
-                        <p>Direccion para conectar otros dispositivos en la misma red.</p>
+            <div class="settings-panel" data-settings-panel="actualizacion">
+                <section class="config-section">
+                    <h2>Actualizacion</h2>
+                    <div class="config-list">
+                        <div class="config-item">
+                            <div class="config-icon icon-blue"><i data-lucide="download-cloud"></i></div>
+                            <div class="config-info">
+                                <b>Buscar actualizaciones</b>
+                                <p id="updateDescription">GVI busca nuevas versiones desde GitHub Releases y avisa en notificaciones.</p>
+                                <div class="progress-container" id="downloadProgressContainer">
+                                    <div class="progress-bar" id="downloadProgressBar"></div>
+                                </div>
+                            </div>
+                            <div class="update-actions">
+                                <button class="config-action" id="btnCheckUpdate" type="button" onclick="buscarActualizacion()">Buscar</button>
+                                <button class="config-action secondary" id="btnDownloadUpdate" type="button" onclick="descargarActualizacion()" hidden>Descargar</button>
+                                <button class="config-action success" id="btnInstallUpdate" type="button" onclick="instalarActualizacion()" hidden>Actualizar ahora</button>
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <div class="config-icon icon-purple"><i data-lucide="git-branch"></i></div>
+                            <div class="config-info">
+                                <b>Canal estable</b>
+                                <p id="updateProvider">Proveedor pendiente.</p>
+                            </div>
+                            <span class="status-badge pending" id="updateMode">Preparado</span>
+                        </div>
                     </div>
-                    <div class="ip-badge" id="lblIpRed">...</div>
-                </div>
-                <div class="config-item">
-                    <div class="config-icon icon-green"><i data-lucide="wifi"></i></div>
-                    <div class="config-info">
-                        <b>Estado de red</b>
-                        <p>Usa la misma red Wi-Fi para celulares o equipos secundarios.</p>
-                    </div>
-                    <span class="status-badge">Activo</span>
-                </div>
+                    <div class="update-status" id="updateStatus"></div>
+                </section>
             </div>
-        </section>
 
-        <section class="config-section">
-            <h2>Seguridad y datos</h2>
-            <div class="config-list">
-                <div class="config-item">
-                    <div class="config-icon icon-purple"><i data-lucide="users"></i></div>
-                    <div class="config-info">
-                        <b>Crear usuario</b>
-                        <p>Agrega perfiles con rol y PIN para iniciar sesion.</p>
+            <div class="settings-panel" data-settings-panel="red">
+                <section class="config-section">
+                    <h2>Conectividad</h2>
+                    <div class="config-list">
+                        <div class="config-item">
+                            <div class="config-icon icon-blue"><i data-lucide="monitor"></i></div>
+                            <div class="config-info">
+                                <b>Servidor local</b>
+                                <p>Direccion para conectar otros dispositivos en la misma red.</p>
+                            </div>
+                            <div class="ip-badge" id="lblIpRed">...</div>
+                        </div>
+                        <div class="config-item">
+                            <div class="config-icon icon-green"><i data-lucide="wifi"></i></div>
+                            <div class="config-info">
+                                <b>Estado de red</b>
+                                <p>Usa la misma red Wi-Fi para celulares o equipos secundarios.</p>
+                            </div>
+                            <span class="status-badge">Activo</span>
+                        </div>
                     </div>
-                </div>
-                <div class="config-item">
-                    <div class="user-form">
-                        <input class="config-input" id="nuevoUsuarioNombre" placeholder="Nombre">
-                        <select class="config-input" id="nuevoUsuarioRol">
-                            <option value="CAJA">Caja</option>
-                            <option value="ADMIN">Administrador</option>
-                        </select>
-                        <input class="config-input" id="nuevoUsuarioPin" maxlength="6" inputmode="numeric" placeholder="PIN">
-                        <button class="config-action" type="button" onclick="crearUsuario()">Crear</button>
-                    </div>
-                </div>
-                <div class="config-item">
-                    <div class="config-info">
-                        <b>Usuarios creados</b>
-                        <div class="users-list" id="usuariosList"></div>
-                    </div>
-                </div>
-                <a href="/api/backup" class="config-item clickable">
-                    <div class="config-icon icon-green"><i data-lucide="archive"></i></div>
-                    <div class="config-info">
-                        <b>Copia de seguridad</b>
-                        <p>Descargar inventario, ventas y datos del negocio en un archivo ZIP.</p>
-                    </div>
-                    <span class="config-action">Descargar</span>
-                </a>
-                <div class="config-item">
-                    <div class="config-icon icon-orange"><i data-lucide="database"></i></div>
-                    <div class="config-info">
-                        <b>Base de datos local</b>
-                        <p>Los datos se guardan en este equipo para uso como programa de escritorio.</p>
-                    </div>
-                    <span class="status-badge">Estable</span>
-                </div>
+                </section>
             </div>
-        </section>
 
-        <section class="config-section">
-            <h2>Sistema</h2>
-            <div class="config-list">
-                <div class="config-item">
-                    <div class="config-icon icon-gray"><i data-lucide="info"></i></div>
-                    <div class="config-info">
-                        <b>Version del software</b>
-                        <p id="appFullName">GVI - Gestor de Ventas Intuitivo</p>
+            <div class="settings-panel" data-settings-panel="usuarios">
+                <section class="config-section">
+                    <h2>Usuarios</h2>
+                    <div class="config-list">
+                        <div class="config-item">
+                            <div class="config-icon icon-purple"><i data-lucide="users"></i></div>
+                            <div class="config-info">
+                                <b>Crear usuario</b>
+                                <p>Agrega perfiles con rol y PIN para iniciar sesion.</p>
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <div class="user-form">
+                                <input class="config-input" id="nuevoUsuarioNombre" placeholder="Nombre">
+                                <select class="config-input" id="nuevoUsuarioRol">
+                                    <option value="CAJA">Caja</option>
+                                    <option value="ADMIN">Administrador</option>
+                                </select>
+                                <input class="config-input" id="nuevoUsuarioPin" maxlength="6" inputmode="numeric" placeholder="PIN">
+                                <button class="config-action" type="button" onclick="crearUsuario()">Crear</button>
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <div class="config-info">
+                                <b>Usuarios creados</b>
+                                <div class="users-list" id="usuariosList"></div>
+                            </div>
+                        </div>
                     </div>
-                    <span class="status-badge" id="lblVersion">v...</span>
-                </div>
-                <div class="config-item clickable" onclick="window.location.reload()">
-                    <div class="config-icon icon-dark"><i data-lucide="refresh-cw"></i></div>
-                    <div class="config-info">
-                        <b>Reiniciar vista</b>
-                        <p>Refresca la pantalla actual sin cerrar el programa.</p>
+                </section>
+            </div>
+
+            <div class="settings-panel" data-settings-panel="datos">
+                <section class="config-section">
+                    <h2>Datos y respaldo</h2>
+                    <div class="config-list">
+                        <a href="/api/backup" class="config-item clickable">
+                            <div class="config-icon icon-green"><i data-lucide="archive"></i></div>
+                            <div class="config-info">
+                                <b>Copia de seguridad</b>
+                                <p>Descargar inventario, ventas y datos del negocio en un archivo ZIP.</p>
+                            </div>
+                            <span class="config-action">Descargar</span>
+                        </a>
+                        <div class="config-item">
+                            <div class="config-icon icon-orange"><i data-lucide="database"></i></div>
+                            <div class="config-info">
+                                <b>Base de datos local</b>
+                                <p>Los datos se guardan en este equipo para uso como programa de escritorio.</p>
+                            </div>
+                            <span class="status-badge">Estable</span>
+                        </div>
                     </div>
-                    <button class="config-action secondary" type="button">Reiniciar</button>
-                </div>
+                </section>
             </div>
         </section>
     </main>
@@ -957,6 +1267,44 @@
 
         function cerrarModalActualizacion() {
             document.getElementById('updateModalOverlay').classList.remove('visible');
+        }
+
+        function activarPanelAjustes(button) {
+            const tab = button?.dataset.settingsTab;
+            if (!tab) return;
+
+            document.querySelectorAll('.settings-nav-item').forEach(item => item.classList.toggle('active', item === button));
+            document.querySelectorAll('.settings-panel').forEach(panel => {
+                panel.classList.toggle('active', panel.dataset.settingsPanel === tab);
+            });
+        }
+
+        function configurarNavegacionAjustes() {
+            document.querySelectorAll('.settings-nav-item').forEach(button => {
+                button.addEventListener('click', () => activarPanelAjustes(button));
+            });
+
+            const search = document.getElementById('settingsSearch');
+            search?.addEventListener('input', () => {
+                const query = search.value.trim().toLowerCase();
+                let firstVisible = null;
+                document.querySelectorAll('.settings-nav-item').forEach(button => {
+                    const hayCoincidencia = !query || button.innerText.toLowerCase().includes(query) || (button.dataset.description || '').toLowerCase().includes(query);
+                    button.hidden = !hayCoincidencia;
+                    if (hayCoincidencia && !firstVisible) firstVisible = button;
+                });
+                if (firstVisible && document.querySelector('.settings-nav-item.active')?.hidden) {
+                    activarPanelAjustes(firstVisible);
+                }
+            });
+
+            const user = JSON.parse(localStorage.getItem('gvi_user') || 'null');
+            if (user?.nombre) {
+                const accountName = document.querySelector('.settings-account strong');
+                const accountMeta = document.querySelector('.settings-account span');
+                if (accountName) accountName.innerText = user.nombre;
+                if (accountMeta) accountMeta.innerText = user.rol || 'Perfil activo';
+            }
         }
 
         function aplicarEstadoActualizacion(data) {
@@ -1105,6 +1453,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            configurarNavegacionAjustes();
             cargarInfoRed();
             cargarInfoApp();
             cargarUsuarios();

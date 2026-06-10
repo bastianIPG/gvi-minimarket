@@ -335,14 +335,15 @@
 
     function actualizarTemaNav() {
         const icon = document.getElementById('themeToggleIcon');
-        const esOscuro = document.body.classList.contains('dark-mode');
+        const esOscuro = typeof gviApplyTheme === 'function' ? gviApplyTheme() : document.body.classList.contains('dark-mode');
         if (icon) icon.setAttribute('data-lucide', esOscuro ? 'sun' : 'moon');
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     function toggleTemaNav() {
-        if (typeof toggleTema === 'function') {
-            toggleTema();
+        const esOscuro = document.body.classList.contains('dark-mode');
+        if (typeof gviSetThemePreference === 'function') {
+            gviSetThemePreference(esOscuro ? 'claro' : 'oscuro');
         } else {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('temaGVI', document.body.classList.contains('dark-mode') ? 'oscuro' : 'claro');
@@ -389,9 +390,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         try {
-            if (localStorage.getItem('temaGVI') === 'oscuro') {
-                document.body.classList.add('dark-mode');
-            }
+            if (typeof gviApplyTheme === 'function') gviApplyTheme();
             actualizarTemaNav();
 
             const usrInfo = JSON.parse(localStorage.getItem('gvi_user'));
@@ -786,6 +785,7 @@
         position: fixed;
         top: 82px;
         z-index: 1810;
+        display: none;
         opacity: 0;
         transform: translateY(-10px) scale(0.96);
         pointer-events: none;
@@ -810,9 +810,14 @@
 
     .notifications-popover.open,
     .profile-popover.open {
+        display: block;
         opacity: 1;
         transform: translateY(0) scale(1);
         pointer-events: auto;
+    }
+
+    .profile-popover.open {
+        display: grid;
     }
 
     .notifications-header {
@@ -978,7 +983,6 @@
         background: rgba(250, 248, 246, 0.96);
         border: 1px solid rgba(0, 0, 0, 0.07);
         box-shadow: 0 18px 44px rgba(18, 24, 36, 0.16);
-        display: grid;
         grid-template-columns: 44px 1fr;
         gap: 10px;
     }
