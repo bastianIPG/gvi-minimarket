@@ -6,14 +6,13 @@
     <style>
         body {
             background:
-                radial-gradient(circle at 82% 16%, rgba(0, 122, 255, 0.08), transparent 30%),
-                linear-gradient(145deg, #f8fbff 0%, #f3f6fa 46%, #f6f7f9 100%);
+                radial-gradient(circle at 9% 10%, rgba(61, 115, 255, 0.14), transparent 25%),
+                radial-gradient(circle at 92% 0%, rgba(132, 154, 190, 0.12), transparent 25%),
+                linear-gradient(180deg, #f6f8fc 0%, var(--bg-claro) 100%);
         }
 
         body.dark-mode {
-            background:
-                radial-gradient(circle at 82% 16%, rgba(0, 122, 255, 0.13), transparent 30%),
-                linear-gradient(145deg, #10151d 0%, #14171d 46%, #111216 100%);
+            background: var(--bg-oscuro);
         }
 
         .productos-shell {
@@ -27,9 +26,9 @@
         .productos-hero,
         .product-card,
         .quick-panel {
-            background: rgba(255, 255, 255, 0.78);
-            border: 1px solid rgba(20, 30, 45, 0.07);
-            box-shadow: 0 18px 48px rgba(20, 30, 45, 0.07);
+            background: var(--panel-claro);
+            border: 1px solid var(--borde-claro);
+            box-shadow: 0 18px 48px rgba(42, 53, 77, 0.09);
             backdrop-filter: blur(16px);
             border-radius: 26px;
         }
@@ -37,8 +36,8 @@
         body.dark-mode .productos-hero,
         body.dark-mode .product-card,
         body.dark-mode .quick-panel {
-            background: rgba(30, 30, 30, 0.72);
-            border-color: rgba(255, 255, 255, 0.08);
+            background: var(--panel-oscuro);
+            border-color: var(--borde-oscuro);
             box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
         }
 

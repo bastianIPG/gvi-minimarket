@@ -25,14 +25,15 @@
                 <i data-lucide="bell"></i>
             <span class="notification-dot" id="notificationDot" hidden></span>
             </button>
-            <button class="topbar-window-btn theme-toggle" onclick="toggleTemaNav()" title="Cambiar tema" data-label="Tema"><i data-lucide="moon" id="themeToggleIcon"></i></button>
-            <button class="topbar-window-btn" onclick="minimizarAppNav()" title="Minimizar GVI" data-label="Minimizar"><i data-lucide="minus"></i></button>
             <div class="topbar-clock-chip" id="topbarClockChip">
                 <strong id="topbarClock">00:00</strong>
                 <span id="topbarDate">--</span>
             </div>
             <a href="#" onclick="togglePerfil(event)" class="topbar-link user-switch" data-label="Perfil"><i data-lucide="user"></i><span id="topbarUserName">Usuario</span></a>
-            <button class="topbar-window-btn danger" onclick="cerrarProgramaNav()" title="Cerrar programa" data-label="Cerrar"><i data-lucide="power"></i></button>
+            <div class="topbar-window-group" aria-label="Controles de ventana">
+                <button class="topbar-window-btn minimize" onclick="minimizarAppNav()" title="Minimizar GVI" data-label="Minimizar"><i data-lucide="minus"></i></button>
+                <button class="topbar-window-btn danger" onclick="cerrarProgramaNav()" title="Cerrar programa" data-label="Cerrar"><i data-lucide="power"></i></button>
+            </div>
         </div>
     </div>
 </nav>
@@ -486,9 +487,9 @@
         margin: 22px auto 0;
         padding: 8px 14px;
         border-radius: 12px;
-        background: rgba(250, 248, 246, 0.96);
-        border: 1px solid rgba(234, 221, 218, 0.9);
-        box-shadow: 0 18px 55px rgba(42, 8, 0, 0.07);
+        background: rgba(255, 255, 255, 0.84);
+        border: 1px solid rgba(36, 47, 70, 0.1);
+        box-shadow: 0 18px 48px rgba(42, 53, 77, 0.1);
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
         display: flex;
@@ -500,8 +501,8 @@
     }
 
     body.dark-mode .app-topbar {
-        background: rgba(33, 30, 29, 0.92);
-        border-color: rgba(234, 221, 218, 0.1);
+        background: rgba(22, 24, 30, 0.9);
+        border-color: rgba(255, 255, 255, 0.08);
         box-shadow: 0 18px 42px rgba(0, 0, 0, 0.26);
     }
 
@@ -546,19 +547,18 @@
         background: rgba(255, 255, 255, 0.08);
     }
 
-    .topbar-window-btn.theme-toggle {
-        color: var(--azul-gvi);
-    }
-
-    body.dark-mode .topbar-window-btn.theme-toggle {
-        color: #ffd166;
-    }
-
     .topbar-icon-btn:hover,
     .topbar-window-btn:hover,
     .topbar-link:hover {
-        background: rgba(234, 221, 218, 0.72);
+        background: rgba(15, 23, 42, 0.1);
         color: #111318;
+    }
+
+    body.dark-mode .topbar-icon-btn:hover,
+    body.dark-mode .topbar-window-btn:hover,
+    body.dark-mode .topbar-link:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
     }
 
     .topbar-icon-btn i,
@@ -660,7 +660,7 @@
         top: 0;
         border-radius: 999px;
         background: var(--negro-gvi);
-        box-shadow: 0 10px 22px rgba(42, 8, 0, 0.18);
+        box-shadow: 0 10px 22px rgba(17, 24, 39, 0.18);
         pointer-events: none;
         will-change: transform, width;
         transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -706,12 +706,34 @@
         position: relative;
     }
 
+    .topbar-window-group {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        padding: 2px;
+        border-radius: 999px;
+        background: var(--superficie-suave);
+        flex: 0 0 auto;
+    }
+
+    body.dark-mode .topbar-window-group {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .topbar-window-group .topbar-window-btn {
+        background: transparent;
+    }
+
+    .topbar-window-group .topbar-window-btn:hover {
+        box-shadow: none;
+    }
+
     .notification-dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
         background: #ff3b30;
-        border: 2px solid var(--superficie-suave);
+        border: 2px solid #eef2f7;
         position: absolute;
         top: 8px;
         right: 8px;
@@ -762,8 +784,17 @@
     }
 
     .topbar-window-btn.danger {
-        background: #ff3b30;
-        color: white;
+        color: rgba(28, 30, 33, 0.72);
+    }
+
+    body.dark-mode .topbar-window-btn.danger {
+        color: rgba(228, 230, 235, 0.78);
+    }
+
+    .topbar-window-btn.minimize:hover {
+        background: #ffd166;
+        color: #111318;
+        box-shadow: 0 4px 12px rgba(255, 209, 102, 0.22);
     }
 
     .topbar-window-btn.danger:hover {
