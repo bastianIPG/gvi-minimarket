@@ -26,6 +26,41 @@ El instalador queda en:
 dist/GVI Minimarket Setup 2.0.0.exe
 ```
 
+## Publicar una actualizacion automatica desde Mac
+
+El actualizador automatico de GVI no se activa solo por subir codigo a GitHub. Para que los equipos instalados detecten una nueva version, hay que publicar una release con:
+
+```text
+GVI-Setup-x.x.x.exe
+GVI-Setup-x.x.x.exe.blockmap
+latest.yml
+```
+
+Este repositorio ya incluye un workflow de GitHub Actions que genera esos archivos en Windows y los publica cuando subes un tag `v*`.
+
+Flujo recomendado desde Mac:
+
+```bash
+npm install
+npm start
+```
+
+Despues de probar los cambios, sube una nueva version:
+
+```bash
+npm version patch
+git push origin main --follow-tags
+```
+
+Tambien puedes elegir la version manualmente:
+
+```bash
+npm version 2.1.2
+git push origin main --follow-tags
+```
+
+GitHub Actions ejecutara el workflow `Release GVI Application`, creara el instalador en Windows y publicara la release. Cuando la app instalada en Windows revise actualizaciones, leera `latest.yml` desde GitHub Releases y descargara la nueva version.
+
 ## Datos locales
 
 La base de datos, usuarios y logs se guardan en la carpeta de datos del usuario de Windows. Esto permite actualizar o reinstalar la aplicacion sin borrar ventas ni productos.
