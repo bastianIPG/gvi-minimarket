@@ -23,7 +23,7 @@
         <div class="topbar-actions">
             <button class="topbar-window-btn notification-toggle" onclick="toggleNotificaciones(event)" title="Notificaciones" data-label="Notificaciones">
                 <i data-lucide="bell"></i>
-                <span class="notification-dot"></span>
+            <span class="notification-dot" id="notificationDot" hidden></span>
             </button>
             <button class="topbar-window-btn theme-toggle" onclick="toggleTemaNav()" title="Cambiar tema" data-label="Tema"><i data-lucide="moon" id="themeToggleIcon"></i></button>
             <button class="topbar-window-btn" onclick="minimizarAppNav()" title="Minimizar GVI" data-label="Minimizar"><i data-lucide="minus"></i></button>
@@ -42,7 +42,7 @@
         <strong>Notificaciones</strong>
         <span>Centro GVI</span>
     </div>
-    <div class="notification-item update" id="notificationUpdateItem">
+    <div class="notification-item update" id="notificationUpdateItem" hidden>
         <i data-lucide="download-cloud" id="notificationUpdateIcon"></i>
         <div>
             <strong id="notificationUpdateTitle">Actualizaciones</strong>
@@ -50,7 +50,10 @@
             <div class="notification-progress" id="notificationUpdateProgress">
                 <div id="notificationUpdateProgressBar"></div>
             </div>
-            <button class="notification-action" id="notificationUpdateAction" type="button" onclick="instalarActualizacionNav(event)" hidden>Actualizar ahora</button>
+            <div class="notification-actions" id="notificationUpdateActions" hidden>
+                <button class="notification-action" id="notificationUpdatePrimary" type="button">Descargar</button>
+                <button class="notification-action secondary" id="notificationUpdateSecondary" type="button">Ahora no</button>
+            </div>
         </div>
     </div>
     <div class="notification-item" id="notificationInstalledNotice" hidden>
@@ -61,14 +64,7 @@
             <button class="notification-action secondary" type="button" onclick="descartarAvisoActualizacion(event)">Entendido</button>
         </div>
     </div>
-    <div class="notification-item urgent">
-        <i data-lucide="triangle-alert"></i>
-        <div>
-            <strong>Stock por revisar</strong>
-            <span>Productos con poco stock apareceran aqui.</span>
-        </div>
-    </div>
-    <div class="notifications-empty" id="notificationsEmpty">Las alertas reales se conectaran a stock, caja y ventas.</div>
+    <div class="notifications-empty" id="notificationsEmpty">No hay notificaciones por ahora.</div>
 </div>
 
 <div class="profile-popover" id="profilePopover">
@@ -136,19 +132,61 @@
         return String(texto || '').replace(/<[^>]*>/g, '').trim();
     }
 
+    function updateNotificationKey(kind, version) {
+        return `gvi_update_notification_${kind}_${version || 'actual'}`;
+    }
+
+    function estaNotificacionPospuesta(kind, version) {
+        return localStorage.getItem(updateNotificationKey(kind, version)) === 'later';
+    }
+
+    function posponerNotificacionActualizacion(kind, version) {
+        localStorage.setItem(updateNotificationKey(kind, version), 'later');
+        aplicarVisibilidadNotificaciones();
+    }
+
+    function aplicarVisibilidadNotificaciones() {
+        const popover = document.getElementById('notificationsPopover');
+        const items = popover ? Array.from(popover.querySelectorAll('.notification-item')) : [];
+        const visibleItems = items.filter(item => !item.hidden);
+        const empty = document.getElementById('notificationsEmpty');
+        const dot = document.getElementById('notificationDot');
+        if (empty) empty.hidden = visibleItems.length > 0;
+        if (dot) dot.hidden = visibleItems.length === 0;
+    }
+
+    async function descargarActualizacionNav(e) {
+        if (e) e.preventDefault();
+        const primary = document.getElementById('notificationUpdatePrimary');
+        if (primary) {
+            primary.disabled = true;
+            primary.innerText = 'Descargando...';
+        }
+        try {
+            const res = await fetch('/api/app/update/download', { method: 'POST' });
+            const data = await res.json();
+            aplicarActualizacionNav(data);
+        } catch (_) {
+            if (primary) {
+                primary.disabled = false;
+                primary.innerText = 'Descargar';
+            }
+        }
+    }
+
     async function instalarActualizacionNav(e) {
         if (e) e.preventDefault();
-        const action = document.getElementById('notificationUpdateAction');
-        if (action) {
-            action.disabled = true;
-            action.innerText = 'Actualizando...';
+        const primary = document.getElementById('notificationUpdatePrimary');
+        if (primary) {
+            primary.disabled = true;
+            primary.innerText = 'Instalando...';
         }
         try {
             await fetch('/api/app/update/install', { method: 'POST' });
         } catch (_) {
-            if (action) {
-                action.disabled = false;
-                action.innerText = 'Actualizar ahora';
+            if (primary) {
+                primary.disabled = false;
+                primary.innerText = 'Instalar ahora';
             }
         }
     }
@@ -157,6 +195,7 @@
         if (e) e.preventDefault();
         document.getElementById('notificationInstalledNotice')?.setAttribute('hidden', '');
         document.getElementById('updateInstalledToast')?.setAttribute('hidden', '');
+        aplicarVisibilidadNotificaciones();
         await fetch('/api/app/update/notice/dismiss', { method: 'POST' }).catch(() => null);
     }
 
@@ -171,56 +210,91 @@
         const text = document.getElementById('notificationUpdateText');
         const progress = document.getElementById('notificationUpdateProgress');
         const bar = document.getElementById('notificationUpdateProgressBar');
-        const action = document.getElementById('notificationUpdateAction');
+        const item = document.getElementById('notificationUpdateItem');
+        const actions = document.getElementById('notificationUpdateActions');
+        const primary = document.getElementById('notificationUpdatePrimary');
+        const secondary = document.getElementById('notificationUpdateSecondary');
         const icon = document.getElementById('notificationUpdateIcon');
-        if (!title || !text || !progress || !bar || !action) return;
+        if (!title || !text || !progress || !bar || !item || !actions || !primary || !secondary) return;
 
-        action.hidden = true;
-        action.disabled = false;
-        action.innerText = 'Actualizar ahora';
+        item.hidden = true;
+        actions.hidden = true;
+        primary.disabled = false;
+        secondary.disabled = false;
         progress.classList.remove('visible');
         bar.style.width = '0%';
         if (icon) icon.setAttribute('data-lucide', 'download-cloud');
 
         if (!data.configured) {
-            title.innerText = 'Actualizaciones';
-            text.innerText = data.message || 'Disponible solo en la version instalada.';
+            aplicarVisibilidadNotificaciones();
             return;
         }
 
         if (data.installing) {
+            item.hidden = false;
             title.innerText = 'Actualizando GVI';
             text.innerText = 'Instalando en silencio. La app se reiniciara automaticamente.';
             if (icon) icon.setAttribute('data-lucide', 'loader-circle');
+            aplicarVisibilidadNotificaciones();
             return;
         }
 
         if (data.downloading) {
+            item.hidden = false;
             title.innerText = `Descargando v${data.version || ''}`;
-            text.innerText = data.message || 'Descarga en segundo plano.';
+            text.innerText = data.message || 'Descarga en segundo plano. Puedes seguir usando GVI.';
             progress.classList.add('visible');
             bar.style.width = `${data.percent || 0}%`;
             if (icon) icon.setAttribute('data-lucide', 'download');
+            aplicarVisibilidadNotificaciones();
             return;
         }
 
         if (data.ready) {
-            title.innerText = `Version v${data.version} lista`;
-            text.innerText = 'Presiona actualizar. GVI instalara todo sin preguntas y volvera a abrirse.';
-            action.hidden = false;
+            if (estaNotificacionPospuesta('ready', data.version)) {
+                aplicarVisibilidadNotificaciones();
+                return;
+            }
+            item.hidden = false;
+            title.innerText = `Actualizacion v${data.version} lista`;
+            text.innerText = 'La descarga termino. Puedes instalarla ahora o recordarlo mas tarde.';
+            actions.hidden = false;
+            primary.innerText = 'Instalar ahora';
+            primary.onclick = instalarActualizacionNav;
+            secondary.innerText = 'Recordar mas tarde';
+            secondary.onclick = (event) => {
+                if (event) event.preventDefault();
+                posponerNotificacionActualizacion('ready', data.version);
+            };
             if (icon) icon.setAttribute('data-lucide', 'refresh-cw');
+            aplicarVisibilidadNotificaciones();
             return;
         }
 
         if (data.checking) {
-            title.innerText = 'Buscando actualizaciones';
-            text.innerText = 'Revisando GitHub Releases...';
-            if (icon) icon.setAttribute('data-lucide', 'loader-circle');
+            aplicarVisibilidadNotificaciones();
             return;
         }
 
-        title.innerText = 'Actualizaciones';
-        text.innerText = data.message || 'GVI revisa nuevas versiones en segundo plano.';
+        if (data.available) {
+            if (estaNotificacionPospuesta('available', data.version)) {
+                aplicarVisibilidadNotificaciones();
+                return;
+            }
+            item.hidden = false;
+            title.innerText = `Nueva version v${data.version}`;
+            text.innerText = 'Hay una actualizacion disponible. Quieres descargarla ahora?';
+            actions.hidden = false;
+            primary.innerText = 'Descargar';
+            primary.onclick = descargarActualizacionNav;
+            secondary.innerText = 'Ahora no';
+            secondary.onclick = (event) => {
+                if (event) event.preventDefault();
+                posponerNotificacionActualizacion('available', data.version);
+            };
+            if (icon) icon.setAttribute('data-lucide', 'download-cloud');
+        }
+        aplicarVisibilidadNotificaciones();
     }
 
     async function consultarActualizacionNav() {
@@ -242,6 +316,7 @@
             if (!notice) {
                 item.hidden = true;
                 document.getElementById('updateInstalledToast')?.setAttribute('hidden', '');
+                aplicarVisibilidadNotificaciones();
                 return;
             }
             item.hidden = false;
@@ -254,6 +329,7 @@
                 document.getElementById('updateInstalledToastTitle').innerText = `GVI v${notice.version} instalado`;
                 document.getElementById('updateInstalledToastText').innerText = notes.slice(0, 110);
             }
+            aplicarVisibilidadNotificaciones();
         } catch (_) {}
     }
 
@@ -643,6 +719,10 @@
         box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.08);
     }
 
+    .notification-dot[hidden] {
+        display: none;
+    }
+
     body.dark-mode .notification-dot {
         border-color: #2a2f38;
     }
@@ -776,6 +856,11 @@
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
+    .notification-item[hidden],
+    .notifications-empty[hidden] {
+        display: none;
+    }
+
     body.dark-mode .notification-item {
         border-bottom-color: rgba(255, 255, 255, 0.07);
     }
@@ -858,6 +943,21 @@
         font-size: 12px;
         font-weight: 900;
         cursor: pointer;
+    }
+
+    .notification-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .notification-actions[hidden] {
+        display: none;
+    }
+
+    .notification-actions .notification-action {
+        margin-top: 0;
     }
 
     .notification-action.secondary {
@@ -1071,13 +1171,28 @@
 
         .topbar-nav-pill {
             justify-content: flex-start;
+            width: 100%;
+            min-width: 0;
             max-width: 100%;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .topbar-nav-pill::-webkit-scrollbar {
+            display: none;
         }
 
         .topbar-actions {
             min-width: 0;
             width: 100%;
-            justify-content: flex-end;
+            justify-content: flex-start;
+            overflow-x: auto;
+            padding-bottom: 2px;
+            scrollbar-width: none;
+        }
+
+        .topbar-actions::-webkit-scrollbar {
+            display: none;
         }
 
         .topbar-link.user-switch {

@@ -100,7 +100,7 @@ function configureAutoUpdater() {
 
     updateState.configured = true;
     updateState.message = 'Listo para buscar actualizaciones.';
-    autoUpdater.autoDownload = true;
+    autoUpdater.autoDownload = false;
     autoUpdater.autoInstallOnAppQuit = false;
 
     autoUpdater.on('checking-for-update', () => {
@@ -117,7 +117,7 @@ function configureAutoUpdater() {
         updateState.releaseName = info.releaseName || info.version;
         updateState.releaseNotes = normalizeReleaseNotes(info.releaseNotes);
         updateState.percent = 0;
-        updateState.message = `Nueva version v${info.version} detectada. Descargando en segundo plano...`;
+        updateState.message = `Nueva version v${info.version} detectada.`;
     });
 
     autoUpdater.on('update-not-available', () => {
