@@ -31,4 +31,27 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
         run: |
-          npx electron-builder --win nsis --publish always
+          npm run generate-icon
+          npm run pack
+
+          $rcedit = Get-ChildItem -Path ".cache\electron-builder\winCodeSign" -Recurse -Filter rcedit-x64.exe | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $rcedit) {
+            throw "No se encontro rcedit para aplicar el icono al ejecutable."
+          }
+
+          $exe = "dist\win-unpacked\GVI.exe"
+          $icon = "build\icon.ico"
+          if (-not (Test-Path $exe)) {
+            throw "No se encontro el ejecutable generado: $exe"
+          }
+          if (-not (Test-Path $icon)) {
+            throw "No se encontro el icono del programa: $icon"
+          }
+
+          & $rcedit $exe `
+            --set-icon $icon `
+            --set-version-string FileDescription "GVI - Gestor de Ventas Intuitivo" `
+            --set-version-string ProductName "GVI" `
+            --set-version-string OriginalFilename "GVI.exe"
+
+          npx electron-builder --win nsis --prepackaged "dist\win-unpacked" --publish always
