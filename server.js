@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const AdmZip = require('adm-zip');
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
 const { app, BrowserWindow } = require('electron');

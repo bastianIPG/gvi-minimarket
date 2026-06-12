@@ -3,6 +3,11 @@
  */
 
 async function cargarClima() {
+    const tempEl = document.getElementById('wClimaTemp');
+    const iconEl = document.getElementById('wClimaIcon');
+    const ciudadEl = document.getElementById('wCiudadLabel');
+    if (!tempEl || !iconEl || !ciudadEl) return;
+
     const lat = localStorage.getItem('gvi_lat') || -36.6155;
     const lon = localStorage.getItem('gvi_lon') || -72.9561;
     const ciudad = localStorage.getItem('gvi_ciudad_nombre') || "Tomé";
@@ -18,9 +23,9 @@ async function cargarClima() {
             3: '☁️', 45: '🌫️', 51: '🌧️', 61: '🌧️', 71: '❄️', 95: '⚡' 
         };
 
-        document.getElementById('wClimaTemp').innerText = `${temp}°C`;
-        document.getElementById('wClimaIcon').innerText = iconos[datos.current_weather.weathercode] || '☁️';
-        document.getElementById('wCiudadLabel').innerText = ciudad.toUpperCase();
+        tempEl.innerText = `${temp}°C`;
+        iconEl.innerText = iconos[datos.current_weather.weathercode] || '☁️';
+        ciudadEl.innerText = ciudad.toUpperCase();
     } catch (e) { 
         console.error("Error clima"); 
     }

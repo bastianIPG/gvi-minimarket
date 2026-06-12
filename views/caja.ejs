@@ -240,80 +240,182 @@
             margin-top: 8px;
         }
 
-        .modal-cobro-panel {
-            width: min(560px, calc(100vw - 32px));
+        .modal-cobro-panel,
+        .modal-manual-panel {
+            width: min(620px, calc(100vw - 32px));
             padding: 0;
             overflow: hidden;
-            border-radius: 22px;
+            border-radius: 26px;
             text-align: left;
+            border: 1px solid rgba(255,255,255,0.7);
+            box-shadow: 0 34px 90px rgba(25, 35, 58, 0.26);
         }
 
-        .modal-cobro-header {
-            padding: 24px 26px 20px;
-            background: linear-gradient(135deg, rgba(0,122,255,0.12), rgba(52,199,89,0.1));
+        body.dark-mode .modal-cobro-panel,
+        body.dark-mode .modal-manual-panel {
+            border-color: rgba(255,255,255,0.08);
+            box-shadow: 0 34px 90px rgba(0,0,0,0.42);
+        }
+
+        .modal-cobro-header,
+        .modal-manual-header {
+            padding: 24px 28px 22px;
+            background:
+                radial-gradient(circle at 88% 0%, rgba(52,199,89,0.18), transparent 34%),
+                linear-gradient(135deg, rgba(61,115,255,0.14), rgba(242,247,255,0.88));
             border-bottom: 1px solid rgba(0,0,0,0.06);
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
         }
 
-        body.dark-mode .modal-cobro-header { border-bottom-color: #333; }
+        body.dark-mode .modal-cobro-header,
+        body.dark-mode .modal-manual-header {
+            background:
+                radial-gradient(circle at 88% 0%, rgba(52,199,89,0.16), transparent 34%),
+                linear-gradient(135deg, rgba(61,115,255,0.14), rgba(255,255,255,0.04));
+            border-bottom-color: rgba(255,255,255,0.08);
+        }
 
-        .modal-cobro-header span {
+        .modal-kicker {
             display: block;
             font-size: 12px;
             font-weight: 900;
             opacity: 0.58;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+        }
+
+        .modal-cobro-header h3,
+        .modal-manual-header h3 {
+            margin: 0;
+            font-size: clamp(26px, 4vw, 34px);
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+
+        .modal-cobro-meta,
+        .modal-manual-meta {
+            margin: 9px 0 0;
+            color: var(--texto-suave);
+            font-size: 14px;
+            font-weight: 750;
+        }
+
+        .modal-icon-soft {
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--azul-gvi);
+            background: rgba(255,255,255,0.72);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 16px 34px rgba(61,115,255,0.18);
+            flex: 0 0 auto;
+        }
+
+        body.dark-mode .modal-icon-soft {
+            background: rgba(255,255,255,0.08);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 16px 34px rgba(0,0,0,0.2);
+        }
+
+        .modal-icon-soft svg {
+            width: 28px;
+            height: 28px;
         }
 
         .modal-cobro-total {
-            margin-top: 6px;
-            font-size: clamp(42px, 7vw, 58px);
+            font-size: clamp(48px, 8vw, 74px);
             line-height: 1;
             font-weight: 950;
             color: var(--azul-gvi);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.055em;
+            text-align: right;
         }
 
-        .modal-cobro-body {
-            padding: 22px 26px 26px;
+        .modal-cobro-body,
+        .modal-manual-body {
+            padding: 24px 28px 28px;
         }
 
         .metodos-cobro {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 18px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .metodos-cobro .btn-metodo {
-            min-height: 58px;
-            padding: 10px 8px;
-            border-radius: 16px;
-            background: rgba(0,0,0,0.025);
-            border-width: 2px;
+            min-height: 74px;
+            padding: 12px;
+            border-radius: 18px;
+            background: rgba(17,24,39,0.035);
+            border: 1px solid rgba(17,24,39,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--texto-oscuro);
+            box-shadow: none;
+            transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease;
         }
 
-        body.dark-mode .metodos-cobro .btn-metodo { background: rgba(255,255,255,0.04); }
+        .metodos-cobro .btn-metodo svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .metodos-cobro .btn-metodo:hover {
+            transform: translateY(-1px);
+            border-color: rgba(61,115,255,0.24);
+        }
+
+        .metodos-cobro .btn-metodo.activo {
+            background: rgba(61,115,255,0.1);
+            border-color: rgba(61,115,255,0.58);
+            color: var(--azul-gvi);
+        }
+
+        .metodos-cobro .btn-metodo.fiado-color {
+            color: #f08a00;
+            border-color: rgba(240,138,0,0.28);
+        }
+
+        .metodos-cobro .btn-metodo.fiado-color.activo {
+            background: rgba(255,149,0,0.1);
+            border-color: rgba(240,138,0,0.66);
+        }
+
+        body.dark-mode .metodos-cobro .btn-metodo {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.08);
+            color: rgba(246,247,251,0.84);
+        }
 
         .campo-pago-card {
-            background: rgba(0,0,0,0.025);
-            border: 1px solid rgba(0,0,0,0.06);
-            border-radius: 18px;
-            padding: 16px;
+            background: #f7f9fd;
+            border: 1px solid rgba(17,24,39,0.07);
+            border-radius: 22px;
+            padding: 18px;
         }
 
         body.dark-mode .campo-pago-card {
-            background: rgba(255,255,255,0.04);
+            background: rgba(255,255,255,0.05);
             border-color: rgba(255,255,255,0.08);
         }
 
         .campo-pago-card label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 12px;
             font-weight: 900;
             opacity: 0.62;
             text-transform: uppercase;
+            letter-spacing: 0.07em;
         }
 
         .pago-input-wrap {
@@ -333,88 +435,257 @@
         }
 
         .pago-input-wrap .form-input {
-            min-height: 58px;
-            padding-left: 48px !important;
-            border-radius: 15px;
-            font-size: 24px;
-            font-weight: 900;
+            min-height: 68px;
+            padding: 0 20px 0 52px !important;
+            border-radius: 18px;
+            border: 2px solid rgba(61,115,255,0.2);
+            background: #fff;
+            font-size: clamp(24px, 4vw, 34px);
+            font-weight: 950;
             text-align: center;
+            color: var(--texto-oscuro);
+            font-variant-numeric: tabular-nums;
+        }
+
+        body.dark-mode .pago-input-wrap .form-input {
+            background: rgba(255,255,255,0.06);
+            color: rgba(246,247,251,0.96);
         }
 
         .vuelto-card {
-            margin-top: 12px;
-            padding: 12px 14px;
-            border-radius: 14px;
-            background: rgba(52,199,89,0.1);
+            margin-top: 14px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(52,199,89,0.12);
             color: #2eb84e;
             display: flex;
             align-items: center;
             justify-content: space-between;
             font-weight: 900;
-            font-size: 20px;
+            font-size: 24px;
+            font-variant-numeric: tabular-nums;
         }
 
         .vuelto-card span:first-child {
             font-size: 12px;
             text-transform: uppercase;
             opacity: 0.75;
+            letter-spacing: 0.07em;
         }
 
         .fiado-card {
             background: rgba(255,149,0,0.08);
             border: 1px solid rgba(255,149,0,0.18);
-            border-radius: 18px;
-            padding: 16px;
+            border-radius: 22px;
+            padding: 18px;
+        }
+
+        .fiado-card .form-input {
+            min-height: 62px;
+            border-radius: 17px;
+            border: 2px solid rgba(255,149,0,0.34);
+            font-size: 21px;
+            font-weight: 900;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .aviso-cliente-nuevo {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            color: #b86b00;
+            background: rgba(255,149,0,0.12);
+            font-size: 13px;
+            font-weight: 850;
+            text-align: center;
         }
 
         .acciones-cobro {
             display: grid;
             grid-template-columns: 0.85fr 1fr 1.25fr;
-            gap: 10px;
+            gap: 12px;
             margin-top: 18px;
         }
 
         .acciones-cobro button {
-            min-height: 58px;
-            border-radius: 14px !important;
+            min-height: 64px;
+            border-radius: 18px !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            font-size: 16px;
+            font-weight: 950;
         }
 
-        #modalFinalizar #seccionEfectivo > input {
+        .acciones-cobro button svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .modal-manual-panel {
+            --modal-width: 500px;
+            border-radius: 22px;
+        }
+
+        .manual-form-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .manual-field label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 900;
+            opacity: 0.68;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+        }
+
+        .manual-field-hint {
+            display: block;
+            margin-top: 2px;
+            text-transform: none;
+            letter-spacing: 0;
+            font-size: 12px;
+            opacity: 0.72;
+        }
+
+        .manual-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .manual-input-wrap svg,
+        .manual-input-wrap i {
+            position: absolute;
+            left: 16px;
+            width: 22px;
+            height: 22px;
+            color: var(--azul-gvi);
+            opacity: 0.78;
+        }
+
+        .manual-input-wrap .form-input {
             width: 100%;
-            min-height: 58px;
-            border-radius: 15px !important;
-            border: 2px solid rgba(0,122,255,0.22) !important;
-            background: var(--panel-claro);
-            font-size: 24px !important;
-            font-weight: 900 !important;
-            text-align: center !important;
-            color: inherit;
-        }
-
-        body.dark-mode #modalFinalizar #seccionEfectivo > input { background: rgba(255,255,255,0.05); }
-
-        #modalFinalizar #seccionEfectivo > input::placeholder {
-            color: rgba(28,30,33,0.42);
+            box-sizing: border-box;
+            min-height: 56px;
+            border-radius: 16px;
+            border: 2px solid rgba(17,24,39,0.1);
+            padding-left: 50px;
             font-size: 20px;
-            font-weight: 800;
+            font-weight: 850;
+            outline: none;
         }
 
-        #modalFinalizar #seccionEfectivo > div {
-            margin-top: 12px !important;
-            padding: 12px 14px;
-            border-radius: 14px;
-            background: rgba(52,199,89,0.1);
-            color: #2eb84e;
-            font-size: 20px !important;
-            font-weight: 900 !important;
-            text-align: center;
+        .manual-input-wrap .form-input:focus {
+            border-color: rgba(61,115,255,0.56);
+            box-shadow: 0 0 0 4px rgba(61,115,255,0.12);
         }
 
-        #modalFinalizar #seccionFiado {
-            background: rgba(255,149,0,0.08);
-            border: 1px solid rgba(255,149,0,0.18);
-            border-radius: 18px;
-            padding: 16px;
+        .manual-input-wrap.price .form-input {
+            font-size: clamp(28px, 5vw, 38px);
+            font-weight: 950;
+            color: var(--azul-gvi);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .manual-input-wrap.price::before {
+            content: "$";
+            position: absolute;
+            left: 51px;
+            z-index: 1;
+            color: rgba(61,115,255,0.55);
+            font-size: 28px;
+            font-weight: 950;
+            pointer-events: none;
+        }
+
+        .manual-input-wrap.price .form-input {
+            padding-left: 76px;
+        }
+
+        .manual-presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .manual-presets button {
+            min-height: 46px;
+            border: 1px solid rgba(17,24,39,0.08);
+            background: rgba(17,24,39,0.035);
+            color: inherit;
+            border-radius: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: transform 0.14s ease, border-color 0.14s ease, background-color 0.14s ease;
+        }
+
+        .manual-presets button:hover {
+            transform: translateY(-1px);
+            border-color: rgba(61,115,255,0.28);
+            background: rgba(61,115,255,0.08);
+        }
+
+        .acciones-manual {
+            display: grid;
+            grid-template-columns: 0.9fr 1.25fr;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .acciones-manual button {
+            min-height: 58px;
+            border-radius: 16px !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            font-size: 17px;
+            font-weight: 950;
+        }
+
+        #modalManual .modal-manual-header {
+            padding: 22px 24px 18px;
+            background: #f8faff;
+            border-bottom-color: rgba(17,24,39,0.07);
+        }
+
+        body.dark-mode #modalManual .modal-manual-header {
+            background: rgba(255,255,255,0.04);
+        }
+
+        #modalManual .modal-manual-header h3 {
+            font-size: 30px;
+        }
+
+        #modalManual .modal-manual-body {
+            padding: 20px 24px 24px;
+        }
+
+        #modalManual .modal-icon-soft {
+            width: 46px;
+            height: 46px;
+            border-radius: 15px;
+        }
+
+        @media (max-width: 620px) {
+            .modal-cobro-header,
+            .modal-manual-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+            .modal-cobro-total { text-align: left; }
+            .metodos-cobro,
+            .acciones-cobro,
+            .acciones-manual { grid-template-columns: 1fr; }
+            .manual-presets { grid-template-columns: repeat(2, 1fr); }
         }
 
         .btn-manual-rapido {
@@ -446,6 +717,14 @@
         .caja-header {
             margin: 26px 0 18px;
             align-items: flex-end;
+        }
+
+        .caja-header-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .caja-title-kicker {
@@ -486,6 +765,43 @@
         .estado-caja-chip svg {
             width: 17px;
             height: 17px;
+        }
+
+        .caja-focus-toggle {
+            border: 1px solid rgba(36,47,70,0.1);
+            background: rgba(255,255,255,0.82);
+            color: rgba(17,24,39,0.78);
+            border-radius: 999px;
+            min-height: 42px;
+            padding: 0 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 950;
+            cursor: pointer;
+            box-shadow: 0 10px 24px rgba(42,53,77,0.08);
+            transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+        }
+
+        .caja-focus-toggle:hover {
+            transform: translateY(-1px);
+            border-color: rgba(61,115,255,0.28);
+            color: var(--azul-gvi);
+            background: rgba(61,115,255,0.08);
+        }
+
+        .caja-focus-toggle i,
+        .caja-focus-toggle svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        body.dark-mode .caja-focus-toggle {
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(255,255,255,0.09);
+            color: rgba(246,247,251,0.78);
+            box-shadow: 0 14px 28px rgba(0,0,0,0.18);
         }
 
         .caja-grid {
@@ -900,6 +1216,55 @@
             color: var(--texto-oscuro);
         }
 
+        body.caja-focus-mode .app-topbar {
+            position: fixed;
+            left: 50%;
+            top: 0;
+            margin-top: 0;
+            opacity: 0;
+            pointer-events: none;
+            transform: translate3d(-50%, -118%, 0);
+            transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body.caja-focus-mode .caja-shell {
+            width: min(100% - 34px, 1660px);
+            max-width: 1660px;
+            margin-top: 14px;
+            transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1), margin 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body.caja-focus-mode .caja-header {
+            margin: 10px 0 14px;
+        }
+
+        body.caja-focus-mode .caja-header p,
+        body.caja-focus-mode .caja-title-kicker {
+            display: none;
+        }
+
+        body.caja-focus-mode .caja-header h1 {
+            font-size: clamp(26px, 2.4vw, 36px);
+        }
+
+        body.caja-focus-mode .panel-ticket {
+            min-height: calc(100dvh - 96px);
+        }
+
+        body.caja-focus-mode .panel-cobro {
+            top: 16px;
+        }
+
+        body.caja-focus-mode .caja-focus-toggle {
+            background: rgba(61,115,255,0.12);
+            border-color: rgba(61,115,255,0.24);
+            color: var(--azul-gvi);
+        }
+
+        body.caja-focus-mode .estado-caja-chip {
+            display: none;
+        }
+
         @media (max-width: 1100px) {
             .caja-grid { grid-template-columns: 1fr; }
             .panel-cobro { position: static; }
@@ -908,6 +1273,7 @@
 
         @media (max-width: 720px) {
             .caja-header { align-items: flex-start; flex-direction: column; }
+            .caja-header-actions { justify-content: flex-start; }
             .buscador-caja,
             .caja-quickbar { grid-template-columns: 1fr; }
             .buscador-caja { flex-direction: column; }
@@ -944,6 +1310,13 @@
     </style>
 </head>
 <body>
+    <script>
+        try {
+            if (localStorage.getItem('gvi_caja_modo_foco') === '1') {
+                document.body.classList.add('caja-focus-mode');
+            }
+        } catch (_) {}
+    </script>
     <%- include('partials/nav') %>
 
     <div class="contenedor caja-shell">
@@ -953,7 +1326,13 @@
                 <h1>Punto de venta</h1>
                 <p>Escanea, busca o vende manualmente sin salir del flujo de caja.</p>
             </div>
-            <div class="estado-caja-chip"><i data-lucide="scan-line"></i> Lista para vender</div>
+            <div class="caja-header-actions">
+                <button class="caja-focus-toggle" id="btnModoFocoCaja" type="button" onclick="toggleModoFocoCaja()" title="Ocultar barra y enfocar venta (F10)">
+                    <i data-lucide="maximize-2"></i>
+                    <span>Modo venta</span>
+                </button>
+                <div class="estado-caja-chip"><i data-lucide="scan-line"></i> Lista para vender</div>
+            </div>
         </div>
 
         <div class="caja-grid">
@@ -1045,6 +1424,7 @@
                     <div><span>Buscar producto</span><kbd>Escaner</kbd></div>
                     <div><span>Venta manual</span><kbd>Manual</kbd></div>
                     <div><span>Cobrar</span><kbd>Enter</kbd></div>
+                    <div><span>Ocultar barra</span><kbd>F10</kbd></div>
                 </div>
             </div>
         </div>
@@ -1053,43 +1433,68 @@
     <div id="modalFinalizar" class="modal-fondo">
         <div class="panel modal-cobro-panel">
             <div class="modal-cobro-header">
-                <span>Resumen de venta</span>
+                <div>
+                    <span class="modal-kicker">Cobro de caja</span>
+                    <h3>Finalizar venta</h3>
+                    <p class="modal-cobro-meta">Elige el método, confirma el pago y guarda la venta.</p>
+                </div>
                 <div class="modal-cobro-total" id="totalModal">$0</div>
             </div>
             <div class="modal-cobro-body">
 
             <div class="metodos-cobro">
-                <button class="btn-metodo activo" id="btnEfec" onclick="setMetodo('Efectivo')">💵 EFECTIVO</button>
-                <button class="btn-metodo" id="btnTarj" onclick="setMetodo('Tarjeta')">💳 TARJETA</button>
-                <button class="btn-metodo fiado-color" id="btnFiado" onclick="setMetodo('Fiado')">📓 FIADO</button>
+                <button class="btn-metodo activo" id="btnEfec" onclick="setMetodo('Efectivo')">
+                    <i data-lucide="banknote"></i>
+                    <span>Efectivo</span>
+                </button>
+                <button class="btn-metodo" id="btnTarj" onclick="setMetodo('Tarjeta')">
+                    <i data-lucide="credit-card"></i>
+                    <span>Tarjeta</span>
+                </button>
+                <button class="btn-metodo fiado-color" id="btnFiado" onclick="setMetodo('Fiado')">
+                    <i data-lucide="notebook"></i>
+                    <span>Fiado</span>
+                </button>
             </div>
 
             <div id="seccionEfectivo" class="campo-pago-card">
-                <input type="text" id="inputPagoModal" class="form-input" placeholder="¿Cuánto entrega el cliente?" 
-                       oninput="formatearVuelto(this)" style="font-size: 24px; text-align: center; font-weight: bold;">
-                <div id="estadoPagoModal" style="margin-top: 15px; font-size: 22px; font-weight: 800; color: #34c759;">
+                <label for="inputPagoModal">Monto recibido</label>
+                <div class="pago-input-wrap">
+                    <i data-lucide="circle-dollar-sign"></i>
+                    <input type="text" id="inputPagoModal" class="form-input" placeholder="$0" inputmode="numeric"
+                           oninput="formatearVuelto(this)">
+                </div>
+                <div id="estadoPagoModal" class="vuelto-card">
                     <span id="estadoPagoTexto">Vuelto:</span> <span id="vueltoModal">$0</span>
                 </div>
             </div>
 
-            <div id="seccionFiado" style="display: none; text-align: left;">
-                <label style="font-size: 11px; font-weight: 800; opacity: 0.6; display: block; margin-bottom: 5px;">BUSCAR O REGISTRAR CLIENTE</label>
+            <div id="seccionFiado" class="fiado-card" style="display: none;">
+                <label for="nombreClienteFiado">Buscar o registrar cliente</label>
                 <input type="text" id="nombreClienteFiado" class="form-input" placeholder="Escribe el nombre del cliente..." 
                        list="listaClientesRegistrados" autocomplete="off"
-                       style="font-size: 18px; text-align: center; border-color: #ff9500; text-transform: uppercase;"
                        oninput="verificarClienteExistente(this)">
                 
                 <datalist id="listaClientesRegistrados"></datalist>
 
-                <div id="avisoNuevoCliente" style="display:none; margin-top:10px; color:#ff9500; font-size:12px; font-weight:bold; text-align:center;">
-                    ⚠️ Cliente nuevo: se creará una cuenta nueva.
+                <div id="avisoNuevoCliente" class="aviso-cliente-nuevo">
+                    Cliente nuevo: se creará una cuenta nueva.
                 </div>
             </div>
 
             <div class="acciones-cobro">
-                <button class="btn-cancelar" style="flex: 1;" onclick="cerrarModalFinalizar()">Cancelar</button>
-                <button class="btn-cancelar" id="btnSoloGuardar" style="flex: 1.5;" onclick="procesarVentaReal(false)">Solo Guardar</button>
-                <button class="btn-success" id="btnGuardarImprimir" style="flex: 2;" onclick="procesarVentaReal(true)">✅ Guardar e Imprimir</button>
+                <button class="btn-cancelar" onclick="cerrarModalFinalizar()">
+                    <i data-lucide="x"></i>
+                    <span>Cancelar</span>
+                </button>
+                <button class="btn-cancelar" id="btnSoloGuardar" onclick="procesarVentaReal(false)">
+                    <i data-lucide="save"></i>
+                    <span id="btnSoloGuardarTexto">Solo guardar</span>
+                </button>
+                <button class="btn-success" id="btnGuardarImprimir" onclick="procesarVentaReal(true)">
+                    <i data-lucide="printer"></i>
+                    <span>Guardar e imprimir</span>
+                </button>
             </div>
             </div>
         </div>
@@ -1134,24 +1539,48 @@
 
     <!-- MODAL VENTA MANUAL -->
     <div id="modalManual" class="modal-fondo">
-        <div class="panel" style="width: 400px; padding: 35px;">
-            <h3 style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
-                <i data-lucide="plus-square" style="color: var(--azul-gvi);"></i> Producto Manual
-            </h3>
-            <p style="opacity: 0.5; font-size: 13px; margin-bottom: 20px;">Agrega un monto directo a la venta.</p>
-            
-            <div style="margin-bottom: 15px;">
-                <label class="form-label" style="text-align: left; display: block;">Nombre / Concepto</label>
-                <input type="text" id="manualNombre" class="form-input" placeholder="Varios" value="Varios">
+        <div class="panel modal-manual-panel">
+            <div class="modal-manual-header">
+                <div>
+                    <span class="modal-kicker">Venta rápida</span>
+                    <h3>Producto manual</h3>
+                    <p class="modal-manual-meta">Agrega un cobro directo cuando el producto no está creado.</p>
+                </div>
+                <div class="modal-icon-soft"><i data-lucide="plus"></i></div>
             </div>
-            <div style="margin-bottom: 25px;">
-                <label class="form-label" style="text-align: left; display: block;">Precio ($)</label>
-                <input type="number" id="manualPrecio" class="form-input" placeholder="0" style="font-size: 24px; font-weight: bold; color: var(--azul-gvi);">
-            </div>
+            <div class="modal-manual-body">
+                <div class="manual-form-grid">
+                    <div class="manual-field">
+                        <label for="manualNombre">Concepto <span class="manual-field-hint">visible en el ticket</span></label>
+                        <div class="manual-input-wrap">
+                            <i data-lucide="tag"></i>
+                            <input type="text" id="manualNombre" class="form-input" placeholder="Varios" value="Varios">
+                        </div>
+                    </div>
+                    <div class="manual-field">
+                        <label for="manualPrecio">Precio</label>
+                        <div class="manual-input-wrap price">
+                            <i data-lucide="circle-dollar-sign"></i>
+                            <input type="text" id="manualPrecio" class="form-input" placeholder="0" inputmode="numeric" autocomplete="off">
+                        </div>
+                        <div class="manual-presets" aria-label="Montos rápidos">
+                            <button type="button" onclick="setManualPrecio(500)">$500</button>
+                            <button type="button" onclick="setManualPrecio(1000)">$1.000</button>
+                            <button type="button" onclick="setManualPrecio(2000)">$2.000</button>
+                        </div>
+                    </div>
+                </div>
 
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-cancelar" style="flex: 1;" onclick="cerrarModalManual()">Cancelar</button>
-                <button class="btn-accion" style="flex: 1.5;" onclick="agregarManualAlCarrito()">Añadir a la Venta</button>
+                <div class="acciones-manual">
+                    <button class="btn-cancelar" onclick="cerrarModalManual()">
+                        <i data-lucide="x"></i>
+                        <span>Cancelar</span>
+                    </button>
+                    <button class="btn-accion" onclick="agregarManualAlCarrito()">
+                        <i data-lucide="shopping-cart"></i>
+                        <span>Añadir a la venta</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1213,19 +1642,27 @@
         let productoEsperaPeso = null;
         let indicePrecioEditando = null;
         let filtroRapidoActual = '';
+        const modoFocoCajaKey = 'gvi_caja_modo_foco';
 
         // --- LÓGICA VENTA MANUAL ---
         function abrirModalManual() {
             document.getElementById('modalManual').style.display = 'flex';
             document.getElementById('manualPrecio').value = '';
             document.getElementById('manualNombre').value = 'Varios';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
             setTimeout(() => document.getElementById('manualPrecio').focus(), 150);
         }
         function cerrarModalManual() { document.getElementById('modalManual').style.display = 'none'; inputCaja.focus(); }
 
+        function setManualPrecio(monto) {
+            const input = document.getElementById('manualPrecio');
+            input.value = monto;
+            input.focus();
+        }
+
         function agregarManualAlCarrito() {
             const nombre = document.getElementById('manualNombre').value.trim() || 'Varios';
-            const precio = Number(document.getElementById('manualPrecio').value);
+            const precio = Number(document.getElementById('manualPrecio').value.replace(/\D/g, ''));
             if (!precio || precio <= 0) return alert("Ingresa un precio válido.");
 
             carrito.unshift({
@@ -1244,6 +1681,35 @@
         const listaSug = document.getElementById('listaSugerencias');
         let timerRefocoSku = null;
 
+        function setModoFocoCaja(activo) {
+            document.body.classList.toggle('caja-focus-mode', !!activo);
+            localStorage.setItem(modoFocoCajaKey, activo ? '1' : '0');
+
+            const btn = document.getElementById('btnModoFocoCaja');
+            if (btn) {
+                btn.innerHTML = activo
+                    ? '<i data-lucide="minimize-2"></i><span>Modo normal</span>'
+                    : '<i data-lucide="maximize-2"></i><span>Modo venta</span>';
+                btn.setAttribute('aria-pressed', activo ? 'true' : 'false');
+                btn.title = activo ? 'Mostrar barra (F10)' : 'Ocultar barra y enfocar venta (F10)';
+            }
+
+            document.getElementById('notificationsPopover')?.classList.remove('open');
+            document.getElementById('profilePopover')?.classList.remove('open');
+            requestAnimationFrame(() => {
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                inputCaja?.focus();
+            });
+        }
+
+        function toggleModoFocoCaja() {
+            setModoFocoCaja(!document.body.classList.contains('caja-focus-mode'));
+        }
+
+        function restaurarModoFocoCaja() {
+            setModoFocoCaja(localStorage.getItem(modoFocoCajaKey) === '1');
+        }
+
         function hayModalCajaAbierto() {
             return ['modalFinalizar', 'modalPeso', 'modalManual', 'modalEditarPrecio'].some(id => {
                 const modal = document.getElementById(id);
@@ -1256,6 +1722,19 @@
             const tag = el.tagName;
             return el.isContentEditable || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
         }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F10') {
+                e.preventDefault();
+                toggleModoFocoCaja();
+                return;
+            }
+
+            if (e.key === 'Escape' && document.body.classList.contains('caja-focus-mode') && !hayModalCajaAbierto()) {
+                e.preventDefault();
+                setModoFocoCaja(false);
+            }
+        });
 
         function programarRefocoSku() {
             clearTimeout(timerRefocoSku);
@@ -1713,6 +2192,7 @@
             document.getElementById('nombreClienteFiado').value = "";
             document.getElementById('avisoNuevoCliente').style.display = 'none';
             setMetodo('Efectivo');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
             setTimeout(() => document.getElementById('inputPagoModal').focus(), 150);
         }
 
@@ -1728,8 +2208,10 @@
             document.getElementById('seccionFiado').style.display = (m === 'Fiado') ? 'block' : 'none';
             
             // Si es FIADO, ocultamos el botón de imprimir y cargamos nombres
-            document.getElementById('btnGuardarImprimir').style.display = (m === 'Fiado') ? 'none' : 'block';
-            document.getElementById('btnSoloGuardar').innerText = (m === 'Fiado') ? '📓 ANOTAR FIADO' : 'SOLO GUARDAR';
+            document.getElementById('btnGuardarImprimir').style.display = (m === 'Fiado') ? 'none' : '';
+            const textoSoloGuardar = document.getElementById('btnSoloGuardarTexto');
+            if (textoSoloGuardar) textoSoloGuardar.innerText = (m === 'Fiado') ? 'Anotar fiado' : 'Solo guardar';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
 
             if(m === 'Fiado') {
                 cargarSugerenciasFiados();
@@ -1854,7 +2336,10 @@
             });
         });
 
-        document.addEventListener('DOMContentLoaded', cargarCatalogo);
+        document.addEventListener('DOMContentLoaded', () => {
+            restaurarModoFocoCaja();
+            cargarCatalogo();
+        });
     </script>
 </body>
 </html>

@@ -79,12 +79,9 @@ fs.mkdirSync(buildDir, { recursive: true });
 const source = PNG.sync.read(fs.readFileSync(sourcePath));
 const images = sizes.map(size => ({ size, buffer: resize(source, size) }));
 const iconPng = images.find(image => image.size === 256).buffer;
-const previewPng = images.find(image => image.size === 32).buffer;
 const sourceBase64 = fs.readFileSync(sourcePath).toString('base64');
 
 fs.writeFileSync(path.join(buildDir, 'icon.png'), iconPng);
-fs.writeFileSync(path.join(buildDir, 'exe-icon-preview.png'), previewPng);
-fs.writeFileSync(path.join(buildDir, 'installed-exe-icon-preview.png'), previewPng);
 fs.writeFileSync(path.join(buildDir, 'icon.ico'), makeIco(images));
 fs.writeFileSync(
     path.join(buildDir, 'icon.svg'),
