@@ -3,6 +3,7 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $node = "C:\Program Files\nodejs\npm.cmd"
 $builder = Join-Path $root "node_modules\.bin\electron-builder.cmd"
+$icon = Join-Path $root "build\icon.ico"
 $rcedit = Get-ChildItem -Path (Join-Path $root ".cache\electron-builder\winCodeSign") -Recurse -Filter rcedit-x64.exe |
     Select-Object -First 1 -ExpandProperty FullName
 
@@ -18,6 +19,10 @@ if (-not $rcedit) {
     throw "No se encontro rcedit. Ejecuta npm run pack una vez para preparar la cache."
 }
 
+if (-not (Test-Path $icon)) {
+    throw "No se encontro el icono del programa: $icon"
+}
+
 $env:Path = "C:\Program Files\nodejs;" + $env:Path
 $env:CSC_IDENTITY_AUTO_DISCOVERY = "false"
 $env:ELECTRON_CACHE = Join-Path $root ".cache\electron"
@@ -25,11 +30,16 @@ $env:ELECTRON_BUILDER_CACHE = Join-Path $root ".cache\electron-builder"
 
 Push-Location $root
 try {
+    & $node run generate-icon
     & $node run pack
 
     $exe = Join-Path $root "dist\win-unpacked\GVI.exe"
+    if (-not (Test-Path $exe)) {
+        throw "No se encontro el ejecutable generado: $exe"
+    }
+
     & $rcedit $exe `
-        --set-icon "build\icon.ico" `
+        --set-icon $icon `
         --set-version-string FileDescription "GVI - Gestor de Ventas Intuitivo" `
         --set-version-string ProductName "GVI" `
         --set-version-string OriginalFilename "GVI.exe"

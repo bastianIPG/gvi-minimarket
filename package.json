@@ -7,8 +7,9 @@
   "scripts": {
     "start": "electron .",
     "dev": "electron .",
+    "generate-icon": "node scripts/generate-icon.js",
     "pack": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& set ELECTRON_CACHE=.cache\\electron&& set ELECTRON_BUILDER_CACHE=.cache\\electron-builder&& electron-builder --dir",
-    "dist": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& set ELECTRON_CACHE=.cache\\electron&& set ELECTRON_BUILDER_CACHE=.cache\\electron-builder&& electron-builder --win nsis --publish never",
+    "dist": "powershell -ExecutionPolicy Bypass -File scripts\\build-installer.ps1",
     "release": "powershell -ExecutionPolicy Bypass -File scripts\\build-installer.ps1",
     "publish-release": "powershell -ExecutionPolicy Bypass -File scripts\\release-github.ps1"
   },
