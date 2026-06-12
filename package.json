@@ -1,6 +1,6 @@
 {
   "name": "gvi-minimarket",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Gestor de Ventas Intuitivo - Version Modular",
   "author": "GVI",
   "main": "server.js",
