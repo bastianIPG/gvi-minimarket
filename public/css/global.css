@@ -37,14 +37,13 @@ body.dark-mode {
 body:not(.no-page-motion) main,
 body:not(.no-page-motion) .contenedor,
 body:not(.no-page-motion) .dashboard-container {
-    animation: contentIn 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both;
     will-change: opacity, transform;
 }
 
 body.content-leaving main,
 body.content-leaving .contenedor,
 body.content-leaving .dashboard-container {
-    animation: contentOut 0.09s linear both;
+    will-change: opacity, transform;
 }
 
 @keyframes contentIn {

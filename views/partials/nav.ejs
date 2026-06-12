@@ -105,18 +105,30 @@
     }
 
     function prepararCambioRuta(destino) {
+        try {
+            sessionStorage.setItem('gvi_previous_route', window.location.pathname);
+            sessionStorage.setItem('gvi_next_route', destino || '');
+        } catch (_) {}
+        document.body.dataset.routeDestino = destino || '';
+        if (typeof window.gviMotionPrepareRoute === 'function') {
+            window.gviMotionPrepareRoute(destino);
+        }
         document.body.classList.add('content-leaving', 'is-routing');
     }
 
     function navegarConMovimiento(destino) {
         prepararCambioRuta(destino);
-        setTimeout(() => { window.location.href = destino; }, 90);
+        setTimeout(() => { window.location.href = destino; }, 190);
     }
 
     function togglePerfil(e) {
         if (e) e.preventDefault();
         const popover = document.getElementById('profilePopover');
-        document.getElementById('notificationsPopover')?.classList.remove('open');
+        if (typeof window.gviMotionCloseNotifications === 'function') {
+            window.gviMotionCloseNotifications();
+        } else {
+            document.getElementById('notificationsPopover')?.classList.remove('open');
+        }
         popover?.classList.toggle('open');
     }
 
@@ -124,7 +136,11 @@
         if (e) e.preventDefault();
         const popover = document.getElementById('notificationsPopover');
         document.getElementById('profilePopover')?.classList.remove('open');
-        popover?.classList.toggle('open');
+        if (typeof window.gviMotionToggleNotifications === 'function') {
+            window.gviMotionToggleNotifications();
+        } else {
+            popover?.classList.toggle('open');
+        }
         consultarActualizacionNav();
         consultarAvisoActualizacionNav();
     }
@@ -154,6 +170,9 @@
         const dot = document.getElementById('notificationDot');
         if (empty) empty.hidden = visibleItems.length > 0;
         if (dot) dot.hidden = visibleItems.length === 0;
+        if (typeof window.gviMotionPositionNotifications === 'function') {
+            window.gviMotionPositionNotifications();
+        }
     }
 
     async function descargarActualizacionNav(e) {
@@ -203,7 +222,11 @@
     function abrirNovedadesActualizacion(e) {
         if (e) e.preventDefault();
         document.getElementById('profilePopover')?.classList.remove('open');
-        document.getElementById('notificationsPopover')?.classList.add('open');
+        if (typeof window.gviMotionOpenNotifications === 'function') {
+            window.gviMotionOpenNotifications();
+        } else {
+            document.getElementById('notificationsPopover')?.classList.add('open');
+        }
     }
 
     function aplicarActualizacionNav(data) {
@@ -465,7 +488,11 @@
                 popover.classList.remove('open');
             }
             if (notifications?.classList.contains('open') && !notifications.contains(event.target) && !notificationButton?.contains(event.target)) {
-                notifications.classList.remove('open');
+                if (typeof window.gviMotionCloseNotifications === 'function') {
+                    window.gviMotionCloseNotifications();
+                } else {
+                    notifications.classList.remove('open');
+                }
             }
         });
 
@@ -495,8 +522,7 @@
         display: flex;
         align-items: center;
         gap: 14px;
-        position: sticky;
-        top: 14px;
+        position: relative;
         z-index: 1800;
     }
 
@@ -751,13 +777,15 @@
     .topbar-clock-chip {
         margin-left: 0;
         min-height: 34px;
-        padding: 0 13px;
+        min-width: 124px;
+        box-sizing: border-box;
+        padding: 0 17px;
         border-radius: 999px;
         background: var(--superficie-suave);
         color: rgba(28, 30, 33, 0.74);
         display: inline-flex;
         flex-direction: column;
-        align-items: flex-end;
+        align-items: center;
         justify-content: center;
         line-height: 1.05;
         white-space: nowrap;
@@ -770,16 +798,17 @@
     }
 
     .topbar-clock-chip strong {
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 900;
         color: inherit;
+        letter-spacing: 0.01em;
     }
 
     .topbar-clock-chip span {
         margin-top: 2px;
-        font-size: 9px;
+        font-size: 10px;
         font-weight: 800;
-        opacity: 0.58;
+        opacity: 0.62;
         text-transform: capitalize;
     }
 
@@ -824,13 +853,13 @@
     }
 
     .notifications-popover {
-        right: 310px;
         width: 310px;
         padding: 14px;
         border-radius: 18px;
         background: rgba(250, 248, 246, 0.96);
         border: 1px solid rgba(0, 0, 0, 0.07);
         box-shadow: 0 18px 44px rgba(18, 24, 36, 0.16);
+        transition: none;
     }
 
     body.dark-mode .notifications-popover {
