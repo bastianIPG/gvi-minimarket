@@ -1,34 +1,26 @@
-<script>
-    const esInicio = window.location.pathname === '/';
-</script>
-
 <nav class="app-topbar" id="appTopbar">
     <div class="app-topbar-left">
         <div class="topbar-brand" title="GVI">
+            <img src="/img/gvi-logo.png" alt="" class="brand-logo">
             <span class="brand-text">GVI</span>
         </div>
     </div>
 
     <div class="topbar-links">
         <div class="topbar-nav-pill">
-            <span class="topbar-active-indicator" id="topbarActiveIndicator"></span>
             <a href="/" class="topbar-link" data-label="Inicio"><i data-lucide="home"></i><span>Inicio</span></a>
-            <a href="/caja" class="topbar-link" data-label="Venta"><i data-lucide="shopping-cart"></i><span>Venta</span></a>
-            <a href="/cobrar" class="topbar-link" data-label="Cobrar"><i data-lucide="credit-card"></i><span>Cobrar</span></a>
-            <a href="/bodega" class="topbar-link" data-label="Bodega"><i data-lucide="package"></i><span>Bodega</span></a>
+            <a href="/caja" class="topbar-link" data-label="Ventas"><i data-lucide="shopping-cart"></i><span>Ventas</span></a>
             <a href="/productos" class="topbar-link" data-label="Productos"><i data-lucide="scan-barcode"></i><span>Productos</span></a>
+            <a href="/bodega" class="topbar-link" data-label="Bodega"><i data-lucide="package"></i><span>Bodega</span></a>
             <a href="/finanzas" class="topbar-link admin-only" data-label="Finanzas"><i data-lucide="bar-chart-3"></i><span>Finanzas</span></a>
-            <a href="/configuracion" class="topbar-link admin-only" data-label="Ajustes"><i data-lucide="settings"></i><span>Ajustes</span></a>
+            <a href="/finanzas#reportes" class="topbar-link admin-only" data-label="Reportes"><i data-lucide="file-bar-chart"></i><span>Reportes</span></a>
+            <a href="/configuracion" class="topbar-link admin-only" data-label="Configuracion"><i data-lucide="settings"></i><span>Configuracion</span></a>
         </div>
         <div class="topbar-actions">
             <button class="topbar-window-btn notification-toggle" onclick="toggleNotificaciones(event)" title="Notificaciones" data-label="Notificaciones">
                 <i data-lucide="bell"></i>
             <span class="notification-dot" id="notificationDot" hidden></span>
             </button>
-            <div class="topbar-clock-chip" id="topbarClockChip">
-                <strong id="topbarClock">00:00</strong>
-                <span id="topbarDate">--</span>
-            </div>
             <a href="#" onclick="togglePerfil(event)" class="topbar-link user-switch" data-label="Perfil"><i data-lucide="user"></i><span id="topbarUserName">Usuario</span></a>
             <div class="topbar-window-group" aria-label="Controles de ventana">
                 <button class="topbar-window-btn minimize" onclick="minimizarAppNav()" title="Minimizar GVI" data-label="Minimizar"><i data-lucide="minus"></i></button>
@@ -94,8 +86,6 @@
 </div>
 
 <script>
-    if (esInicio) document.getElementById('appTopbar')?.classList.add('home-topbar');
-
     function cerrarSesion(e) {
         if (e) e.preventDefault();
         if (confirm('Cerrar sesion actual?')) {
@@ -104,21 +94,58 @@
         }
     }
 
-    function prepararCambioRuta(destino) {
+    function claveRutaNav(valor) {
         try {
-            sessionStorage.setItem('gvi_previous_route', window.location.pathname);
-            sessionStorage.setItem('gvi_next_route', destino || '');
+            const url = new URL(valor || window.location.href, window.location.origin);
+            return `${url.pathname}${url.hash || ''}`;
+        } catch (_) {
+            return valor || '';
+        }
+    }
+
+    function indiceRutaNav(valor) {
+        const clave = claveRutaNav(valor);
+        const sinHash = clave.split('#')[0];
+        const links = Array.from(document.querySelectorAll('.topbar-nav-pill .topbar-link'))
+            .filter(link => {
+                const href = link.getAttribute('href');
+                return href && href !== '#';
+            });
+
+        const exacto = links.findIndex(link => claveRutaNav(link.getAttribute('href')) === clave);
+        if (exacto >= 0) return exacto;
+        return links.findIndex(link => claveRutaNav(link.getAttribute('href')).split('#')[0] === sinHash);
+    }
+
+    function direccionRutaNav(destino) {
+        const actual = `${window.location.pathname}${window.location.hash || ''}`;
+        const desde = indiceRutaNav(actual);
+        const hacia = indiceRutaNav(destino);
+        if (desde < 0 || hacia < 0 || desde === hacia) return 'neutral';
+        return hacia > desde ? 'right' : 'left';
+    }
+
+    function prepararCambioRuta(destino) {
+        const direccion = direccionRutaNav(destino);
+        try {
+            sessionStorage.setItem('gvi_previous_route', `${window.location.pathname}${window.location.hash || ''}`);
+            sessionStorage.setItem('gvi_next_route', claveRutaNav(destino));
+            sessionStorage.setItem('gvi_route_direction', direccion);
+            sessionStorage.setItem('gvi_route_cover', '1');
         } catch (_) {}
         document.body.dataset.routeDestino = destino || '';
+        document.body.dataset.routeDirection = direccion;
+        document.documentElement.dataset.routeDirection = direccion;
+        document.documentElement.classList.add('gvi-route-leaving');
         if (typeof window.gviMotionPrepareRoute === 'function') {
-            window.gviMotionPrepareRoute(destino);
+            window.gviMotionPrepareRoute(destino, direccion);
         }
-        document.body.classList.add('content-leaving', 'is-routing');
+        document.body.classList.add('is-routing');
     }
 
     function navegarConMovimiento(destino) {
         prepararCambioRuta(destino);
-        setTimeout(() => { window.location.href = destino; }, 190);
+        setTimeout(() => { window.location.href = destino; }, 165);
     }
 
     function togglePerfil(e) {
@@ -392,26 +419,6 @@
         await fetch('/api/app/quit', { method: 'POST' });
     }
 
-    function actualizarRelojTopbar() {
-        const ahora = new Date();
-        const clock = document.getElementById('topbarClock');
-        const date = document.getElementById('topbarDate');
-        if (clock) {
-            let horas = ahora.getHours();
-            const minutos = String(ahora.getMinutes()).padStart(2, '0');
-            const periodo = horas >= 12 ? 'PM' : 'AM';
-            horas = horas % 12 || 12;
-            clock.innerText = `${String(horas).padStart(2, '0')}:${minutos} ${periodo}`;
-        }
-        if (date) {
-            date.innerText = ahora.toLocaleDateString('es-CL', {
-                weekday: 'short',
-                day: '2-digit',
-                month: 'short'
-            });
-        }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
         try {
             if (typeof gviApplyTheme === 'function') gviApplyTheme();
@@ -434,37 +441,19 @@
         } catch (e) {}
 
         const path = window.location.pathname;
-        const indicator = document.getElementById('topbarActiveIndicator');
-
-        function moverIndicador(link, instant = false) {
-            if (!indicator || !link) return;
-            const parentRect = link.parentElement.getBoundingClientRect();
-            const rect = link.getBoundingClientRect();
-            if (instant) indicator.style.transition = 'none';
-            indicator.style.width = `${rect.width}px`;
-            indicator.style.height = `${rect.height}px`;
-            indicator.style.top = `${rect.top - parentRect.top}px`;
-            indicator.style.transform = `translateX(${rect.left - parentRect.left + link.parentElement.scrollLeft}px)`;
-            if (instant) {
-                indicator.offsetHeight;
-                indicator.style.transition = '';
-            }
-        }
 
         const activeLink = Array.from(document.querySelectorAll('.topbar-link')).find(link => link.getAttribute('href') === path);
         if (activeLink) {
             activeLink.classList.add('active');
-            requestAnimationFrame(() => moverIndicador(activeLink, true));
         }
 
         document.querySelectorAll('.topbar-link').forEach(link => {
             const href = link.getAttribute('href');
             if (!href || href === '#' || href === path) return;
             link.addEventListener('click', (event) => {
-                event.preventDefault();
                 document.querySelectorAll('.topbar-link').forEach(item => item.classList.remove('active'));
                 link.classList.add('active');
-                moverIndicador(link);
+                event.preventDefault();
                 navegarConMovimiento(href);
             });
         });
@@ -496,10 +485,6 @@
             }
         });
 
-        window.addEventListener('resize', () => moverIndicador(document.querySelector('.topbar-link.active'), true));
-        document.querySelector('.topbar-nav-pill')?.addEventListener('scroll', () => moverIndicador(document.querySelector('.topbar-link.active'), true));
-        actualizarRelojTopbar();
-        setInterval(actualizarRelojTopbar, 1000);
         consultarActualizacionNav();
         consultarAvisoActualizacionNav();
         setInterval(consultarActualizacionNav, 3500);
@@ -510,34 +495,37 @@
 
 <style>
     .app-topbar {
-        width: min(100% - 48px, 1480px);
-        margin: 22px auto 0;
-        padding: 8px 14px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.84);
-        border: 1px solid rgba(36, 47, 70, 0.1);
-        box-shadow: 0 18px 48px rgba(42, 53, 77, 0.1);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 14px;
+        min-height: 56px;
+        border-radius: 0;
+        background: #0b1728;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
         display: flex;
         align-items: center;
         gap: 14px;
         position: relative;
         z-index: 1800;
+        color: rgba(255, 255, 255, 0.86);
     }
 
     body.dark-mode .app-topbar {
-        background: rgba(22, 24, 30, 0.9);
-        border-color: rgba(255, 255, 255, 0.08);
-        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.26);
+        background: #0b1728;
+        border-bottom-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
     }
 
     .app-topbar-left {
         display: flex;
         align-items: center;
         gap: 0;
-        flex: 0 0 86px;
-        min-width: 86px;
+        flex: 0 0 142px;
+        min-width: 142px;
     }
 
     .topbar-icon-btn,
@@ -563,21 +551,24 @@
     .topbar-window-btn {
         width: 34px;
         padding: 0;
-        background: var(--superficie-suave);
+        background: transparent;
         cursor: pointer;
         flex: 0 0 auto;
+        color: rgba(255, 255, 255, 0.82);
+        border-radius: 8px;
     }
 
     body.dark-mode .topbar-icon-btn,
     body.dark-mode .topbar-window-btn {
-        background: rgba(255, 255, 255, 0.08);
+        background: transparent;
+        color: rgba(255, 255, 255, 0.82);
     }
 
     .topbar-icon-btn:hover,
     .topbar-window-btn:hover,
     .topbar-link:hover {
-        background: rgba(15, 23, 42, 0.1);
-        color: #111318;
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
     }
 
     body.dark-mode .topbar-icon-btn:hover,
@@ -602,27 +593,37 @@
         min-height: 34px;
         padding: 0;
         background: transparent;
-        color: var(--texto-claro);
+        color: #fff;
         cursor: default;
-        gap: 0;
+        gap: 10px;
     }
 
     body.dark-mode .topbar-brand {
         background: transparent;
-        color: rgba(245, 247, 250, 0.94);
+        color: #fff;
+    }
+
+    .brand-logo {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        object-fit: contain;
+        display: block;
+        flex: 0 0 auto;
     }
 
     .brand-text {
         font-size: 22px;
         font-weight: 900;
         letter-spacing: 0;
+        color: #fff;
     }
 
     .topbar-links {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 14px;
+        gap: 18px;
         overflow: visible;
         padding: 0;
         flex: 1 1 auto;
@@ -633,10 +634,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 5px;
-        padding: 4px;
-        border-radius: 999px;
-        background: var(--superficie-suave);
+        align-self: stretch;
+        gap: 0;
+        padding: 0;
+        border-radius: 0;
+        background: transparent;
         position: relative;
         margin: 0 auto;
         overflow: visible;
@@ -646,7 +648,7 @@
     }
 
     body.dark-mode .topbar-nav-pill {
-        background: rgba(255, 255, 255, 0.08);
+        background: transparent;
     }
 
     .topbar-actions {
@@ -659,20 +661,23 @@
     }
 
     .topbar-link {
-        min-height: 32px;
-        padding: 0 16px;
+        min-height: 56px;
+        padding: 0 15px;
         font-size: 12px;
-        color: rgba(28, 30, 33, 0.74);
+        color: rgba(255, 255, 255, 0.75);
         position: relative;
         z-index: 1;
-        font-weight: 700;
+        font-weight: 800;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
     }
 
     .topbar-nav-pill .topbar-link svg {
         display: none;
     }
 
-    body.dark-mode .topbar-link { color: rgba(228, 230, 235, 0.78); }
+    body.dark-mode .topbar-link { color: rgba(255, 255, 255, 0.75); }
 
     .topbar-link.active {
         color: white;
@@ -680,52 +685,49 @@
         box-shadow: none;
     }
 
-    .topbar-active-indicator {
+    .topbar-nav-pill .topbar-link::after {
+        content: "";
         position: absolute;
-        left: 0;
-        top: 0;
-        border-radius: 999px;
-        background: var(--negro-gvi);
-        box-shadow: 0 10px 22px rgba(17, 24, 39, 0.18);
-        pointer-events: none;
-        will-change: transform, width;
-        transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
-        z-index: 0;
+        left: 14px;
+        right: 14px;
+        bottom: 0;
+        height: 3px;
+        border-radius: 999px 999px 0 0;
+        background: transparent;
     }
 
-    body.dark-mode .topbar-active-indicator {
-        background: var(--azul-gvi);
-        box-shadow: 0 10px 22px rgba(0, 122, 255, 0.22);
+    .topbar-nav-pill .topbar-link.active::after {
+        background: #3d73ff;
     }
 
     .topbar-link.user-switch {
-        width: auto;
-        min-width: 132px;
+        width: 34px;
+        min-width: 34px;
         height: 34px;
         min-height: 34px;
-        padding: 0 12px 0 8px;
-        background: var(--superficie-suave);
-        color: rgba(28, 30, 33, 0.78);
-        border-radius: 999px;
+        padding: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.82);
+        border-radius: 8px;
         margin-left: 0;
-        gap: 8px;
+        gap: 0;
     }
 
     .topbar-link.user-switch span {
-        display: inline;
+        display: none;
         max-width: 92px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     body.dark-mode .topbar-link.user-switch {
-        background: rgba(255, 255, 255, 0.08);
-        color: rgba(228, 230, 235, 0.78);
+        background: transparent;
+        color: rgba(255, 255, 255, 0.82);
     }
 
     .topbar-link.user-switch:hover {
-        background: rgba(0, 122, 255, 0.1);
-        color: var(--azul-gvi);
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
     }
 
     .notification-toggle {
@@ -738,12 +740,12 @@
         gap: 2px;
         padding: 2px;
         border-radius: 999px;
-        background: var(--superficie-suave);
+        background: transparent;
         flex: 0 0 auto;
     }
 
     body.dark-mode .topbar-window-group {
-        background: rgba(255, 255, 255, 0.08);
+        background: transparent;
     }
 
     .topbar-window-group .topbar-window-btn {
@@ -774,46 +776,8 @@
         border-color: #2a2f38;
     }
 
-    .topbar-clock-chip {
-        margin-left: 0;
-        min-height: 34px;
-        min-width: 124px;
-        box-sizing: border-box;
-        padding: 0 17px;
-        border-radius: 999px;
-        background: var(--superficie-suave);
-        color: rgba(28, 30, 33, 0.74);
-        display: inline-flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        line-height: 1.05;
-        white-space: nowrap;
-        flex: 0 0 auto;
-    }
-
-    body.dark-mode .topbar-clock-chip {
-        background: rgba(255, 255, 255, 0.08);
-        color: rgba(228, 230, 235, 0.78);
-    }
-
-    .topbar-clock-chip strong {
-        font-size: 13px;
-        font-weight: 900;
-        color: inherit;
-        letter-spacing: 0.01em;
-    }
-
-    .topbar-clock-chip span {
-        margin-top: 2px;
-        font-size: 10px;
-        font-weight: 800;
-        opacity: 0.62;
-        text-transform: capitalize;
-    }
-
     .topbar-window-btn.danger {
-        color: rgba(28, 30, 33, 0.72);
+        color: rgba(255, 255, 255, 0.82);
     }
 
     body.dark-mode .topbar-window-btn.danger {
@@ -832,18 +796,10 @@
         box-shadow: 0 4px 12px rgba(255, 59, 48, 0.2);
     }
 
-    .app-topbar.home-topbar {
-        animation: none;
-    }
-
-    .app-topbar.home-topbar .topbar-clock-chip {
-        display: none;
-    }
-
     .notifications-popover,
     .profile-popover {
         position: fixed;
-        top: 82px;
+        top: 68px;
         z-index: 1810;
         display: none;
         opacity: 0;
@@ -1220,8 +1176,9 @@
 
     @media (max-width: 760px) {
         .app-topbar {
-            width: min(100% - 20px, 1220px);
-            margin-top: 10px;
+            width: 100%;
+            margin-top: 0;
+            border-radius: 0;
             align-items: flex-start;
             flex-direction: column;
         }

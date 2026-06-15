@@ -4,6 +4,14 @@
     <%- include('partials/head') %>
     <title>GVI - Punto de Venta</title>
     <style>
+        @font-face {
+            font-family: 'Inter GVI';
+            src: url('/fonts/Inter-900.ttf') format('truetype');
+            font-weight: 900;
+            font-style: normal;
+            font-display: swap;
+        }
+
         .caja-header { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 20px; }
         .caja-header h1 { font-size: 32px; margin: 0; display: flex; align-items: center; gap: 10px; }
         
@@ -53,7 +61,7 @@
         .panel-cobro { background: var(--panel-claro); border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); position: sticky; top: 20px; }
         body.dark-mode .panel-cobro { background: var(--panel-oscuro); }
         
-        .caja-total { font-size: 55px; font-weight: 900; color: var(--azul-gvi); margin: 10px 0 20px; text-align: center; }
+        .caja-total { font-family: 'Inter GVI', "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; font-size: 55px; font-weight: 900; color: var(--azul-gvi); margin: 10px 0 20px; text-align: center; }
         
         .btn-cobrar { width: 100%; background: #34c759; color: white; border: none; padding: 20px; font-size: 22px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: background-color 0.16s ease, opacity 0.16s ease; }
         .btn-cobrar:disabled { background: #ccc; opacity: 0.5; cursor: not-allowed; }
@@ -62,9 +70,6 @@
         .btn-metodo { padding: 15px 10px; border-radius: 12px; border: 2px solid #eee; background: transparent; cursor: pointer; font-weight: 800; font-size: 14px; color: inherit; transition: border-color 0.14s ease, background-color 0.14s ease, color 0.14s ease; }
         body.dark-mode .btn-metodo { border-color: #333; }
         .btn-metodo.activo { border-color: var(--azul-gvi); background: rgba(0, 122, 255, 0.1); color: var(--azul-gvi); }
-        .btn-metodo.fiado-color { border-color: #ff9500; color: #ff9500; }
-        .btn-metodo.fiado-color.activo { background: rgba(255, 149, 0, 0.1); }
-
         .badge-peso { display: inline-block; background: rgba(255,149,0,0.15); color: #ff9500; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
 
         .badge-precio-carrito {
@@ -257,17 +262,87 @@
             box-shadow: 0 34px 90px rgba(0,0,0,0.42);
         }
 
+        @keyframes cobroPanelIn {
+            from { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.985); }
+            to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+        }
+
+        @keyframes boletaPreviewIn {
+            from { opacity: 0; transform: translate3d(18px, 0, 0); }
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+
+        .modal-cobro-panel {
+            --modal-width: 1100px;
+            width: min(1100px, calc(100vw - 48px)) !important;
+            max-height: min(780px, calc(100vh - 48px)) !important;
+            overflow: hidden !important;
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid rgba(17,24,39,0.08);
+            box-shadow: 0 30px 80px rgba(15,23,42,0.28);
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 360px;
+            position: relative;
+        }
+
+        .modal-cobro-main {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(17,24,39,0.1);
+        }
+
+        #modalFinalizar {
+            background: rgba(15,23,42,0.44);
+            backdrop-filter: blur(5px);
+        }
+
+        #modalFinalizar.modal-visible .modal-cobro-panel {
+            animation: cobroPanelIn 0.18s ease-out both;
+        }
+
+        #modalFinalizar.modal-visible .boleta-preview-card {
+            animation: boletaPreviewIn 0.22s ease-out both;
+        }
+
         .modal-cobro-header,
         .modal-manual-header {
             padding: 24px 28px 22px;
-            background:
-                radial-gradient(circle at 88% 0%, rgba(52,199,89,0.18), transparent 34%),
-                linear-gradient(135deg, rgba(61,115,255,0.14), rgba(242,247,255,0.88));
+            background: #fff;
             border-bottom: 1px solid rgba(0,0,0,0.06);
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 20px;
+        }
+
+        #modalFinalizar .modal-cobro-header {
+            position: static;
+            padding: 28px 58px 20px 28px;
+            border-bottom: 1px solid rgba(17,24,39,0.08);
+            flex: 0 0 auto;
+        }
+
+        .modal-cobro-close {
+            position: absolute;
+            right: 22px;
+            top: 22px;
+            width: 34px;
+            height: 34px;
+            border: 0;
+            background: transparent;
+            color: #64748b;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .modal-cobro-close:hover {
+            background: rgba(15,23,42,0.06);
+            color: #0f172a;
         }
 
         body.dark-mode .modal-cobro-header,
@@ -328,13 +403,25 @@
         }
 
         .modal-cobro-total {
-            font-size: clamp(48px, 8vw, 74px);
+            min-width: 230px;
+            font-size: clamp(44px, 5.2vw, 58px);
             line-height: 1;
             font-weight: 950;
             color: var(--azul-gvi);
             font-variant-numeric: tabular-nums;
-            letter-spacing: -0.055em;
+            letter-spacing: 0;
             text-align: right;
+        }
+
+        .modal-cobro-total::before {
+            content: "TOTAL A PAGAR";
+            display: block;
+            margin-bottom: 8px;
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1;
+            font-weight: 950;
+            letter-spacing: 0.1em;
         }
 
         .modal-cobro-body,
@@ -342,31 +429,99 @@
             padding: 24px 28px 28px;
         }
 
+        .modal-cobro-body {
+            display: block;
+            padding: 20px 28px 28px;
+            min-height: 0;
+            overflow: hidden;
+            flex: 1 1 auto;
+        }
+
+        #modalFinalizar .modal-cobro-body {
+            background: #fff;
+        }
+
+        .cobro-main-panel {
+            min-width: 0;
+        }
+
+        .cobro-step-title {
+            margin: 0 0 10px;
+            color: #111827;
+            font-size: 13px;
+            font-weight: 950;
+        }
+
         .metodos-cobro {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 12px;
             margin-bottom: 16px;
         }
 
         .metodos-cobro .btn-metodo {
-            min-height: 74px;
+            position: relative;
+            min-height: 76px;
             padding: 12px;
-            border-radius: 18px;
-            background: rgba(17,24,39,0.035);
+            border-radius: 12px;
+            background: #fff;
             border: 1px solid rgba(17,24,39,0.08);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            color: var(--texto-oscuro);
+            gap: 11px;
+            color: #111827;
             box-shadow: none;
             transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease;
         }
 
+        body.dark-mode #modalFinalizar .modal-cobro-panel,
+        body.dark-mode #modalFinalizar .modal-cobro-header,
+        body.dark-mode #modalFinalizar .modal-cobro-body,
+        body.dark-mode #modalFinalizar .boleta-preview-card {
+            background: #fff;
+            color: #111827;
+        }
+
+        body.dark-mode #modalFinalizar .modal-cobro-meta,
+        body.dark-mode #modalFinalizar .modal-kicker,
+        body.dark-mode #modalFinalizar .cobro-step-title,
+        body.dark-mode #modalFinalizar .boleta-preview-title,
+        body.dark-mode #modalFinalizar .campo-pago-card label {
+            color: #667085;
+        }
+
+        body.dark-mode #modalFinalizar .metodos-cobro .btn-metodo {
+            background: #fff;
+            color: #111827;
+            border-color: rgba(17,24,39,0.1);
+        }
+
+        body.dark-mode #modalFinalizar .metodos-cobro .btn-metodo.activo {
+            background: #f8fbff;
+            border-color: rgba(61,115,255,0.58);
+            color: var(--azul-gvi);
+        }
+
+        body.dark-mode #modalFinalizar .metodos-cobro .btn-metodo.transfer-color {
+            color: #0a9f68;
+            border-color: rgba(10,159,104,0.26);
+        }
+
+        body.dark-mode #modalFinalizar .metodos-cobro .btn-metodo.hybrid-color {
+            color: #7c3aed;
+            border-color: rgba(124,58,237,0.24);
+        }
+
         .metodos-cobro .btn-metodo svg {
-            width: 22px;
-            height: 22px;
+            width: 30px;
+            height: 30px;
+        }
+
+        .metodos-cobro .btn-metodo span {
+            font-size: 14px;
+            font-weight: 850;
         }
 
         .metodos-cobro .btn-metodo:hover {
@@ -375,19 +530,26 @@
         }
 
         .metodos-cobro .btn-metodo.activo {
-            background: rgba(61,115,255,0.1);
+            background: #f8fbff;
             border-color: rgba(61,115,255,0.58);
             color: var(--azul-gvi);
         }
 
-        .metodos-cobro .btn-metodo.fiado-color {
-            color: #f08a00;
-            border-color: rgba(240,138,0,0.28);
-        }
-
-        .metodos-cobro .btn-metodo.fiado-color.activo {
-            background: rgba(255,149,0,0.1);
-            border-color: rgba(240,138,0,0.66);
+        .metodos-cobro .btn-metodo.activo::after {
+            content: "✓";
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            background: var(--azul-gvi);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 950;
         }
 
         body.dark-mode .metodos-cobro .btn-metodo {
@@ -396,11 +558,63 @@
             color: rgba(246,247,251,0.84);
         }
 
+        .metodos-cobro .btn-metodo.transfer-color {
+            color: #0a9f68;
+            border-color: rgba(10,159,104,0.26);
+        }
+
+        .metodos-cobro .btn-metodo.transfer-color.activo {
+            background: rgba(10,159,104,0.1);
+            border-color: rgba(10,159,104,0.55);
+        }
+
+        .metodos-cobro .btn-metodo.hybrid-color {
+            color: #7c3aed;
+            border-color: rgba(124,58,237,0.24);
+        }
+
+        .metodos-cobro .btn-metodo.hybrid-color.activo {
+            background: rgba(124,58,237,0.1);
+            border-color: rgba(124,58,237,0.5);
+        }
+
+        #modalFinalizar .metodos-cobro .btn-metodo {
+            background: #fff !important;
+            color: #111827 !important;
+            border-color: rgba(17,24,39,0.1) !important;
+        }
+
+        #modalFinalizar .metodos-cobro .btn-metodo.activo {
+            background: #f8fbff !important;
+            color: var(--azul-gvi) !important;
+            border-color: rgba(61,115,255,0.58) !important;
+        }
+
+        #modalFinalizar .metodos-cobro .btn-metodo.transfer-color {
+            color: #0a9f68 !important;
+            border-color: rgba(10,159,104,0.26) !important;
+        }
+
+        #modalFinalizar .metodos-cobro .btn-metodo.transfer-color.activo {
+            background: rgba(10,159,104,0.1) !important;
+            border-color: rgba(10,159,104,0.55) !important;
+        }
+
+        #modalFinalizar .metodos-cobro .btn-metodo.hybrid-color {
+            color: #7c3aed !important;
+            border-color: rgba(124,58,237,0.24) !important;
+        }
+
+        #modalFinalizar .metodos-cobro .btn-metodo.hybrid-color.activo {
+            background: rgba(124,58,237,0.1) !important;
+            border-color: rgba(124,58,237,0.5) !important;
+        }
+
         .campo-pago-card {
             background: #f7f9fd;
             border: 1px solid rgba(17,24,39,0.07);
-            border-radius: 22px;
-            padding: 18px;
+            border-radius: 14px;
+            padding: 12px 14px;
         }
 
         body.dark-mode .campo-pago-card {
@@ -435,16 +649,22 @@
         }
 
         .pago-input-wrap .form-input {
-            min-height: 68px;
+            min-height: 50px;
             padding: 0 20px 0 52px !important;
-            border-radius: 18px;
+            border-radius: 12px;
             border: 2px solid rgba(61,115,255,0.2);
             background: #fff;
-            font-size: clamp(24px, 4vw, 34px);
+            font-size: clamp(22px, 3vw, 30px);
             font-weight: 950;
             text-align: center;
             color: var(--texto-oscuro);
             font-variant-numeric: tabular-nums;
+            outline: none;
+        }
+
+        .pago-input-wrap .form-input:focus {
+            border-color: rgba(61,115,255,0.8);
+            box-shadow: 0 0 0 4px rgba(61,115,255,0.1);
         }
 
         body.dark-mode .pago-input-wrap .form-input {
@@ -453,17 +673,164 @@
         }
 
         .vuelto-card {
-            margin-top: 14px;
-            padding: 14px 16px;
-            border-radius: 18px;
+            margin-top: 10px;
+            padding: 10px 14px;
+            border-radius: 12px;
             background: rgba(52,199,89,0.12);
             color: #2eb84e;
             display: flex;
             align-items: center;
             justify-content: space-between;
             font-weight: 900;
-            font-size: 24px;
+            font-size: 22px;
             font-variant-numeric: tabular-nums;
+        }
+
+        .campo-pago-card + .campo-pago-card {
+            margin-top: 10px;
+        }
+
+        .hibrido-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .hibrido-restante {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(61,115,255,0.08);
+            color: var(--azul-gvi);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .boleta-preview-card {
+            min-width: 0;
+            border-radius: 0;
+            border-top: 0;
+            border-right: 0;
+            border-bottom: 0;
+            background: #fff;
+            padding: 48px 28px 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 0;
+        }
+
+        .boleta-preview-title {
+            width: 300px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: var(--texto-suave);
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+
+        .boleta-preview-paper {
+            width: 300px;
+            min-height: 500px;
+            padding: 22px 17px 16px;
+            border-radius: 4px;
+            background: #fff;
+            color: #111827;
+            box-shadow: 0 20px 42px rgba(15,23,42,0.18);
+            font-family: "Courier New", monospace;
+            font-size: 10.5px;
+            font-weight: 800;
+            line-height: 1.2;
+            position: relative;
+        }
+
+        .boleta-preview-paper::before,
+        .boleta-preview-paper::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background:
+                radial-gradient(circle at 4px 4px, transparent 4px, #fff 4.5px) repeat-x;
+            background-size: 12px 8px;
+        }
+
+        .boleta-preview-paper::before {
+            top: -6px;
+        }
+
+        .boleta-preview-paper::after {
+            bottom: -6px;
+            transform: rotate(180deg);
+        }
+
+        .boleta-preview-paper .ticket-center {
+            text-align: center;
+        }
+
+        .boleta-preview-paper .ticket-line {
+            border-top: 1px dashed #111827;
+            margin: 8px 0;
+        }
+
+        .boleta-preview-paper .ticket-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 3px 0;
+        }
+
+        .boleta-preview-paper .ticket-row span:first-child {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .boleta-preview-paper .ticket-total {
+            font-size: 15px;
+            font-weight: 950;
+        }
+
+        .boleta-preview-paper .ticket-table-head {
+            display: grid;
+            grid-template-columns: 30px minmax(82px, 1fr) 58px 62px;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 950;
+        }
+
+        .boleta-preview-paper .ticket-item-row {
+            display: grid;
+            grid-template-columns: 30px minmax(82px, 1fr) 58px 62px;
+            gap: 6px;
+            padding: 3px 0;
+            align-items: start;
+        }
+
+        .boleta-preview-paper .ticket-item-row span:nth-child(2) {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .boleta-preview-paper .ticket-right {
+            text-align: right;
+        }
+
+        .ticket-barcode {
+            height: 34px;
+            margin: 12px 0 10px;
+            background: repeating-linear-gradient(90deg, #111 0 1px, transparent 1px 3px, #111 3px 5px, transparent 5px 8px);
         }
 
         .vuelto-card span:first-child {
@@ -471,35 +838,6 @@
             text-transform: uppercase;
             opacity: 0.75;
             letter-spacing: 0.07em;
-        }
-
-        .fiado-card {
-            background: rgba(255,149,0,0.08);
-            border: 1px solid rgba(255,149,0,0.18);
-            border-radius: 22px;
-            padding: 18px;
-        }
-
-        .fiado-card .form-input {
-            min-height: 62px;
-            border-radius: 17px;
-            border: 2px solid rgba(255,149,0,0.34);
-            font-size: 21px;
-            font-weight: 900;
-            text-align: center;
-            text-transform: uppercase;
-        }
-
-        .aviso-cliente-nuevo {
-            display: none;
-            margin-top: 12px;
-            padding: 10px 12px;
-            border-radius: 14px;
-            color: #b86b00;
-            background: rgba(255,149,0,0.12);
-            font-size: 13px;
-            font-weight: 850;
-            text-align: center;
         }
 
         .acciones-cobro {
@@ -525,19 +863,74 @@
             height: 20px;
         }
 
+        @keyframes manualBackdropIn {
+            from { background: rgba(6, 12, 24, 0); }
+            to { background: rgba(6, 12, 24, 0.52); }
+        }
+
+        @keyframes manualPanelIn {
+            from {
+                opacity: 0;
+                transform: translate3d(0, 10px, 0) scale(0.985);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+        }
+
+        @keyframes manualButtonPop {
+            0% { transform: scale(1); }
+            45% { transform: scale(0.985); }
+            100% { transform: scale(1); }
+        }
+
+        #modalManual.modal-visible {
+            animation: manualBackdropIn 0.12s ease-out both;
+        }
+
+        #modalManual.modal-visible .modal-manual-panel {
+            animation: manualPanelIn 0.16s ease-out both;
+        }
+
         .modal-manual-panel {
-            --modal-width: 500px;
-            border-radius: 22px;
+            --modal-width: 560px;
+            width: min(560px, calc(100vw - 32px));
+            border-radius: 16px;
+            will-change: transform, opacity;
+            transform: translateZ(0);
         }
 
         .manual-form-grid {
             display: grid;
-            gap: 14px;
+            gap: 10px;
+        }
+
+        .manual-row {
+            min-height: 82px;
+            border: 1px solid rgba(17,24,39,0.08);
+            background: rgba(255,255,255,0.78);
+            border-radius: 12px;
+            padding: 12px;
+            display: grid;
+            grid-template-columns: 132px minmax(0, 1fr);
+            align-items: center;
+            gap: 12px;
+        }
+
+        body.dark-mode .manual-row {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .manual-row.primary {
+            background: rgba(61,115,255,0.055);
+            border-color: rgba(61,115,255,0.18);
         }
 
         .manual-field label {
             display: block;
-            margin-bottom: 8px;
+            margin: 0;
             font-size: 12px;
             font-weight: 900;
             opacity: 0.68;
@@ -547,10 +940,10 @@
 
         .manual-field-hint {
             display: block;
-            margin-top: 2px;
+            margin-top: 5px;
             text-transform: none;
             letter-spacing: 0;
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.72;
         }
 
@@ -573,11 +966,11 @@
         .manual-input-wrap .form-input {
             width: 100%;
             box-sizing: border-box;
-            min-height: 56px;
-            border-radius: 16px;
-            border: 2px solid rgba(17,24,39,0.1);
-            padding-left: 50px;
-            font-size: 20px;
+            min-height: 54px;
+            border-radius: 10px;
+            border: 1px solid rgba(17,24,39,0.12);
+            padding-left: 46px;
+            font-size: 17px;
             font-weight: 850;
             outline: none;
         }
@@ -588,61 +981,38 @@
         }
 
         .manual-input-wrap.price .form-input {
-            font-size: clamp(28px, 5vw, 38px);
+            min-height: 54px;
+            font-size: 28px;
             font-weight: 950;
-            color: var(--azul-gvi);
+            color: var(--texto-claro);
             font-variant-numeric: tabular-nums;
         }
 
         .manual-input-wrap.price::before {
             content: "$";
             position: absolute;
-            left: 51px;
+            left: 47px;
             z-index: 1;
-            color: rgba(61,115,255,0.55);
-            font-size: 28px;
+            color: rgba(61,115,255,0.62);
+            font-size: 24px;
             font-weight: 950;
             pointer-events: none;
         }
 
         .manual-input-wrap.price .form-input {
-            padding-left: 76px;
-        }
-
-        .manual-presets {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .manual-presets button {
-            min-height: 46px;
-            border: 1px solid rgba(17,24,39,0.08);
-            background: rgba(17,24,39,0.035);
-            color: inherit;
-            border-radius: 13px;
-            font-weight: 900;
-            cursor: pointer;
-            transition: transform 0.14s ease, border-color 0.14s ease, background-color 0.14s ease;
-        }
-
-        .manual-presets button:hover {
-            transform: translateY(-1px);
-            border-color: rgba(61,115,255,0.28);
-            background: rgba(61,115,255,0.08);
+            padding-left: 70px;
         }
 
         .acciones-manual {
             display: grid;
             grid-template-columns: 0.9fr 1.25fr;
             gap: 12px;
-            margin-top: 18px;
+            margin-top: 12px;
         }
 
         .acciones-manual button {
-            min-height: 58px;
-            border-radius: 16px !important;
+            min-height: 50px;
+            border-radius: 12px !important;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -651,8 +1021,24 @@
             font-weight: 950;
         }
 
+        .acciones-manual kbd {
+            margin-left: 4px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: rgba(17,24,39,0.12);
+            color: inherit;
+            font: inherit;
+            font-size: 11px;
+            font-weight: 950;
+        }
+
+        .acciones-manual .btn-accion kbd {
+            background: rgba(255,255,255,0.18);
+            color: #fff;
+        }
+
         #modalManual .modal-manual-header {
-            padding: 22px 24px 18px;
+            padding: 18px 22px 16px;
             background: #f8faff;
             border-bottom-color: rgba(17,24,39,0.07);
         }
@@ -662,17 +1048,17 @@
         }
 
         #modalManual .modal-manual-header h3 {
-            font-size: 30px;
+            font-size: 26px;
         }
 
         #modalManual .modal-manual-body {
-            padding: 20px 24px 24px;
+            padding: 14px 22px 20px;
         }
 
         #modalManual .modal-icon-soft {
-            width: 46px;
-            height: 46px;
-            border-radius: 15px;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
         }
 
         @media (max-width: 620px) {
@@ -684,8 +1070,11 @@
             .modal-cobro-total { text-align: left; }
             .metodos-cobro,
             .acciones-cobro,
-            .acciones-manual { grid-template-columns: 1fr; }
-            .manual-presets { grid-template-columns: repeat(2, 1fr); }
+            .acciones-manual,
+            .manual-form-grid { grid-template-columns: 1fr; }
+            .manual-row {
+                grid-template-columns: 1fr;
+            }
         }
 
         .btn-manual-rapido {
@@ -699,9 +1088,16 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: background-color 0.16s ease, filter 0.16s ease;
+            transition: background-color 0.16s ease, filter 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
         }
-        .btn-manual-rapido:hover { filter: brightness(1.08); }
+        .btn-manual-rapido:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(61,115,255,0.22);
+        }
+        .btn-manual-rapido.manual-opening {
+            animation: manualButtonPop 0.14s ease-out;
+        }
         .btn-manual-rapido i { width: 18px; height: 18px; }
 
         .contenedor.caja-shell {
@@ -746,25 +1142,6 @@
             margin: 8px 0 0;
             color: var(--texto-suave);
             font-weight: 700;
-        }
-
-        .estado-caja-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-            padding: 10px 14px;
-            border-radius: 999px;
-            background: rgba(40, 199, 111, 0.12);
-            color: #159c52;
-            font-size: 13px;
-            font-weight: 900;
-            border: 1px solid rgba(40, 199, 111, 0.18);
-        }
-
-        .estado-caja-chip i,
-        .estado-caja-chip svg {
-            width: 17px;
-            height: 17px;
         }
 
         .caja-focus-toggle {
@@ -869,49 +1246,18 @@
             box-shadow: 0 12px 24px rgba(61,115,255,0.22);
         }
 
-        .caja-quickbar {
+        .venta-summarybar {
             display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 16px;
+            justify-content: flex-end;
             align-items: center;
-            padding: 14px 18px;
+            padding: 8px 14px;
             border-bottom: 1px solid rgba(36,47,70,0.08);
-            background: rgba(248,250,255,0.58);
+            background: #f8fafc;
         }
 
-        body.dark-mode .caja-quickbar {
+        body.dark-mode .venta-summarybar {
             background: rgba(255,255,255,0.025);
             border-bottom-color: rgba(255,255,255,0.08);
-        }
-
-        .caja-categorias {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .categoria-chip {
-            border: 1px solid rgba(36,47,70,0.1);
-            background: rgba(255,255,255,0.72);
-            color: inherit;
-            border-radius: 999px;
-            padding: 9px 12px;
-            font-weight: 900;
-            font-size: 12px;
-            cursor: pointer;
-            transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
-        }
-
-        .categoria-chip:hover {
-            transform: translateY(-1px);
-            border-color: rgba(61,115,255,0.35);
-            background: rgba(61,115,255,0.08);
-        }
-
-        body.dark-mode .categoria-chip {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.08);
-            color: rgba(246,247,251,0.88);
         }
 
         .venta-meta {
@@ -1005,14 +1351,14 @@
 
         .productos-rapidos-header h2 {
             margin: 0;
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.06em;
             color: var(--texto-suave);
         }
 
         .productos-rapidos-header span {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--texto-suave);
             font-weight: 800;
         }
@@ -1112,10 +1458,83 @@
         }
 
         .caja-total {
+            font-family: 'Inter GVI', "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
             font-size: clamp(52px, 5.8vw, 76px);
             line-height: 0.95;
-            letter-spacing: -0.06em;
+            letter-spacing: 0;
             margin: 12px 0 4px;
+            width: 100%;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            position: relative;
+            transform: translateZ(0);
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum" 1, "lnum" 1;
+        }
+
+        .total-char {
+            display: inline-block;
+            vertical-align: baseline;
+        }
+
+        .total-symbol {
+            width: auto;
+            letter-spacing: 0;
+        }
+
+        .total-currency {
+            transform: translateY(-0.06em);
+        }
+
+        .total-symbol + .total-digit {
+            margin-left: 0.02em;
+        }
+
+        .total-digit {
+            position: relative;
+            width: 0.66em;
+            height: 0.95em;
+            overflow: hidden;
+        }
+
+        .total-digit-track {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            will-change: transform;
+            animation-duration: 0.24s;
+            animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+            animation-fill-mode: both;
+            animation-delay: var(--delay, 0ms);
+        }
+
+        .total-digit-track span {
+            height: 0.95em;
+            line-height: 0.95;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .total-digit.sube .total-digit-track {
+            animation-name: totalDigitSube;
+        }
+
+        .total-digit.baja .total-digit-track {
+            animation-name: totalDigitBaja;
+        }
+
+        @keyframes totalDigitSube {
+            from { transform: translate3d(0, 0, 0); }
+            to { transform: translate3d(0, -0.95em, 0); }
+        }
+
+        @keyframes totalDigitBaja {
+            from { transform: translate3d(0, -0.95em, 0); }
+            to { transform: translate3d(0, 0, 0); }
         }
 
         .cobro-subtotal {
@@ -1148,6 +1567,10 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
+        }
+
+        .acciones-venta-grid.single {
+            grid-template-columns: 1fr;
         }
 
         .btn-venta-secundaria {
@@ -1216,6 +1639,354 @@
             color: var(--texto-oscuro);
         }
 
+        body {
+            overflow: hidden;
+            background: #edf2f8;
+        }
+
+        .contenedor.caja-shell {
+            width: 100%;
+            max-width: none;
+            height: calc(100dvh - 57px);
+            margin: 0;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .pos-operational-header {
+            margin: 0;
+            min-height: 50px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid rgba(36,47,70,0.12);
+            box-shadow: none;
+            display: grid;
+            grid-template-columns: minmax(190px, 0.8fr) minmax(0, 1.4fr) auto;
+            align-items: center;
+            gap: 12px;
+        }
+
+        body.dark-mode .pos-operational-header {
+            background: rgba(255,255,255,0.055);
+            border-color: rgba(255,255,255,0.08);
+            box-shadow: 0 18px 34px rgba(0,0,0,0.18);
+        }
+
+        .pos-station {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pos-station strong {
+            display: block;
+            margin-top: 2px;
+            font-size: 20px;
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+
+        .pos-kicker {
+            display: block;
+            font-size: 11px;
+            line-height: 1;
+            font-weight: 950;
+            color: var(--azul-gvi);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .pos-meta-strip {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .pos-meta-item {
+            min-height: 36px;
+            min-width: 116px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(36,47,70,0.1);
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        body.dark-mode .pos-meta-item {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .pos-meta-item span {
+            display: block;
+            font-size: 10px;
+            line-height: 1;
+            font-weight: 950;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--texto-suave);
+        }
+
+        .pos-meta-item b {
+            display: block;
+            margin-top: 4px;
+            font-size: 13px;
+            line-height: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pos-meta-item.time {
+            min-width: 92px;
+            background: rgba(61,115,255,0.08);
+            border-color: rgba(61,115,255,0.14);
+        }
+
+        .pos-meta-item.time b {
+            color: #000000;
+            font-family: 'Amatry', 'Manrope', 'Segoe UI', system-ui, sans-serif;
+            font-size: 18px;
+            font-weight: 950;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .caja-header-actions {
+            justify-content: flex-end;
+        }
+
+        .pos-operational-header .caja-focus-toggle {
+            min-height: 40px;
+            border-radius: 8px;
+            box-shadow: none;
+            background: #ffffff;
+        }
+
+        .caja-grid {
+            flex: 1 1 auto;
+            min-height: 0;
+            grid-template-columns: minmax(0, 1fr) 360px;
+            gap: 8px;
+        }
+
+        .panel-ticket,
+        .panel-cobro {
+            min-height: 0;
+            height: 100%;
+            border-radius: 8px;
+            box-shadow: none;
+            border-color: rgba(36,47,70,0.12);
+        }
+
+        .panel-ticket {
+            display: flex;
+            overflow: hidden;
+        }
+
+        .panel-cobro {
+            padding: 12px;
+            top: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .buscador-caja {
+            padding: 10px;
+            gap: 8px;
+            background: #fff;
+        }
+
+        .input-barras {
+            min-height: 48px;
+            border-radius: 8px;
+            border-width: 1px;
+            font-size: 18px;
+            letter-spacing: -0.01em;
+        }
+
+        .btn-manual-rapido {
+            min-width: 112px;
+            min-height: 48px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: none;
+        }
+
+        .venta-summarybar {
+            padding: 7px 10px;
+        }
+
+        .carrito-scroll {
+            min-height: 0;
+            flex: 1 1 auto;
+        }
+
+        .carrito-tabla th {
+            padding: 9px 12px;
+            font-size: 10px;
+            background: #f3f6fa;
+        }
+
+        .carrito-tabla td {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .carrito-tabla td:first-child {
+            width: 112px;
+            color: var(--texto-suave);
+            font-size: 12px;
+            font-weight: 850;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        }
+
+        .empty-carrito {
+            padding: 28px 18px !important;
+            font-family: inherit !important;
+            font-size: 13px !important;
+            font-weight: 800;
+            color: var(--texto-suave) !important;
+        }
+
+        .empty-carrito-box svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .productos-rapidos {
+            padding: 10px;
+            background: #f8fafc;
+        }
+
+        .productos-rapidos-header {
+            margin-bottom: 9px;
+        }
+
+        .productos-rapidos-grid {
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            gap: 6px;
+        }
+
+        .producto-rapido {
+            min-height: 48px;
+            padding: 7px 8px;
+            border-radius: 7px;
+            gap: 6px;
+        }
+
+        .producto-rapido strong {
+            font-size: 11px;
+        }
+
+        .producto-rapido span {
+            font-size: 14px;
+        }
+
+        .cobro-status {
+            margin-bottom: 12px;
+        }
+
+        .cobro-total-card {
+            border-radius: 8px;
+            padding: 16px 12px;
+        }
+
+        .caja-total {
+            font-size: clamp(50px, 4.8vw, 68px);
+        }
+
+        .btn-cobrar {
+            min-height: 58px;
+            border-radius: 8px;
+            font-size: 22px;
+            box-shadow: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            line-height: 1;
+            padding: 0 18px;
+        }
+
+        .btn-cobrar i,
+        .btn-cobrar svg {
+            width: 24px;
+            height: 24px;
+            flex: 0 0 24px;
+            display: block;
+            stroke-width: 2.2;
+        }
+
+        .btn-venta-secundaria {
+            min-height: 42px;
+            border-radius: 8px;
+        }
+
+        .pos-shortcuts {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(36,47,70,0.09);
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            color: var(--texto-suave);
+            font-size: 12px;
+            font-weight: 850;
+        }
+
+        body.dark-mode .pos-shortcuts {
+            border-top-color: rgba(255,255,255,0.08);
+        }
+
+        .pos-shortcuts strong {
+            grid-column: 1 / -1;
+            color: var(--texto-suave);
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+
+        .pos-shortcuts span {
+            min-height: 34px;
+            padding: 0 9px;
+            border: 1px solid rgba(36,47,70,0.1);
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(15,23,42,0.035);
+            color: var(--texto-claro);
+            white-space: nowrap;
+        }
+
+        body.dark-mode .pos-shortcuts span {
+            background: rgba(255,255,255,0.055);
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .pos-shortcuts kbd {
+            min-width: 28px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: rgba(11,23,40,0.9);
+            color: #fff;
+            text-align: center;
+            font: inherit;
+            font-size: 11px;
+            font-weight: 950;
+        }
+
         body.caja-focus-mode .app-topbar {
             position: fixed;
             left: 50%;
@@ -1228,31 +1999,24 @@
         }
 
         body.caja-focus-mode .caja-shell {
-            width: min(100% - 34px, 1660px);
-            max-width: 1660px;
-            margin-top: 14px;
+            width: 100%;
+            max-width: none;
+            height: 100dvh;
+            margin: 0;
+            padding-top: 14px;
             transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1), margin 0.28s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         body.caja-focus-mode .caja-header {
-            margin: 10px 0 14px;
-        }
-
-        body.caja-focus-mode .caja-header p,
-        body.caja-focus-mode .caja-title-kicker {
-            display: none;
-        }
-
-        body.caja-focus-mode .caja-header h1 {
-            font-size: clamp(26px, 2.4vw, 36px);
+            margin: 0;
         }
 
         body.caja-focus-mode .panel-ticket {
-            min-height: calc(100dvh - 96px);
+            min-height: 0;
         }
 
         body.caja-focus-mode .panel-cobro {
-            top: 16px;
+            top: auto;
         }
 
         body.caja-focus-mode .caja-focus-toggle {
@@ -1261,21 +2025,40 @@
             color: var(--azul-gvi);
         }
 
-        body.caja-focus-mode .estado-caja-chip {
-            display: none;
-        }
-
         @media (max-width: 1100px) {
             .caja-grid { grid-template-columns: 1fr; }
             .panel-cobro { position: static; }
             .productos-rapidos-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .modal-cobro-panel {
+                grid-template-columns: 1fr;
+            }
+            .modal-cobro-main {
+                border-right: 0;
+                border-bottom: 1px solid rgba(17,24,39,0.1);
+            }
+            .boleta-preview-card {
+                padding-top: 24px;
+            }
+            .pos-operational-header {
+                grid-template-columns: 1fr;
+            }
+            .pos-meta-strip,
+            .caja-header-actions {
+                justify-content: flex-start;
+            }
         }
 
         @media (max-width: 720px) {
             .caja-header { align-items: flex-start; flex-direction: column; }
             .caja-header-actions { justify-content: flex-start; }
-            .buscador-caja,
-            .caja-quickbar { grid-template-columns: 1fr; }
+            .pos-meta-strip {
+                flex-wrap: wrap;
+            }
+            .pos-meta-item {
+                min-width: 0;
+                flex: 1 1 120px;
+            }
+            .buscador-caja { grid-template-columns: 1fr; }
             .buscador-caja { flex-direction: column; }
             .btn-manual-rapido { min-height: 54px; }
             .productos-rapidos-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1307,6 +2090,28 @@
                 print-color-adjust: exact;
             }
         }
+
+        body.dark-mode #modalFinalizar .modal-cobro-panel .metodos-cobro .btn-metodo {
+            background: #fff !important;
+            color: #111827 !important;
+            border-color: rgba(17,24,39,0.1) !important;
+        }
+
+        body.dark-mode #modalFinalizar .modal-cobro-panel .metodos-cobro .btn-metodo.activo {
+            background: #f8fbff !important;
+            color: var(--azul-gvi) !important;
+            border-color: rgba(61,115,255,0.58) !important;
+        }
+
+        body.dark-mode #modalFinalizar .modal-cobro-panel .metodos-cobro .btn-metodo.transfer-color {
+            color: #0a9f68 !important;
+            border-color: rgba(10,159,104,0.26) !important;
+        }
+
+        body.dark-mode #modalFinalizar .modal-cobro-panel .metodos-cobro .btn-metodo.hybrid-color {
+            color: #7c3aed !important;
+            border-color: rgba(124,58,237,0.24) !important;
+        }
     </style>
 </head>
 <body>
@@ -1320,18 +2125,32 @@
     <%- include('partials/nav') %>
 
     <div class="contenedor caja-shell">
-        <div class="caja-header">
-            <div>
-                <div class="caja-title-kicker">Caja principal</div>
-                <h1>Punto de venta</h1>
-                <p>Escanea, busca o vende manualmente sin salir del flujo de caja.</p>
+        <div class="caja-header pos-operational-header">
+            <div class="pos-station">
+                <div>
+                    <span class="pos-kicker">Caja principal</span>
+                    <strong>Venta</strong>
+                </div>
+            </div>
+            <div class="pos-meta-strip" aria-label="Datos de caja">
+                <div class="pos-meta-item">
+                    <span>Cajero</span>
+                    <b id="cajaCajeroNombre">Pruebas</b>
+                </div>
+                <div class="pos-meta-item">
+                    <span>Fecha</span>
+                    <b id="cajaFechaActual">--</b>
+                </div>
+                <div class="pos-meta-item time">
+                    <span>Hora</span>
+                    <b id="cajaHoraActual">--:--</b>
+                </div>
             </div>
             <div class="caja-header-actions">
-                <button class="caja-focus-toggle" id="btnModoFocoCaja" type="button" onclick="toggleModoFocoCaja()" title="Ocultar barra y enfocar venta (F10)">
+                <button class="caja-focus-toggle" id="btnModoFocoCaja" type="button" onclick="toggleModoFocoCaja()" title="Ocultar barra y enfocar venta">
                     <i data-lucide="maximize-2"></i>
                     <span>Modo venta</span>
                 </button>
-                <div class="estado-caja-chip"><i data-lucide="scan-line"></i> Lista para vender</div>
             </div>
         </div>
 
@@ -1340,7 +2159,7 @@
                 <div class="buscador-caja">
                     <div style="position: relative; flex: 1; display: flex; align-items: center;">
                         <i data-lucide="search" style="position: absolute; left: 15px; opacity: 0.4;"></i>
-                        <input type="text" id="inputCodigoCaja" class="input-barras" placeholder="Escanear o buscar producto..." autocomplete="off" autofocus style="padding-left: 45px;">
+                        <input type="text" id="inputCodigoCaja" class="input-barras" placeholder="Escanear codigo o buscar producto" autocomplete="off" autofocus style="padding-left: 45px;">
                         <div id="listaSugerencias" class="sugerencias-busqueda"></div>
                     </div>
                     <button class="btn-manual-rapido" onclick="abrirModalManual()" title="Venta Manual">
@@ -1348,15 +2167,7 @@
                     </button>
                 </div>
 
-                <div class="caja-quickbar">
-                    <div class="caja-categorias">
-                        <button class="categoria-chip" onclick="filtrarRapidos('')">Frecuentes</button>
-                        <button class="categoria-chip" onclick="filtrarRapidos('bebida')">Bebidas</button>
-                        <button class="categoria-chip" onclick="filtrarRapidos('pan')">Pan</button>
-                        <button class="categoria-chip" onclick="filtrarRapidos('leche')">Lacteos</button>
-                        <button class="categoria-chip" onclick="filtrarRapidos('cigar')">Cigarros</button>
-                        <button class="categoria-chip" onclick="filtrarRapidos('snack')">Snacks</button>
-                    </div>
+                <div class="venta-summarybar">
                     <div class="venta-meta">
                         <span>Items <b id="ventaItems">0</b></span>
                         <span>Unidades <b id="ventaUnidades">0</b></span>
@@ -1366,15 +2177,15 @@
                 <div class="carrito-scroll">
                     <table class="carrito-tabla">
                         <thead>
-                            <tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Subtotal</th><th></th></tr>
+                            <tr><th>Codigo</th><th>Producto</th><th>Cant.</th><th>Precio</th><th>Subtotal</th><th></th></tr>
                         </thead>
                         <tbody id="listaCarrito">
                             <tr>
-                                <td colspan="5" class="empty-carrito">
+                                <td colspan="6" class="empty-carrito">
                                     <div class="empty-carrito-box">
                                         <i data-lucide="scan-barcode"></i>
-                                        <strong>Escanea un producto para comenzar</strong>
-                                        <span>Tambien puedes usar venta manual o tocar un producto rapido.</span>
+                                        <strong>Listo para escanear</strong>
+                                        <span>Usa el lector, busca por nombre o agrega una venta manual.</span>
                                     </div>
                                 </td>
                             </tr>
@@ -1399,7 +2210,6 @@
             <div class="panel-cobro">
                 <div class="cobro-status">
                     <span><i data-lucide="receipt-text"></i> Venta actual</span>
-                    <span id="cobroEstado">Sin productos</span>
                 </div>
                 <div class="cobro-total-card">
                     <div class="cobro-label">Total a pagar</div>
@@ -1410,21 +2220,19 @@
                     <button class="btn-cobrar" id="btnCobrar" onclick="abrirModalFinalizar()" disabled>
                         <i data-lucide="banknote"></i> Cobrar
                     </button>
-                    <div class="acciones-venta-grid">
-                        <button class="btn-venta-secundaria" type="button" onclick="abrirModalManual()">
-                            <i data-lucide="plus"></i> Varios
-                        </button>
+                    <div class="acciones-venta-grid single">
                         <button class="btn-venta-secundaria danger" type="button" onclick="cancelarVentaActual()">
-                            <i data-lucide="trash-2"></i> Cancelar
+                            <i data-lucide="trash-2"></i> Cancelar venta
                         </button>
                     </div>
                 </div>
-                <div class="atajos-caja">
+                <div class="pos-shortcuts" aria-label="Atajos de teclado">
                     <strong>Atajos de caja</strong>
-                    <div><span>Buscar producto</span><kbd>Escaner</kbd></div>
-                    <div><span>Venta manual</span><kbd>Manual</kbd></div>
-                    <div><span>Cobrar</span><kbd>Enter</kbd></div>
-                    <div><span>Ocultar barra</span><kbd>F10</kbd></div>
+                    <span><kbd>F1</kbd> Buscar</span>
+                    <span><kbd>F2</kbd> Manual</span>
+                    <span><kbd>F3</kbd> Cobrar</span>
+                    <span><kbd>F4</kbd> Cancelar</span>
+                    <span><kbd>Esc</kbd> Limpiar</span>
                 </div>
             </div>
         </div>
@@ -1432,6 +2240,7 @@
 
     <div id="modalFinalizar" class="modal-fondo">
         <div class="panel modal-cobro-panel">
+            <div class="modal-cobro-main">
             <div class="modal-cobro-header">
                 <div>
                     <span class="modal-kicker">Cobro de caja</span>
@@ -1439,9 +2248,12 @@
                     <p class="modal-cobro-meta">Elige el método, confirma el pago y guarda la venta.</p>
                 </div>
                 <div class="modal-cobro-total" id="totalModal">$0</div>
+                <button class="modal-cobro-close" type="button" onclick="cerrarModalFinalizar()" title="Cerrar">
+                    <i data-lucide="x"></i>
+                </button>
             </div>
             <div class="modal-cobro-body">
-
+            <div class="cobro-step-title">1. Selecciona método de pago</div>
             <div class="metodos-cobro">
                 <button class="btn-metodo activo" id="btnEfec" onclick="setMetodo('Efectivo')">
                     <i data-lucide="banknote"></i>
@@ -1451,12 +2263,17 @@
                     <i data-lucide="credit-card"></i>
                     <span>Tarjeta</span>
                 </button>
-                <button class="btn-metodo fiado-color" id="btnFiado" onclick="setMetodo('Fiado')">
-                    <i data-lucide="notebook"></i>
-                    <span>Fiado</span>
+                <button class="btn-metodo transfer-color" id="btnTrans" onclick="setMetodo('Transferencia')">
+                    <i data-lucide="landmark"></i>
+                    <span>Transferencia</span>
+                </button>
+                <button class="btn-metodo hybrid-color" id="btnHibrido" onclick="setMetodo('Hibrido')">
+                    <i data-lucide="split"></i>
+                    <span>Híbrido</span>
                 </button>
             </div>
 
+            <div class="cobro-step-title">2. Ingresa los datos del pago</div>
             <div id="seccionEfectivo" class="campo-pago-card">
                 <label for="inputPagoModal">Monto recibido</label>
                 <div class="pago-input-wrap">
@@ -1469,16 +2286,29 @@
                 </div>
             </div>
 
-            <div id="seccionFiado" class="fiado-card" style="display: none;">
-                <label for="nombreClienteFiado">Buscar o registrar cliente</label>
-                <input type="text" id="nombreClienteFiado" class="form-input" placeholder="Escribe el nombre del cliente..." 
-                       list="listaClientesRegistrados" autocomplete="off"
-                       oninput="verificarClienteExistente(this)">
-                
-                <datalist id="listaClientesRegistrados"></datalist>
+            <div id="seccionTransferencia" class="campo-pago-card" style="display: none;">
+                <label for="inputTransferenciaRef">Referencia transferencia</label>
+                <div class="pago-input-wrap">
+                    <i data-lucide="hash"></i>
+                    <input type="text" id="inputTransferenciaRef" class="form-input" placeholder="Opcional" autocomplete="off" oninput="renderBoletaPreview()">
+                </div>
+            </div>
 
-                <div id="avisoNuevoCliente" class="aviso-cliente-nuevo">
-                    Cliente nuevo: se creará una cuenta nueva.
+            <div id="seccionHibrido" class="campo-pago-card" style="display: none;">
+                <label>Pago hibrido</label>
+                <div class="hibrido-grid">
+                    <div class="pago-input-wrap">
+                        <i data-lucide="banknote"></i>
+                        <input type="text" id="inputHibridoEfectivo" class="form-input" placeholder="Efectivo" inputmode="numeric" oninput="formatearHibrido(this)">
+                    </div>
+                    <div class="pago-input-wrap">
+                        <i data-lucide="landmark"></i>
+                        <input type="text" id="inputHibridoTransferencia" class="form-input" placeholder="Transfer." inputmode="numeric" oninput="formatearHibrido(this)">
+                    </div>
+                </div>
+                <div class="hibrido-restante">
+                    <span id="hibridoRestanteLabel">Restante</span>
+                    <b id="hibridoRestante">$0</b>
                 </div>
             </div>
 
@@ -1496,6 +2326,14 @@
                     <span>Guardar e imprimir</span>
                 </button>
             </div>
+            </div>
+            </div>
+            <div class="boleta-preview-card">
+                <div class="boleta-preview-title">
+                    <span>Boleta a imprimir</span>
+                    <i data-lucide="receipt-text"></i>
+                </div>
+                <div class="boleta-preview-paper" id="boletaPreview"></div>
             </div>
         </div>
     </div>
@@ -1546,27 +2384,31 @@
                     <h3>Producto manual</h3>
                     <p class="modal-manual-meta">Agrega un cobro directo cuando el producto no está creado.</p>
                 </div>
-                <div class="modal-icon-soft"><i data-lucide="plus"></i></div>
             </div>
             <div class="modal-manual-body">
                 <div class="manual-form-grid">
-                    <div class="manual-field">
-                        <label for="manualNombre">Concepto <span class="manual-field-hint">visible en el ticket</span></label>
-                        <div class="manual-input-wrap">
-                            <i data-lucide="tag"></i>
-                            <input type="text" id="manualNombre" class="form-input" placeholder="Varios" value="Varios">
+                    <div class="manual-row">
+                        <div class="manual-field">
+                            <label for="manualNombre">Concepto</label>
+                            <span class="manual-field-hint">Visible en el ticket</span>
+                        </div>
+                        <div class="manual-field">
+                            <div class="manual-input-wrap">
+                                <i data-lucide="tag"></i>
+                                <input type="text" id="manualNombre" class="form-input" placeholder="Varios">
+                            </div>
                         </div>
                     </div>
-                    <div class="manual-field">
-                        <label for="manualPrecio">Precio</label>
-                        <div class="manual-input-wrap price">
-                            <i data-lucide="circle-dollar-sign"></i>
-                            <input type="text" id="manualPrecio" class="form-input" placeholder="0" inputmode="numeric" autocomplete="off">
+                    <div class="manual-row primary">
+                        <div class="manual-field">
+                            <label for="manualPrecio">Precio</label>
+                            <span class="manual-field-hint">Monto a cobrar</span>
                         </div>
-                        <div class="manual-presets" aria-label="Montos rápidos">
-                            <button type="button" onclick="setManualPrecio(500)">$500</button>
-                            <button type="button" onclick="setManualPrecio(1000)">$1.000</button>
-                            <button type="button" onclick="setManualPrecio(2000)">$2.000</button>
+                        <div class="manual-field">
+                            <div class="manual-input-wrap price">
+                                <i data-lucide="circle-dollar-sign"></i>
+                                <input type="text" id="manualPrecio" class="form-input" placeholder="0" inputmode="numeric" autocomplete="off" oninput="formatearPrecioManual(this)">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1575,9 +2417,11 @@
                     <button class="btn-cancelar" onclick="cerrarModalManual()">
                         <i data-lucide="x"></i>
                         <span>Cancelar</span>
+                        <kbd>Esc</kbd>
                     </button>
                     <button class="btn-accion" onclick="agregarManualAlCarrito()">
                         <i data-lucide="shopping-cart"></i>
+                        <kbd>Enter</kbd>
                         <span>Añadir a la venta</span>
                     </button>
                 </div>
@@ -1637,27 +2481,39 @@
         let carrito = [];
         let totalCaja = 0;
         let metodoPagoActual = 'Efectivo';
-        let clientesFiadores = [];
         let timerBusqueda;
         let productoEsperaPeso = null;
         let indicePrecioEditando = null;
-        let filtroRapidoActual = '';
+        let ultimoTotalRenderizado = 0;
         const modoFocoCajaKey = 'gvi_caja_modo_foco';
 
         // --- LÓGICA VENTA MANUAL ---
         function abrirModalManual() {
-            document.getElementById('modalManual').style.display = 'flex';
-            document.getElementById('manualPrecio').value = '';
-            document.getElementById('manualNombre').value = 'Varios';
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-            setTimeout(() => document.getElementById('manualPrecio').focus(), 150);
-        }
-        function cerrarModalManual() { document.getElementById('modalManual').style.display = 'none'; inputCaja.focus(); }
+            const modal = document.getElementById('modalManual');
+            const btnManual = document.querySelector('.btn-manual-rapido');
+            btnManual?.classList.remove('manual-opening');
+            void btnManual?.offsetWidth;
+            btnManual?.classList.add('manual-opening');
 
-        function setManualPrecio(monto) {
-            const input = document.getElementById('manualPrecio');
-            input.value = monto;
-            input.focus();
+            modal.classList.remove('modal-visible');
+            modal.style.display = 'flex';
+            requestAnimationFrame(() => modal.classList.add('modal-visible'));
+            document.getElementById('manualPrecio').value = '';
+            document.getElementById('manualNombre').value = '';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            setTimeout(() => document.getElementById('manualPrecio').focus({ preventScroll: true }), 90);
+            setTimeout(() => btnManual?.classList.remove('manual-opening'), 160);
+        }
+        function cerrarModalManual() {
+            const modal = document.getElementById('modalManual');
+            modal.classList.remove('modal-visible');
+            modal.style.display = 'none';
+            inputCaja.focus();
+        }
+
+        function formatearPrecioManual(input) {
+            const valor = input.value.replace(/\D/g, '');
+            input.value = valor === '' ? '' : Number(valor).toLocaleString('es-CL');
         }
 
         function agregarManualAlCarrito() {
@@ -1680,10 +2536,22 @@
         const inputCaja = document.getElementById('inputCodigoCaja');
         const listaSug = document.getElementById('listaSugerencias');
         let timerRefocoSku = null;
+        const demoraRefocoSku = 2000;
+
+        function modoFocoCajaActivo() {
+            return document.body.classList.contains('caja-focus-mode');
+        }
+
+        function enfocarSkuCaja(seleccionar = false) {
+            if (!inputCaja || hayModalCajaAbierto()) return;
+            inputCaja.focus({ preventScroll: true });
+            if (seleccionar) inputCaja.select();
+        }
 
         function setModoFocoCaja(activo) {
             document.body.classList.toggle('caja-focus-mode', !!activo);
             localStorage.setItem(modoFocoCajaKey, activo ? '1' : '0');
+            if (!activo) clearTimeout(timerRefocoSku);
 
             const btn = document.getElementById('btnModoFocoCaja');
             if (btn) {
@@ -1691,14 +2559,14 @@
                     ? '<i data-lucide="minimize-2"></i><span>Modo normal</span>'
                     : '<i data-lucide="maximize-2"></i><span>Modo venta</span>';
                 btn.setAttribute('aria-pressed', activo ? 'true' : 'false');
-                btn.title = activo ? 'Mostrar barra (F10)' : 'Ocultar barra y enfocar venta (F10)';
+                btn.title = activo ? 'Mostrar barra' : 'Ocultar barra y enfocar venta';
             }
 
             document.getElementById('notificationsPopover')?.classList.remove('open');
             document.getElementById('profilePopover')?.classList.remove('open');
             requestAnimationFrame(() => {
                 if (typeof lucide !== 'undefined') lucide.createIcons();
-                inputCaja?.focus();
+                enfocarSkuCaja();
             });
         }
 
@@ -1717,33 +2585,77 @@
             });
         }
 
-        function esCampoDeEscritura(el) {
-            if (!el) return false;
-            const tag = el.tagName;
-            return el.isContentEditable || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
-        }
-
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'F10') {
+            if (hayModalCajaAbierto()) return;
+
+            if (e.key === 'F1') {
                 e.preventDefault();
-                toggleModoFocoCaja();
+                inputCaja?.focus();
+                inputCaja?.select();
                 return;
             }
 
-            if (e.key === 'Escape' && document.body.classList.contains('caja-focus-mode') && !hayModalCajaAbierto()) {
+            if (e.key === 'F2') {
                 e.preventDefault();
-                setModoFocoCaja(false);
+                abrirModalManual();
+                return;
+            }
+
+            if (e.key === 'F3') {
+                e.preventDefault();
+                if (carrito.length) abrirModalFinalizar();
+                return;
+            }
+
+            if (e.key === 'F4') {
+                e.preventDefault();
+                cancelarVentaActual();
+                return;
+            }
+
+            if (e.key === 'Escape' && inputCaja?.value) {
+                e.preventDefault();
+                inputCaja.value = '';
+                listaSug.style.display = 'none';
+                inputCaja.focus();
+                return;
             }
         });
+
+        function actualizarCabeceraCaja() {
+            const ahora = new Date();
+            const hora = document.getElementById('cajaHoraActual');
+            const fecha = document.getElementById('cajaFechaActual');
+            if (hora) {
+                const horas = ahora.getHours();
+                const minutos = String(ahora.getMinutes()).padStart(2, '0');
+                const horas12 = String(horas % 12 || 12).padStart(2, '0');
+                hora.innerText = `${horas12}:${minutos} ${horas >= 12 ? 'PM' : 'AM'}`;
+            }
+            if (fecha) {
+                const fechaTexto = ahora.toLocaleDateString('es-CL', {
+                    weekday: 'short',
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                }).replace('.', '').replace(',', '');
+                fecha.innerText = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
+            }
+
+            try {
+                const user = JSON.parse(localStorage.getItem('gvi_user') || 'null');
+                const cajero = document.getElementById('cajaCajeroNombre');
+                if (cajero && user?.nombre) cajero.innerText = user.nombre;
+            } catch (_) {}
+        }
 
         function programarRefocoSku() {
             clearTimeout(timerRefocoSku);
             timerRefocoSku = setTimeout(() => {
+                if (!modoFocoCajaActivo()) return;
                 if (hayModalCajaAbierto()) return;
-                if (esCampoDeEscritura(document.activeElement) && document.activeElement !== inputCaja) return;
-                inputCaja.focus();
-                inputCaja.select();
-            }, 3000);
+                enfocarSkuCaja(true);
+            }, demoraRefocoSku);
         }
 
         async function cargarCatalogo() {
@@ -1752,29 +2664,12 @@
             renderProductosRapidos();
         }
 
-        function filtrarRapidos(filtro) {
-            filtroRapidoActual = filtro || '';
-            renderProductosRapidos();
-            inputCaja.focus();
-        }
-
-        function productoCoincideFiltro(producto, filtro) {
-            if (!filtro) return true;
-            const texto = `${producto.nombre || ''} ${producto.codigo || ''}`.toLowerCase();
-            if (filtro === 'bebida') return /bebida|coca|fanta|sprite|jugo|agua|nectar|energetica|red bull|bilz|pap/.test(texto);
-            if (filtro === 'pan') return /pan|hallulla|marraqueta|amasado|molde/.test(texto);
-            if (filtro === 'leche') return /leche|yogur|yoghurt|lacteo|queso|mantequilla|crema/.test(texto);
-            if (filtro === 'cigar') return /cigar|tabaco|kent|marlboro|pall mall|belmont|lucky/.test(texto);
-            if (filtro === 'snack') return /snack|papas|ramitas|sufle|galleta|chocolate|dulce|mani/.test(texto);
-            return texto.includes(filtro);
-        }
-
         function renderProductosRapidos() {
             const cont = document.getElementById('productosRapidos');
             if (!cont) return;
 
             const productos = catalogo
-                .filter(p => Number(p.stock) > 0 && productoCoincideFiltro(p, filtroRapidoActual))
+                .filter(p => Number(p.stock) > 0)
                 .sort((a, b) => {
                     const ofertaA = a.ofertaActiva ? 1 : 0;
                     const ofertaB = b.ofertaActiva ? 1 : 0;
@@ -1802,29 +2697,6 @@
             }).join('');
 
             if (typeof lucide !== 'undefined') lucide.createIcons();
-        }
-
-        // --- CARGAR LISTA DE CLIENTES QUE YA DEBEN ---
-        async function cargarSugerenciasFiados() {
-            try {
-                const res = await fetch('/api/fiados');
-                const fiados = await res.json();
-                // Filtramos solo los nombres únicos que estén PENDIENTES
-                clientesFiadores = [...new Set(fiados.filter(f => f.estado === "PENDIENTE").map(f => f.cliente))];
-                
-                const datalist = document.getElementById('listaClientesRegistrados');
-                datalist.innerHTML = clientesFiadores.map(nombre => `<option value="${nombre}">`).join('');
-            } catch (e) { console.error("Error al cargar deudores"); }
-        }
-
-        function verificarClienteExistente(input) {
-            const nombre = input.value.trim().toUpperCase();
-            const aviso = document.getElementById('avisoNuevoCliente');
-            if (nombre.length > 0 && !clientesFiadores.includes(nombre)) {
-                aviso.style.display = 'block';
-            } else {
-                aviso.style.display = 'none';
-            }
         }
 
         // --- BUSCADOR INTELIGENTE ---
@@ -2003,6 +2875,64 @@
             cerrarModalPeso();
         }
 
+        function actualizarTotalAnimado(nuevoTotal) {
+            const totalEl = document.getElementById('txtTotal');
+            if (!totalEl) return;
+
+            const renderTotalEstatico = (texto) => texto.split('').map(char => {
+                if (/\d/.test(char)) {
+                    return `<span class="total-char total-digit"><span class="total-digit-track"><span>${char}</span></span></span>`;
+                }
+                return `<span class="total-char total-symbol ${char === '$' ? 'total-currency' : ''}">${char}</span>`;
+            }).join('');
+
+            const totalAnterior = ultimoTotalRenderizado;
+            const direccion = nuevoTotal >= totalAnterior ? 'sube' : 'baja';
+            const textoAnterior = "$" + Number(totalAnterior || 0).toLocaleString('es-CL');
+            const textoTotal = "$" + Number(nuevoTotal || 0).toLocaleString('es-CL');
+            if (totalEl.dataset.totalTexto === textoTotal) return;
+
+            const anteriorChars = textoAnterior.split('');
+            const nuevoChars = textoTotal.split('');
+
+            totalEl.setAttribute('aria-label', textoTotal);
+            totalEl.dataset.totalTexto = textoTotal;
+            totalEl.innerHTML = nuevoChars.map((charNuevo, index) => {
+                const distanciaDesdeDerecha = nuevoChars.length - 1 - index;
+                const indexAnterior = anteriorChars.length - 1 - distanciaDesdeDerecha;
+                const charAnterior = anteriorChars[indexAnterior] || charNuevo;
+                const esDigito = /\d/.test(charNuevo);
+                const delay = index * 22;
+
+                if (!esDigito) {
+                    return `<span class="total-char total-symbol ${charNuevo === '$' ? 'total-currency' : ''}">${charNuevo}</span>`;
+                }
+
+                const numeroAnterior = /\d/.test(charAnterior) ? charAnterior : (direccion === 'sube' ? '0' : charNuevo);
+                if (numeroAnterior === charNuevo) {
+                    return `<span class="total-char total-digit"><span class="total-digit-track"><span>${charNuevo}</span></span></span>`;
+                }
+
+                const primero = direccion === 'sube' ? numeroAnterior : charNuevo;
+                const segundo = direccion === 'sube' ? charNuevo : numeroAnterior;
+                return `
+                    <span class="total-char total-digit ${direccion}" style="--delay:${delay}ms">
+                        <span class="total-digit-track">
+                            <span>${primero}</span>
+                            <span>${segundo}</span>
+                        </span>
+                    </span>`;
+            }).join('');
+
+            ultimoTotalRenderizado = nuevoTotal;
+
+            window.clearTimeout(totalEl._totalAnimTimer);
+            totalEl._totalAnimTimer = window.setTimeout(() => {
+                totalEl.innerHTML = renderTotalEstatico(textoTotal);
+                totalEl.dataset.totalTexto = textoTotal;
+            }, 340 + nuevoChars.length * 22);
+        }
+
         function actualizarVista() {
             const tbody = document.getElementById('listaCarrito');
             tbody.innerHTML = "";
@@ -2027,7 +2957,8 @@
                 }
 
                 tbody.innerHTML += `<tr>
-                    <td><b>${item.nombre}</b>${item.vendidoPorPeso ? '<span class="badge-peso">⚖️ PESO</span>' : ''}${precioBadge}<br><small>${item.codigo}</small></td>
+                    <td>${item.codigo}</td>
+                    <td><b>${item.nombre}</b>${item.vendidoPorPeso ? '<span class="badge-peso">⚖️ PESO</span>' : ''}${precioBadge}</td>
                     ${cantidadCell}
                     ${precioCell}
                     <td><b>$${subtotal.toLocaleString('es-CL')}</b></td>
@@ -2037,23 +2968,20 @@
             if (carrito.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="empty-carrito">
+                        <td colspan="6" class="empty-carrito">
                             <div class="empty-carrito-box">
                                 <i data-lucide="scan-barcode"></i>
-                                <strong>Escanea un producto para comenzar</strong>
-                                <span>Tambien puedes usar venta manual o tocar un producto rapido.</span>
+                                <strong>Listo para escanear</strong>
+                                <span>Usa el lector, busca por nombre o agrega una venta manual.</span>
                             </div>
                         </td>
                     </tr>`;
             }
-            document.getElementById('txtTotal').innerText = "$" + totalCaja.toLocaleString('es-CL');
+            actualizarTotalAnimado(totalCaja);
             document.getElementById('btnCobrar').disabled = carrito.length === 0;
             document.getElementById('ventaItems').innerText = carrito.length;
             document.getElementById('ventaUnidades').innerText = Number(unidadesCaja.toFixed(3)).toLocaleString('es-CL');
-            document.getElementById('cobroEstado').innerText = carrito.length ? `${carrito.length} producto${carrito.length === 1 ? '' : 's'}` : 'Sin productos';
-            document.getElementById('txtResumenCobro').innerText = carrito.length
-                ? `${Number(unidadesCaja.toFixed(3)).toLocaleString('es-CL')} unidad${unidadesCaja === 1 ? '' : 'es'} en esta venta`
-                : 'Agrega productos para habilitar el cobro';
+            document.getElementById('txtResumenCobro').innerText = carrito.length ? '' : 'Agrega productos para habilitar el cobro';
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
@@ -2183,41 +3111,54 @@
 
         // --- CIERRE DE VENTA ---
         function abrirModalFinalizar() {
-            document.getElementById('modalFinalizar').style.display = 'flex';
+            const modal = document.getElementById('modalFinalizar');
+            modal.classList.remove('modal-visible');
+            modal.style.display = 'flex';
+            requestAnimationFrame(() => modal.classList.add('modal-visible'));
+            document.querySelector('#modalFinalizar .modal-cobro-meta').innerText = 'Confirma el pago y revisa la boleta';
             document.getElementById('totalModal').innerText = "$" + totalCaja.toLocaleString('es-CL');
             document.getElementById('inputPagoModal').value = "";
+            document.getElementById('inputTransferenciaRef').value = "";
+            document.getElementById('inputHibridoEfectivo').value = "";
+            document.getElementById('inputHibridoTransferencia').value = "";
             document.getElementById('vueltoModal').innerText = "$0";
             document.getElementById('estadoPagoTexto').innerText = "Vuelto:";
             document.getElementById('estadoPagoModal').style.color = "#34c759";
-            document.getElementById('nombreClienteFiado').value = "";
-            document.getElementById('avisoNuevoCliente').style.display = 'none';
             setMetodo('Efectivo');
+            renderBoletaPreview();
             if (typeof lucide !== 'undefined') lucide.createIcons();
             setTimeout(() => document.getElementById('inputPagoModal').focus(), 150);
         }
 
-        function cerrarModalFinalizar() { document.getElementById('modalFinalizar').style.display = 'none'; }
+        function cerrarModalFinalizar() {
+            const modal = document.getElementById('modalFinalizar');
+            modal.classList.remove('modal-visible');
+            modal.style.display = 'none';
+        }
 
         function setMetodo(m) {
             metodoPagoActual = m;
             document.getElementById('btnEfec').classList.toggle('activo', m === 'Efectivo');
             document.getElementById('btnTarj').classList.toggle('activo', m === 'Tarjeta');
-            document.getElementById('btnFiado').classList.toggle('activo', m === 'Fiado');
+            document.getElementById('btnTrans').classList.toggle('activo', m === 'Transferencia');
+            document.getElementById('btnHibrido').classList.toggle('activo', m === 'Hibrido');
             
             document.getElementById('seccionEfectivo').style.display = (m === 'Efectivo') ? 'block' : 'none';
-            document.getElementById('seccionFiado').style.display = (m === 'Fiado') ? 'block' : 'none';
+            document.getElementById('seccionTransferencia').style.display = (m === 'Transferencia') ? 'block' : 'none';
+            document.getElementById('seccionHibrido').style.display = (m === 'Hibrido') ? 'block' : 'none';
             
-            // Si es FIADO, ocultamos el botón de imprimir y cargamos nombres
-            document.getElementById('btnGuardarImprimir').style.display = (m === 'Fiado') ? 'none' : '';
+            document.getElementById('btnGuardarImprimir').style.display = '';
             const textoSoloGuardar = document.getElementById('btnSoloGuardarTexto');
-            if (textoSoloGuardar) textoSoloGuardar.innerText = (m === 'Fiado') ? 'Anotar fiado' : 'Solo guardar';
+            if (textoSoloGuardar) textoSoloGuardar.innerText = 'Solo guardar';
             if (typeof lucide !== 'undefined') lucide.createIcons();
 
-            if(m === 'Fiado') {
-                cargarSugerenciasFiados();
-                setTimeout(() => document.getElementById('nombreClienteFiado').focus(), 150);
+            if (m === 'Efectivo') setTimeout(() => document.getElementById('inputPagoModal').focus(), 120);
+            if (m === 'Transferencia') setTimeout(() => document.getElementById('inputTransferenciaRef').focus(), 120);
+            if (m === 'Hibrido') {
+                actualizarHibrido();
+                setTimeout(() => document.getElementById('inputHibridoEfectivo').focus(), 120);
             }
-            if(m === 'Efectivo') setTimeout(() => document.getElementById('inputPagoModal').focus(), 150);
+            renderBoletaPreview();
         }
 
         function formatearVuelto(input) {
@@ -2236,32 +3177,128 @@
                 estado.style.color = "#ff3b30";
                 document.getElementById('vueltoModal').innerText = "$" + Math.abs(vuelto).toLocaleString('es-CL');
             }
+            renderBoletaPreview();
+        }
+
+        function formatearHibrido(input) {
+            const valor = input.value.replace(/\D/g, "");
+            input.value = valor === "" ? "" : "$" + Number(valor).toLocaleString('es-CL');
+            actualizarHibrido();
+        }
+
+        function getMontoInput(id) {
+            return Number((document.getElementById(id)?.value || '').replace(/\D/g, '')) || 0;
+        }
+
+        function actualizarHibrido() {
+            const efectivo = getMontoInput('inputHibridoEfectivo');
+            const transferencia = getMontoInput('inputHibridoTransferencia');
+            const pagado = efectivo + transferencia;
+            const diferencia = pagado - totalCaja;
+            const restanteEl = document.getElementById('hibridoRestante');
+            const labelEl = document.getElementById('hibridoRestanteLabel');
+            if (!restanteEl || !labelEl) return;
+
+            if (diferencia >= 0) {
+                labelEl.innerText = diferencia > 0 ? 'Vuelto' : 'Restante';
+                restanteEl.innerText = "$" + Math.max(0, diferencia).toLocaleString('es-CL');
+                restanteEl.parentElement.style.color = '#2eb84e';
+            } else {
+                labelEl.innerText = 'Restante';
+                restanteEl.innerText = "$" + Math.abs(diferencia).toLocaleString('es-CL');
+                restanteEl.parentElement.style.color = '#ff3b30';
+            }
+            renderBoletaPreview();
+        }
+
+        function resumenPagoActual() {
+            if (metodoPagoActual === 'Efectivo') {
+                const pago = getMontoInput('inputPagoModal');
+                return { metodo: 'Efectivo', pagoCon: pago, vuelto: pago - totalCaja };
+            }
+            if (metodoPagoActual === 'Tarjeta') {
+                return { metodo: 'Tarjeta', pagoCon: totalCaja, vuelto: 0 };
+            }
+            if (metodoPagoActual === 'Transferencia') {
+                const ref = document.getElementById('inputTransferenciaRef')?.value.trim();
+                return { metodo: ref ? `Transferencia (${ref})` : 'Transferencia', pagoCon: totalCaja, vuelto: 0 };
+            }
+            const efectivo = getMontoInput('inputHibridoEfectivo');
+            const transferencia = getMontoInput('inputHibridoTransferencia');
+            return {
+                metodo: 'Hibrido',
+                pagoCon: efectivo + transferencia,
+                vuelto: efectivo + transferencia - totalCaja,
+                detalle: `Efectivo $${efectivo.toLocaleString('es-CL')} / Transferencia $${transferencia.toLocaleString('es-CL')}`
+            };
+        }
+
+        function renderBoletaPreview() {
+            const cont = document.getElementById('boletaPreview');
+            if (!cont) return;
+
+            const pago = resumenPagoActual();
+            const fecha = new Date().toLocaleDateString('es-CL');
+            const hora = new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+            const filas = carrito.map(i => {
+                const cant = i.vendidoPorPeso ? `${i.pesoGramos}g` : `${i.cantidad}`;
+                const subtotal = Number(i.precio || 0) * Number(i.cantidad || 0);
+                const precio = Number(i.precio || 0);
+                return `
+                    <div class="ticket-item-row">
+                        <span>${cant}</span>
+                        <span>${String(i.nombre || '').substring(0, 16)}</span>
+                        <span class="ticket-right">$${precio.toLocaleString('es-CL')}</span>
+                        <span class="ticket-right">$${subtotal.toLocaleString('es-CL')}</span>
+                    </div>`;
+            }).join('');
+
+            cont.innerHTML = `
+                <div class="ticket-center" style="font-size:16px;"><b>GVI MINIMARKET</b></div>
+                <div class="ticket-center">RUT: 76.123.456-7</div>
+                <div class="ticket-center">Av. Principal 1234, Local 5</div>
+                <div class="ticket-center">Santiago, Chile</div>
+                <div class="ticket-line"></div>
+                <div class="ticket-center"><b>BOLETA ELECTRONICA</b></div>
+                <div class="ticket-center">N° 000012345</div>
+                <div class="ticket-center">${fecha} &nbsp; ${hora}</div>
+                <div class="ticket-line"></div>
+                <div class="ticket-table-head">
+                    <span>CANT.</span>
+                    <span>PRODUCTO</span>
+                    <span class="ticket-right">P.UNIT</span>
+                    <span class="ticket-right">TOTAL</span>
+                </div>
+                ${filas || '<div class="ticket-center" style="padding:10px 0;">Sin productos</div>'}
+                <div class="ticket-line"></div>
+                <div class="ticket-row"><span>SUBTOTAL</span><b>$${totalCaja.toLocaleString('es-CL')}</b></div>
+                <div class="ticket-row"><span>DESCUENTO</span><b>$0</b></div>
+                <div class="ticket-line"></div>
+                <div class="ticket-row ticket-total"><span>TOTAL</span><b style="color:#3d73ff;">$${totalCaja.toLocaleString('es-CL')}</b></div>
+                <div class="ticket-line"></div>
+                <div class="ticket-row"><span>METODO DE PAGO</span><b>${pago.metodo}</b></div>
+                ${pago.detalle ? `<div class="ticket-row"><span>DETALLE</span><b>${pago.detalle}</b></div>` : ''}
+                ${pago.metodo.startsWith('Efectivo') && pago.pagoCon ? `<div class="ticket-row"><span>RECIBIDO</span><b>$${pago.pagoCon.toLocaleString('es-CL')}</b></div>` : ''}
+                ${pago.vuelto > 0 ? `<div class="ticket-row"><span>Vuelto</span><b>$${pago.vuelto.toLocaleString('es-CL')}</b></div>` : ''}
+                <div class="ticket-line"></div>
+                <div class="ticket-center">¡GRACIAS POR SU COMPRA!</div>
+                <div class="ticket-barcode"></div>
+                <div class="ticket-center" style="font-size:10px;">Timbre Electronico SII</div>
+                <div class="ticket-center" style="font-size:9px;">Res. 80 de 2014 - Verifique documento: sii.cl</div>`;
         }
 
         async function procesarVentaReal(imprimir) {
-            if(metodoPagoActual === 'Fiado') {
-                const cliente = document.getElementById('nombreClienteFiado').value.trim().toUpperCase();
-                if(!cliente) return alert("❌ Debes ingresar el nombre del cliente.");
+            const resumen = resumenPagoActual();
+            if (metodoPagoActual === 'Efectivo' && resumen.pagoCon < totalCaja) return alert("Pago insuficiente");
+            if (metodoPagoActual === 'Hibrido' && resumen.pagoCon < totalCaja) return alert("El pago hibrido no cubre el total.");
 
-                try {
-                    const res = await fetch('/api/fiados', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ cliente, items: carrito, total: totalCaja })
-                    });
-                    const r = await res.json();
-                    if(r.success) {
-                        alert(`📓 Cuenta de ${cliente} actualizada.`);
-                        finalizarTodo();
-                    }
-                } catch (e) { alert("Error de red"); }
-                return;
-            }
-
-            let pago = metodoPagoActual === 'Efectivo' ? Number(document.getElementById('inputPagoModal').value.replace(/\D/g, "")) : totalCaja;
-            if (metodoPagoActual === 'Efectivo' && pago < totalCaja) return alert("Pago insuficiente");
-
-            const datos = { items: carrito, total: totalCaja, metodoPago: metodoPagoActual, pagoCon: pago, vuelto: pago - totalCaja };
+            const datos = {
+                items: carrito,
+                total: totalCaja,
+                metodoPago: resumen.detalle ? `${resumen.metodo} - ${resumen.detalle}` : resumen.metodo,
+                pagoCon: resumen.pagoCon,
+                vuelto: resumen.vuelto
+            };
 
             try {
                 const res = await fetch('/api/vender', {
@@ -2320,6 +3357,14 @@
         document.addEventListener('click', (e) => {
             if (!listaSug.contains(e.target) && e.target !== inputCaja) {
                 listaSug.style.display = 'none';
+            }
+            if (modoFocoCajaActivo() && e.target !== inputCaja && !hayModalCajaAbierto()) {
+                programarRefocoSku();
+            }
+        });
+
+        document.addEventListener('focusin', (e) => {
+            if (modoFocoCajaActivo() && e.target !== inputCaja && !hayModalCajaAbierto()) {
                 programarRefocoSku();
             }
         });
@@ -2327,6 +3372,19 @@
         document.getElementById('inputPesoGramos').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') confirmarPeso();
             if (e.key === 'Escape') cerrarModalPeso();
+        });
+
+        ['manualNombre', 'manualPrecio'].forEach(id => {
+            document.getElementById(id).addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    agregarManualAlCarrito();
+                }
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cerrarModalManual();
+                }
+            });
         });
 
         ['editarPrecioPin', 'editarPrecioValor'].forEach(id => {
@@ -2337,6 +3395,8 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
+            actualizarCabeceraCaja();
+            setInterval(actualizarCabeceraCaja, 1000);
             restaurarModoFocoCaja();
             cargarCatalogo();
         });

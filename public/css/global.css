@@ -34,37 +34,88 @@ body.dark-mode {
     color: var(--texto-oscuro);
 }
 
-body:not(.no-page-motion) main,
-body:not(.no-page-motion) .contenedor,
-body:not(.no-page-motion) .dashboard-container {
-    will-change: opacity, transform;
+html.gvi-route-leaving body::after,
+html.gvi-route-entering body::after {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 57px;
+    bottom: 0;
+    z-index: 1700;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 9% 10%, rgba(61, 115, 255, 0.14), transparent 25%),
+        radial-gradient(circle at 92% 0%, rgba(132, 154, 190, 0.12), transparent 25%),
+        linear-gradient(180deg, #f6f8fc 0%, var(--bg-claro) 100%);
+    box-shadow: 0 0 34px rgba(15, 23, 42, 0.08);
+    will-change: transform;
 }
 
-body.content-leaving main,
-body.content-leaving .contenedor,
-body.content-leaving .dashboard-container {
-    will-change: opacity, transform;
+html.dark-mode.gvi-route-leaving body::after,
+html.dark-mode.gvi-route-entering body::after {
+    background: var(--bg-oscuro);
+    box-shadow: 0 0 34px rgba(0, 0, 0, 0.22);
 }
 
-@keyframes contentIn {
-    from {
-        opacity: 0.96;
-        transform: translateY(3px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+html.gvi-route-leaving[data-route-direction="right"] body::after {
+    animation: gvi-cover-in-right 0.16s cubic-bezier(0.4, 0, 1, 1) both;
 }
 
-@keyframes contentOut {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    to {
-        opacity: 0.98;
-        transform: translateY(0);
+html.gvi-route-leaving[data-route-direction="left"] body::after {
+    animation: gvi-cover-in-left 0.16s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+html.gvi-route-entering[data-route-direction="right"] body::after {
+    animation: gvi-cover-out-left 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+html.gvi-route-entering[data-route-direction="left"] body::after {
+    animation: gvi-cover-out-right 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+html.gvi-route-leaving[data-route-direction="neutral"] body::after {
+    animation: gvi-cover-fade-in 0.14s ease both;
+}
+
+html.gvi-route-entering[data-route-direction="neutral"] body::after {
+    animation: gvi-cover-fade-out 0.22s ease both;
+}
+
+@keyframes gvi-cover-in-right {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes gvi-cover-in-left {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes gvi-cover-out-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
+
+@keyframes gvi-cover-out-right {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+}
+
+@keyframes gvi-cover-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes gvi-cover-fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.gvi-route-leaving body::after,
+    html.gvi-route-entering body::after {
+        animation-duration: 0.01ms !important;
     }
 }
 
