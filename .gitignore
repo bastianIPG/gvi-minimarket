@@ -3,6 +3,7 @@ dist/
 release/
 .data/
 .cache/
+output/
 
 *.log
 errores_sistema.log

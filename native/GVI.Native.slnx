@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GVI.Core/GVI.Core.csproj" />
+    <Project Path="src/GVI.Desktop/GVI.Desktop.csproj" />
+    <Project Path="src/GVI.Infrastructure/GVI.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GVI.Core.Tests/GVI.Core.Tests.csproj" />
+  </Folder>
+</Solution>

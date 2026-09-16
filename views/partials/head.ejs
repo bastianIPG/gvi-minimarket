@@ -1,31 +1,5 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>
-    (function () {
-        let direction = 'neutral';
-        let entering = false;
-        try {
-            const stored = sessionStorage.getItem('gvi_route_direction') || '';
-            if (stored === 'left' || stored === 'right') direction = stored;
-            entering = sessionStorage.getItem('gvi_route_cover') === '1';
-        } catch (_) {}
-
-        document.documentElement.dataset.routeDirection = direction;
-        if (entering) {
-            document.documentElement.classList.add('gvi-route-entering');
-            window.addEventListener('DOMContentLoaded', () => {
-                window.setTimeout(() => {
-                    document.documentElement.classList.remove('gvi-route-entering');
-                    try {
-                        sessionStorage.removeItem('gvi_route_cover');
-                        sessionStorage.removeItem('gvi_route_direction');
-                        sessionStorage.removeItem('gvi_next_route');
-                    } catch (_) {}
-                }, 340);
-            }, { once: true });
-        }
-    })();
-</script>
 <link rel="stylesheet" href="/css/global.css">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>

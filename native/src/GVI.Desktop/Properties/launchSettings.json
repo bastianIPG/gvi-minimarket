@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "GVI.Desktop (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "GVI.Desktop (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

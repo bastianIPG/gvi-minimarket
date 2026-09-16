@@ -10,474 +10,449 @@
         }
 
         body {
-            background: #eef2f7;
-            color: var(--texto-claro);
-            overflow: hidden;
+            background:
+                radial-gradient(circle at 9% 10%, rgba(61, 115, 255, 0.14), transparent 25%),
+                radial-gradient(circle at 92% 0%, rgba(132, 154, 190, 0.12), transparent 25%),
+                linear-gradient(180deg, #f6f8fc 0%, var(--bg-claro) 100%);
+            overflow-x: hidden;
         }
 
         body.dark-mode {
-            background: #10151f;
+            background: var(--bg-oscuro);
         }
 
         .home-dashboard {
-            width: calc(100% - 32px);
+            width: min(100% - 64px, 1480px);
             margin: 0 auto;
-            padding: 10px 0 12px;
-            height: calc(100vh - 56px);
-            box-sizing: border-box;
-            display: flex;
+            padding: clamp(92px, 11vh, 118px) 0 34px;
         }
 
-        .home-board {
-            overflow: hidden;
-            border: 1px solid rgba(36, 47, 70, 0.12);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.96);
-            box-shadow: 0 20px 48px rgba(15, 23, 42, 0.12);
-            flex: 1 1 auto;
-            min-height: 0;
+        .home-header {
             display: grid;
-            grid-template-rows: minmax(208px, 0.9fr) auto minmax(205px, 1fr);
+            grid-template-columns: minmax(420px, 1fr) auto;
+            align-items: end;
+            gap: 28px;
+            margin-bottom: 22px;
         }
 
-        body.dark-mode .home-board {
-            background: rgba(19, 24, 34, 0.98);
-            border-color: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 22px 52px rgba(0, 0, 0, 0.3);
-        }
-
-        .hero-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.75fr) minmax(300px, 0.95fr);
-            border-bottom: 1px solid rgba(36, 47, 70, 0.1);
-        }
-
-        .hero-sales,
-        .hero-stats,
-        .hero-alerts {
-            min-height: 208px;
-        }
-
-        .hero-sales {
-            padding: 24px 34px 22px;
-            display: grid;
-            align-content: center;
-        }
-
-        .hero-stats,
-        .hero-alerts {
-            border-left: 1px solid rgba(36, 47, 70, 0.1);
-        }
-
-        body.dark-mode .hero-grid,
-        body.dark-mode .hero-stats,
-        body.dark-mode .hero-alerts {
-            border-color: rgba(255, 255, 255, 0.08);
-        }
-
-        .metric-label {
-            margin: 0 0 12px;
-            color: #182033;
-            font-size: 17px;
-            font-weight: 900;
-        }
-
-        body.dark-mode .metric-label {
-            color: #fff;
-        }
-
-        .sales-total {
-            margin: 0;
+        .home-kicker {
+            margin: 0 0 8px;
             color: var(--azul-gvi);
-            font-size: clamp(48px, 5.7vw, 72px);
+            font-size: 12px;
             font-weight: 900;
-            letter-spacing: -0.035em;
-            line-height: 0.96;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
-        .sales-trend {
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-            margin-top: 18px;
-            color: #28a955;
+        .home-title {
+            margin: 0;
+            color: var(--texto-claro);
+            font-size: clamp(34px, 4.2vw, 58px);
+            font-weight: 900;
+            line-height: 0.98;
+            letter-spacing: 0;
+        }
+
+        body.dark-mode .home-title { color: #fff; }
+
+        .home-subtitle {
+            margin: 12px 0 0;
+            max-width: 720px;
+            color: rgba(28, 30, 33, 0.58);
             font-size: 15px;
-            font-weight: 900;
+            font-weight: 700;
+            line-height: 1.45;
         }
 
-        .sales-trend svg {
-            width: 18px;
-            height: 18px;
-            stroke-width: 2.5px;
+        body.dark-mode .home-subtitle { color: rgba(228, 230, 235, 0.62); }
+
+        .home-clock-card {
+            min-width: 260px;
+            padding: 18px 22px;
+            border-radius: 22px;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.72)),
+                radial-gradient(circle at 18% 22%, rgba(61, 115, 255, 0.12), transparent 44%);
+            border: 1px solid var(--borde-claro);
+            box-shadow: 0 20px 54px rgba(42, 53, 77, 0.12);
+            text-align: center;
         }
 
-        .sales-trend span {
-            color: #667085;
-            font-weight: 800;
-        }
-
-        body.dark-mode .sales-trend span {
-            color: rgba(246, 247, 251, 0.58);
-        }
-
-        .stat-row,
-        .critical-row {
-            display: grid;
-            grid-template-columns: 42px minmax(0, 1fr);
-            gap: 14px;
-            align-items: center;
-            min-height: 69px;
-            padding: 13px 24px;
-            border-bottom: 1px solid rgba(36, 47, 70, 0.1);
-        }
-
-        .stat-row:last-child,
-        .critical-row:last-child {
-            border-bottom: 0;
-        }
-
-        body.dark-mode .stat-row,
-        body.dark-mode .critical-row {
+        body.dark-mode .home-clock-card {
+            background:
+                linear-gradient(135deg, rgba(32, 34, 42, 0.95), rgba(20, 22, 28, 0.78)),
+                radial-gradient(circle at 18% 22%, rgba(61, 115, 255, 0.16), transparent 44%);
             border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 54px rgba(0, 0, 0, 0.3);
         }
 
-        .stat-icon,
-        .critical-icon,
-        .action-icon {
+        .home-clock {
+            margin: 0;
+            color: #12161d;
+            font-size: clamp(38px, 4.2vw, 58px);
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        body.dark-mode .home-clock { color: #fff; }
+
+        .home-clock-period {
+            margin-left: 6px;
+            font-size: 18px;
+            opacity: 0.38;
+        }
+
+        .home-date {
+            margin-top: 7px;
+            font-size: 13px;
+            font-weight: 800;
+            color: rgba(28, 30, 33, 0.55);
+            text-transform: capitalize;
+        }
+
+        body.dark-mode .home-date { color: rgba(228, 230, 235, 0.58); }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .metric-card,
+        .dashboard-panel {
+            background: var(--panel-claro);
+            border: 1px solid var(--borde-claro);
+            border-radius: 18px;
+            box-shadow: 0 16px 42px rgba(42, 53, 77, 0.08);
+        }
+
+        body.dark-mode .metric-card,
+        body.dark-mode .dashboard-panel {
+            background: var(--panel-oscuro);
+            border-color: var(--borde-oscuro);
+            box-shadow: 0 16px 42px rgba(0, 0, 0, 0.18);
+        }
+
+        .metric-card {
+            min-height: 108px;
+            padding: 18px;
+            display: grid;
+            grid-template-columns: 44px 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .metric-icon,
+        .action-icon,
+        .alert-icon {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 9px;
-            background: rgba(61, 115, 255, 0.1);
-            color: #64748b;
+            border-radius: 14px;
+            background: rgba(23, 105, 255, 0.1);
+            color: var(--azul-gvi);
             flex: 0 0 auto;
         }
 
-        .stat-icon svg,
-        .critical-icon svg,
-        .action-icon svg {
-            width: 19px;
-            height: 19px;
+        .metric-icon {
+            width: 44px;
+            height: 44px;
+        }
+
+        .metric-icon svg,
+        .action-icon svg,
+        .alert-icon svg {
+            width: 22px;
+            height: 22px;
             stroke-width: 2.3px;
         }
 
-        .stat-row span,
-        .critical-row span {
-            display: block;
-            color: #667085;
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        body.dark-mode .stat-row span,
-        body.dark-mode .critical-row span {
-            color: rgba(246, 247, 251, 0.56);
-        }
-
-        .stat-row strong,
-        .critical-row strong {
-            display: block;
-            margin-top: 4px;
-            color: #182033;
-            font-size: 20px;
+        .metric-label {
+            margin: 0 0 7px;
+            color: rgba(119, 81, 68, 0.82);
+            font-size: 11px;
             font-weight: 900;
-            line-height: 1.05;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
         }
 
-        body.dark-mode .stat-row strong,
-        body.dark-mode .critical-row strong {
-            color: #fff;
-        }
+        body.dark-mode .metric-label { color: rgba(228, 230, 235, 0.58); }
 
-        .critical-row.warning .critical-icon {
-            background: rgba(255, 59, 48, 0.08);
-            color: #ff4d4f;
-        }
-
-        .critical-row.pending .critical-icon {
-            background: rgba(255, 149, 0, 0.1);
-            color: #ff9500;
-        }
-
-        .critical-row a {
-            display: inline-block;
-            margin-top: 5px;
-            color: var(--azul-gvi);
-            font-size: 13px;
+        .metric-value {
+            margin: 0;
+            color: var(--texto-claro);
+            font-size: clamp(20px, 2vw, 28px);
             font-weight: 900;
-            text-decoration: none;
+            line-height: 1;
         }
 
-        .section-block {
-            padding: 14px 24px 16px;
-            border-bottom: 1px solid rgba(36, 47, 70, 0.1);
+        body.dark-mode .metric-value { color: #fff; }
+
+        .metric-note {
+            margin: 7px 0 0;
+            color: rgba(119, 81, 68, 0.72);
+            font-size: 12px;
+            font-weight: 700;
         }
 
-        body.dark-mode .section-block {
-            border-color: rgba(255, 255, 255, 0.08);
-        }
+        body.dark-mode .metric-note { color: rgba(228, 230, 235, 0.52); }
 
-        .section-title {
-            margin: 0 0 9px;
-            color: #1d2939;
-            font-size: 15px;
-            font-weight: 900;
-        }
-
-        body.dark-mode .section-title {
-            color: #fff;
-        }
-
-        .quick-actions {
+        .home-layout {
             display: grid;
-            grid-template-columns: repeat(5, minmax(130px, 1fr));
-            gap: 12px;
-        }
-
-        .quick-action {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 9px;
-            min-height: 40px;
-            padding: 0 14px;
-            border: 1px solid rgba(36, 47, 70, 0.14);
-            border-radius: 7px;
-            background: #fff;
-            color: #344054;
-            font-size: 13px;
-            font-weight: 900;
-            text-decoration: none;
-            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-            transition: transform 0.14s ease, border-color 0.14s ease, background-color 0.14s ease;
-        }
-
-        .quick-action.primary {
-            background: var(--azul-gvi);
-            border-color: var(--azul-gvi);
-            color: #fff;
-            box-shadow: 0 8px 18px rgba(61, 115, 255, 0.22);
-        }
-
-        .quick-action:hover {
-            transform: translateY(-1px);
-            border-color: rgba(61, 115, 255, 0.42);
-        }
-
-        body.dark-mode .quick-action {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: rgba(246, 247, 251, 0.86);
-        }
-
-        body.dark-mode .quick-action.primary {
-            background: var(--azul-gvi);
-            border-color: var(--azul-gvi);
-            color: #fff;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
+            grid-template-columns: minmax(0, 1.25fr) minmax(340px, 0.75fr);
             gap: 16px;
-            padding: 16px 24px 18px;
-            min-height: 0;
         }
 
-        .home-panel {
-            min-height: 0;
-            border: 1px solid rgba(36, 47, 70, 0.1);
-            border-radius: 8px;
-            background: #fff;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+        .left-stack,
+        .right-stack {
+            display: grid;
+            gap: 16px;
+            align-content: start;
         }
 
-        body.dark-mode .home-panel {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.08);
+        .dashboard-panel {
+            padding: 18px;
         }
 
         .panel-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            padding: 15px 22px 10px;
+            gap: 14px;
+            margin-bottom: 14px;
         }
 
         .panel-header h2 {
             margin: 0;
-            color: #182033;
-            font-size: 17px;
+            color: var(--texto-claro);
+            font-size: 18px;
             font-weight: 900;
         }
 
-        body.dark-mode .panel-header h2 {
-            color: #fff;
-        }
+        body.dark-mode .panel-header h2 { color: #fff; }
 
+        .panel-header span,
         .panel-link {
-            color: var(--azul-gvi);
-            font-size: 13px;
-            font-weight: 900;
+            color: rgba(28, 30, 33, 0.48);
+            font-size: 12px;
+            font-weight: 800;
             text-decoration: none;
         }
 
-        .sales-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
+        body.dark-mode .panel-header span,
+        body.dark-mode .panel-link {
+            color: rgba(228, 230, 235, 0.58);
         }
 
-        .sales-table th {
-            padding: 10px 18px;
-            border-top: 1px solid rgba(36, 47, 70, 0.08);
-            border-bottom: 1px solid rgba(36, 47, 70, 0.08);
-            color: #667085;
-            font-size: 12px;
-            font-weight: 900;
-            text-align: left;
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(130px, 1fr));
+            gap: 12px;
         }
 
-        .sales-table td {
-            padding: 10px 18px;
-            border-bottom: 1px solid rgba(36, 47, 70, 0.07);
-            color: #344054;
-            font-weight: 800;
+        .quick-action {
+            min-height: 116px;
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid var(--borde-claro);
+            color: inherit;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
         }
 
-        body.dark-mode .sales-table th,
-        body.dark-mode .sales-table td {
+        body.dark-mode .quick-action {
+            background: rgba(255, 255, 255, 0.06);
             border-color: rgba(255, 255, 255, 0.07);
         }
 
-        body.dark-mode .sales-table td {
-            color: rgba(246, 247, 251, 0.82);
+        .quick-action:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 12px 24px rgba(42, 53, 77, 0.1);
         }
 
-        .status-badge {
-            color: #28a955;
-            font-size: 12px;
+        .action-icon {
+            width: 42px;
+            height: 42px;
+            margin-bottom: 12px;
+        }
+
+        .quick-action strong {
+            display: block;
+            color: var(--texto-claro);
+            font-size: 15px;
             font-weight: 900;
+            margin-bottom: 4px;
         }
 
-        .alerts-list {
-            display: grid;
-            gap: 0;
-            padding: 0 22px 10px;
-            align-content: start;
-            flex: 1 1 auto;
+        body.dark-mode .quick-action strong { color: #fff; }
+
+        .quick-action span {
+            color: rgba(28, 30, 33, 0.52);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.25;
         }
 
-        .recent-alert {
+        body.dark-mode .quick-action span { color: rgba(228, 230, 235, 0.58); }
+
+        .sales-list,
+        .alert-list {
             display: grid;
-            grid-template-columns: 12px minmax(0, 1fr) auto;
+            gap: 10px;
+        }
+
+        .sale-row {
+            display: grid;
+            grid-template-columns: minmax(110px, 1fr) auto auto;
             gap: 12px;
             align-items: center;
-            min-height: 43px;
-            border-top: 1px solid rgba(36, 47, 70, 0.07);
-            color: #344054;
-            font-size: 13px;
-            font-weight: 850;
+            min-height: 56px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.68);
         }
 
-        .recent-alert:first-child {
-            border-top: 0;
+        body.dark-mode .sale-row {
+            background: rgba(255, 255, 255, 0.06);
         }
 
-        body.dark-mode .recent-alert {
-            border-color: rgba(255, 255, 255, 0.07);
-            color: rgba(246, 247, 251, 0.82);
+        .sale-title {
+            color: var(--texto-claro);
+            font-size: 14px;
+            font-weight: 900;
         }
 
-        .alert-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--azul-gvi);
-        }
+        body.dark-mode .sale-title { color: #fff; }
 
-        .alert-dot.danger { background: #ff3b30; }
-        .alert-dot.warning { background: #ff9500; }
-        .alert-dot.info { background: var(--azul-gvi); }
-        .alert-dot.success { background: #28c76f; }
-
-        .recent-alert time {
-            color: #667085;
+        .sale-subtitle {
+            margin-top: 3px;
+            color: rgba(28, 30, 33, 0.48);
             font-size: 12px;
+            font-weight: 700;
+        }
+
+        body.dark-mode .sale-subtitle { color: rgba(228, 230, 235, 0.54); }
+
+        .sale-method {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--azul-gvi);
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .sale-total {
+            color: var(--azul-gvi);
+            font-size: 15px;
+            font-weight: 900;
+            text-align: right;
+        }
+
+        .alert-item {
+            display: grid;
+            grid-template-columns: 42px 1fr;
+            gap: 12px;
+            align-items: center;
+            padding: 13px;
+            border-radius: 15px;
+            background: rgba(243, 236, 233, 0.72);
+        }
+
+        body.dark-mode .alert-item {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .alert-icon {
+            width: 42px;
+            height: 42px;
+        }
+
+        .alert-item.warning .alert-icon {
+            background: rgba(255, 149, 0, 0.12);
+            color: #ff9500;
+        }
+
+        .alert-item.danger .alert-icon {
+            background: rgba(255, 59, 48, 0.12);
+            color: #ff3b30;
+        }
+
+        .alert-item.success .alert-icon {
+            background: rgba(52, 199, 89, 0.12);
+            color: #34c759;
+        }
+
+        .alert-item strong {
+            display: block;
+            color: var(--texto-claro);
+            font-size: 14px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        body.dark-mode .alert-item strong { color: #fff; }
+
+        .alert-item span {
+            color: rgba(28, 30, 33, 0.52);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        body.dark-mode .alert-item span { color: rgba(228, 230, 235, 0.58); }
+
+        .empty-state {
+            min-height: 90px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            border-radius: 14px;
+            background: rgba(243, 236, 233, 0.68);
+            color: rgba(28, 30, 33, 0.48);
+            font-size: 13px;
             font-weight: 800;
         }
 
-        body.dark-mode .recent-alert time {
-            color: rgba(246, 247, 251, 0.5);
+        body.dark-mode .empty-state {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(228, 230, 235, 0.56);
         }
 
-        .empty-state {
-            padding: 30px 20px;
-            color: #667085;
-            font-size: 13px;
-            font-weight: 850;
-            text-align: center;
-        }
-
-        .sales-table .empty-state {
-            height: 100%;
-        }
-
-        @media (max-width: 980px) {
-            .hero-grid,
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .hero-stats,
-            .hero-alerts {
-                border-left: 0;
-                border-top: 1px solid rgba(36, 47, 70, 0.1);
-            }
-
-            .quick-actions {
-                grid-template-columns: repeat(2, minmax(150px, 1fr));
-            }
+        @media (max-width: 1180px) {
+            .metric-grid { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+            .home-layout { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
         }
 
         @media (max-width: 760px) {
             .home-dashboard {
-                width: min(100% - 20px, 1440px);
-                padding-top: 10px;
-                height: auto;
-                min-height: calc(100vh - 56px);
-                overflow: visible;
-                display: block;
+                width: min(100% - 28px, 1480px);
+                padding-top: 148px;
             }
 
-            .home-board {
-                display: block;
-                min-height: 0;
+            .home-header {
+                grid-template-columns: 1fr;
             }
 
-            .hero-sales,
-            .section-block,
-            .content-grid {
-                padding-left: 16px;
-                padding-right: 16px;
-            }
-
+            .metric-grid,
             .quick-actions {
                 grid-template-columns: 1fr;
             }
 
-            .sales-table {
-                min-width: 640px;
+            .sale-row {
+                grid-template-columns: 1fr;
+                align-items: start;
             }
 
-            .home-panel {
-                overflow-x: auto;
-            }
+            .sale-total { text-align: left; }
         }
     </style>
 </head>
@@ -485,108 +460,142 @@
     <%- include('partials/nav') %>
 
     <main class="home-dashboard">
-        <section class="home-board" aria-label="Panel principal GVI">
-            <div class="hero-grid">
-                <article class="hero-sales">
+        <header class="home-header">
+            <div>
+                <p class="home-kicker">GVI POS</p>
+                <h1 class="home-title">Resumen de hoy</h1>
+                <p class="home-subtitle" id="homeSubtitle">Panel operativo para revisar ventas, stock, caja y acciones rapidas.</p>
+            </div>
+            <div class="home-clock-card">
+                <h2 class="home-clock">
+                    <span id="relojHome">00:00</span><span id="relojPeriodo" class="home-clock-period">--</span>
+                </h2>
+                <div class="home-date" id="fechaHome">...</div>
+            </div>
+        </header>
+
+        <section class="metric-grid" aria-label="Metricas del dia">
+            <article class="metric-card">
+                <div class="metric-icon"><i data-lucide="banknote"></i></div>
+                <div>
                     <p class="metric-label">Ventas hoy</p>
-                    <h1 class="sales-total" id="metricVentas">$0</h1>
-                    <div class="sales-trend" id="metricTrend">
-                        <i data-lucide="trending-up"></i>
-                        <strong>0%</strong>
-                        <span>vs ayer</span>
+                    <h2 class="metric-value" id="metricVentas">$0</h2>
+                    <p class="metric-note" id="metricVentasNota">0 transacciones</p>
+                </div>
+            </article>
+
+            <article class="metric-card">
+                <div class="metric-icon"><i data-lucide="receipt-text"></i></div>
+                <div>
+                    <p class="metric-label">Ticket promedio</p>
+                    <h2 class="metric-value" id="metricTicket">$0</h2>
+                    <p class="metric-note">Promedio del dia</p>
+                </div>
+            </article>
+
+            <article class="metric-card">
+                <div class="metric-icon"><i data-lucide="package-search"></i></div>
+                <div>
+                    <p class="metric-label">Stock critico</p>
+                    <h2 class="metric-value" id="metricStock">0</h2>
+                    <p class="metric-note" id="metricStockNota">Productos bajo minimo</p>
+                </div>
+            </article>
+
+            <article class="metric-card">
+                <div class="metric-icon"><i data-lucide="clipboard-list"></i></div>
+                <div>
+                    <p class="metric-label">Pedidos en cola</p>
+                    <h2 class="metric-value" id="metricPedidos">0</h2>
+                    <p class="metric-note">Pendientes por cobrar</p>
+                </div>
+            </article>
+        </section>
+
+        <section class="home-layout">
+            <div class="left-stack">
+                <article class="dashboard-panel">
+                    <div class="panel-header">
+                        <h2>Acciones rapidas</h2>
+                        <span>Operaciones frecuentes</span>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="/caja" class="quick-action">
+                            <div>
+                                <div class="action-icon"><i data-lucide="shopping-cart"></i></div>
+                                <strong>Nueva venta</strong>
+                                <span>Ir directo al punto de venta.</span>
+                            </div>
+                        </a>
+                        <a href="/productos" class="quick-action">
+                            <div>
+                                <div class="action-icon"><i data-lucide="scan-barcode"></i></div>
+                                <strong>Agregar producto</strong>
+                                <span>Escanear, buscar o sumar stock.</span>
+                            </div>
+                        </a>
+                        <a href="/bodega" class="quick-action">
+                            <div>
+                                <div class="action-icon"><i data-lucide="boxes"></i></div>
+                                <strong>Revisar bodega</strong>
+                                <span>Control de stock e inventario.</span>
+                            </div>
+                        </a>
+                        <a href="/finanzas" class="quick-action admin-only">
+                            <div>
+                                <div class="action-icon"><i data-lucide="bar-chart-3"></i></div>
+                                <strong>Cierre y caja</strong>
+                                <span>Resumen financiero del dia.</span>
+                            </div>
+                        </a>
                     </div>
                 </article>
 
-                <div class="hero-stats">
-                    <div class="stat-row">
-                        <div class="stat-icon"><i data-lucide="receipt-text"></i></div>
-                        <div>
-                            <span>Transacciones</span>
-                            <strong id="statTransacciones">0</strong>
-                        </div>
-                    </div>
-                    <div class="stat-row">
-                        <div class="stat-icon"><i data-lucide="message-square-text"></i></div>
-                        <div>
-                            <span>Ticket promedio</span>
-                            <strong id="metricTicket">$0</strong>
-                        </div>
-                    </div>
-                    <div class="stat-row">
-                        <div class="stat-icon"><i data-lucide="users"></i></div>
-                        <div>
-                            <span>Clientes hoy</span>
-                            <strong id="statClientes">0</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="hero-alerts">
-                    <div class="critical-row warning">
-                        <div class="critical-icon"><i data-lucide="bell-ring"></i></div>
-                        <div>
-                            <span>Stock critico</span>
-                            <strong><span id="stockCriticalCount">0</span> productos</strong>
-                            <a href="/bodega">Ver lista</a>
-                        </div>
-                    </div>
-                    <div class="critical-row pending">
-                        <div class="critical-icon"><i data-lucide="circle-dollar-sign"></i></div>
-                        <div>
-                            <span>Pedidos pendientes</span>
-                            <strong><span id="pedidosPendingCount">0</span> por cobrar</strong>
-                            <a href="/cobrar">Ver pedidos</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <section class="section-block" aria-label="Acciones rapidas">
-                <h2 class="section-title">Acciones rapidas</h2>
-                <div class="quick-actions">
-                    <a href="/caja" class="quick-action primary"><i data-lucide="plus"></i>Nueva venta</a>
-                    <a href="/cobrar" class="quick-action"><i data-lucide="user-round-check"></i>Cobrar pedidos</a>
-                    <a href="/productos" class="quick-action"><i data-lucide="package"></i>Productos</a>
-                    <a href="/bodega" class="quick-action"><i data-lucide="archive"></i>Bodega</a>
-                    <a href="/finanzas" class="quick-action admin-only"><i data-lucide="file-bar-chart"></i>Reportes</a>
-                </div>
-            </section>
-
-            <section class="content-grid">
-                <article class="home-panel">
+                <article class="dashboard-panel">
                     <div class="panel-header">
                         <h2>Ultimas ventas</h2>
-                        <a href="/finanzas" class="panel-link admin-only">Ver todas las ventas</a>
+                        <a href="/finanzas" class="panel-link admin-only">Ver finanzas</a>
                     </div>
-                    <table class="sales-table" aria-label="Ultimas ventas">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Hora</th>
-                                <th>Cliente</th>
-                                <th>Total</th>
-                                <th>Pago</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ventasRecientes">
-                            <tr><td colspan="6" class="empty-state">Cargando ultimas ventas...</td></tr>
-                        </tbody>
-                    </table>
+                    <div class="sales-list" id="ventasRecientes">
+                        <div class="empty-state">Cargando ultimas ventas...</div>
+                    </div>
                 </article>
+            </div>
 
-                <article class="home-panel">
+            <aside class="right-stack">
+                <article class="dashboard-panel">
                     <div class="panel-header">
-                        <h2>Alertas recientes</h2>
+                        <h2>Alertas</h2>
+                        <span id="alertCount">0 activas</span>
                     </div>
-                    <div class="alerts-list" id="alertasRecientes">
+                    <div class="alert-list" id="alertasOperativas">
                         <div class="empty-state">Cargando alertas...</div>
                     </div>
+                </article>
+
+                <article class="dashboard-panel">
                     <div class="panel-header">
-                        <a href="/bodega" class="panel-link">Ver todas las alertas</a>
+                        <h2>Estado rapido</h2>
+                        <span>Sistema</span>
+                    </div>
+                    <div class="alert-list">
+                        <div class="alert-item success">
+                            <div class="alert-icon"><i data-lucide="shield-check"></i></div>
+                            <div>
+                                <strong>Sesion activa</strong>
+                                <span id="estadoUsuario">Perfil listo para operar.</span>
+                            </div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-icon"><i data-lucide="wifi"></i></div>
+                            <div>
+                                <strong>Modo local</strong>
+                                <span>La app sigue funcionando como programa de escritorio.</span>
+                            </div>
+                        </div>
                     </div>
                 </article>
-            </section>
+            </aside>
         </section>
     </main>
 
@@ -603,28 +612,23 @@
             return money.format(Number(valor) || 0);
         }
 
-        function escapeHtml(value) {
-            return String(value ?? '').replace(/[&<>"']/g, char => ({
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#39;'
-            }[char]));
-        }
-
-        function fechaCL(offsetDias = 0) {
-            const fecha = new Date();
-            fecha.setDate(fecha.getDate() + offsetDias);
-            return fecha.toLocaleDateString('es-CL');
-        }
-
         function esFechaHoy(fecha) {
-            return fecha === fechaCL(0);
+            return fecha === new Date().toLocaleDateString('es-CL');
         }
 
-        function esFechaAyer(fecha) {
-            return fecha === fechaCL(-1);
+        function actualizarDashboard() {
+            const ahora = new Date();
+            let horas = ahora.getHours();
+            const minutos = String(ahora.getMinutes()).padStart(2, '0');
+            const periodo = horas >= 12 ? 'PM' : 'AM';
+            horas = horas % 12 || 12;
+            document.getElementById('relojHome').innerText = `${String(horas).padStart(2, '0')}:${minutos}`;
+            document.getElementById('relojPeriodo').innerText = periodo;
+            document.getElementById('fechaHome').innerText = ahora.toLocaleDateString('es-CL', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long'
+            });
         }
 
         async function cargarDashboardOperativo() {
@@ -640,108 +644,102 @@
                 const pedidos = await pedidosRes.json();
 
                 const ventasHoy = ventas.filter(v => esFechaHoy(v.fecha));
-                const ventasAyer = ventas.filter(v => esFechaAyer(v.fecha));
                 const totalHoy = ventasHoy.reduce((sum, v) => sum + Number(v.total || 0), 0);
-                const totalAyer = ventasAyer.reduce((sum, v) => sum + Number(v.total || 0), 0);
                 const ticketPromedio = ventasHoy.length ? totalHoy / ventasHoy.length : 0;
-                const clientesHoy = new Set(ventasHoy.map(v => v.cliente || 'Publico general')).size;
                 const stockCritico = productos.filter(p => Number(p.stock || 0) <= 5);
                 const sinStock = productos.filter(p => Number(p.stock || 0) <= 0);
-                const tendencia = totalAyer > 0 ? ((totalHoy - totalAyer) / totalAyer) * 100 : 0;
 
                 document.getElementById('metricVentas').innerText = formatoMonto(totalHoy);
-                document.getElementById('statTransacciones').innerText = ventasHoy.length;
+                document.getElementById('metricVentasNota').innerText = `${ventasHoy.length} transaccion${ventasHoy.length === 1 ? '' : 'es'}`;
                 document.getElementById('metricTicket').innerText = formatoMonto(ticketPromedio);
-                document.getElementById('statClientes').innerText = clientesHoy;
-                document.getElementById('stockCriticalCount').innerText = stockCritico.length;
-                document.getElementById('pedidosPendingCount').innerText = pedidos.length;
-                renderTendencia(tendencia, totalAyer);
-                renderVentasRecientes(ventas.slice(0, 3));
-                renderAlertasRecientes({ stockCritico, sinStock, pedidos, ventasHoy });
+                document.getElementById('metricStock').innerText = stockCritico.length;
+                document.getElementById('metricStockNota').innerText = sinStock.length ? `${sinStock.length} sin stock` : 'Productos bajo minimo';
+                document.getElementById('metricPedidos').innerText = pedidos.length;
+
+                renderVentasRecientes(ventas.slice(0, 5));
+                renderAlertas({ stockCritico, sinStock, pedidos, ventasHoy });
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             } catch (error) {
                 console.error('Error cargando dashboard', error);
-                document.getElementById('ventasRecientes').innerHTML = '<tr><td colspan="6" class="empty-state">No se pudieron cargar las ventas.</td></tr>';
-                document.getElementById('alertasRecientes').innerHTML = '<div class="empty-state">No se pudieron cargar las alertas.</div>';
+                document.getElementById('ventasRecientes').innerHTML = '<div class="empty-state">No se pudieron cargar las ventas.</div>';
+                document.getElementById('alertasOperativas').innerHTML = '<div class="empty-state">No se pudieron cargar las alertas.</div>';
             }
-        }
-
-        function renderTendencia(tendencia, totalAyer) {
-            const contenedor = document.getElementById('metricTrend');
-            const valor = totalAyer > 0 ? `${tendencia >= 0 ? '+' : ''}${tendencia.toFixed(1)}%` : '0%';
-            contenedor.style.color = tendencia < 0 ? '#ff3b30' : '#28a955';
-            contenedor.innerHTML = `
-                <i data-lucide="${tendencia < 0 ? 'trending-down' : 'trending-up'}"></i>
-                <strong>${valor}</strong>
-                <span>vs ayer</span>
-            `;
         }
 
         function renderVentasRecientes(ventas) {
             const contenedor = document.getElementById('ventasRecientes');
             if (!ventas.length) {
-                contenedor.innerHTML = '<tr><td colspan="6" class="empty-state">Aun no hay ventas registradas.</td></tr>';
+                contenedor.innerHTML = '<div class="empty-state">Aun no hay ventas registradas.</div>';
                 return;
             }
 
             contenedor.innerHTML = ventas.map(v => `
-                <tr>
-                    <td>${String(v.id).padStart(6, '0')}</td>
-                    <td>${escapeHtml((v.hora || '--').slice(0, 5))}</td>
-                    <td>${escapeHtml(v.cliente || 'Publico general')}</td>
-                    <td>${formatoMonto(v.total)}</td>
-                    <td>${escapeHtml(v.metodoPago || 'Venta')}</td>
-                    <td><span class="status-badge">Completada</span></td>
-                </tr>
+                <div class="sale-row">
+                    <div>
+                        <div class="sale-title">Venta #${v.id}</div>
+                        <div class="sale-subtitle">${v.fecha || '--'} · ${v.hora || '--'}</div>
+                    </div>
+                    <div class="sale-method">${v.metodoPago || 'Venta'}</div>
+                    <div class="sale-total">${formatoMonto(v.total)}</div>
+                </div>
             `).join('');
         }
 
-        function renderAlertasRecientes({ stockCritico, sinStock, pedidos, ventasHoy }) {
+        function renderAlertas({ stockCritico, sinStock, pedidos, ventasHoy }) {
             const alertas = [];
             if (sinStock.length) {
                 alertas.push({
                     tipo: 'danger',
+                    icono: 'package-x',
                     titulo: `${sinStock.length} producto${sinStock.length === 1 ? '' : 's'} sin stock`,
-                    tiempo: 'Ahora'
+                    texto: 'Revisa bodega antes de vender.'
                 });
             }
 
             if (stockCritico.length) {
-                const muestra = stockCritico[0]?.nombre ? `${stockCritico[0].nombre} - ` : '';
                 alertas.push({
-                    tipo: 'danger',
-                    titulo: `${muestra}Stock critico`,
-                    tiempo: 'Hace 10 min'
+                    tipo: 'warning',
+                    icono: 'triangle-alert',
+                    titulo: `${stockCritico.length} producto${stockCritico.length === 1 ? '' : 's'} con stock bajo`,
+                    texto: stockCritico.slice(0, 3).map(p => p.nombre).join(', ')
                 });
             }
 
             if (pedidos.length) {
                 alertas.push({
-                    tipo: 'warning',
-                    titulo: `Pedido #${String(pedidos[0]?.id || '00045').padStart(5, '0')} pendiente de cobro`,
-                    tiempo: 'Hace 25 min'
+                    tipo: '',
+                    icono: 'clipboard-list',
+                    titulo: `${pedidos.length} pedido${pedidos.length === 1 ? '' : 's'} en cola`,
+                    texto: 'Hay ventas pendientes por cobrar.'
                 });
             }
 
-            alertas.push({
-                tipo: 'info',
-                titulo: 'Actualizacion disponible',
-                tiempo: 'Hace 1 h'
-            });
+            if (!ventasHoy.length) {
+                alertas.push({
+                    tipo: '',
+                    icono: 'sun',
+                    titulo: 'Dia sin ventas registradas',
+                    texto: 'Cuando vendas, el resumen se actualizara aqui.'
+                });
+            }
 
-            if (!ventasHoy.length && !stockCritico.length && !pedidos.length) {
-                alertas.unshift({
+            if (!alertas.length) {
+                alertas.push({
                     tipo: 'success',
-                    titulo: 'Sistema listo para comenzar ventas',
-                    tiempo: 'Hoy'
+                    icono: 'check-circle-2',
+                    titulo: 'Todo al dia',
+                    texto: 'No hay alertas operativas importantes.'
                 });
             }
 
-            document.getElementById('alertasRecientes').innerHTML = alertas.slice(0, 4).map(alerta => `
-                <div class="recent-alert">
-                    <span class="alert-dot ${alerta.tipo}"></span>
-                    <strong>${escapeHtml(alerta.titulo)}</strong>
-                    <time>${escapeHtml(alerta.tiempo)}</time>
+            document.getElementById('alertCount').innerText = `${alertas.length} activa${alertas.length === 1 ? '' : 's'}`;
+            document.getElementById('alertasOperativas').innerHTML = alertas.map(alerta => `
+                <div class="alert-item ${alerta.tipo}">
+                    <div class="alert-icon"><i data-lucide="${alerta.icono}"></i></div>
+                    <div>
+                        <strong>${alerta.titulo}</strong>
+                        <span>${alerta.texto}</span>
+                    </div>
                 </div>
             `).join('');
         }
@@ -749,6 +747,10 @@
         function cargarDatosUsuario() {
             try {
                 const usrInfo = JSON.parse(localStorage.getItem('gvi_user'));
+                if (usrInfo?.nombre) {
+                    document.getElementById('homeSubtitle').innerText = `Panel operativo de ${usrInfo.nombre}. Revisa ventas, stock, caja y acciones rapidas.`;
+                    document.getElementById('estadoUsuario').innerText = `${usrInfo.nombre} · ${usrInfo.rol || 'Perfil activo'}`;
+                }
                 if (usrInfo && usrInfo.rol !== 'ADMIN') {
                     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
                 }
@@ -756,6 +758,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            actualizarDashboard();
+            setInterval(actualizarDashboard, 1000);
             cargarDatosUsuario();
             cargarDashboardOperativo();
             setInterval(cargarDashboardOperativo, 5000);
